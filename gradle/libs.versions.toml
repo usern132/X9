@@ -1,8 +1,10 @@
 [versions]
+activityKtx = "1.12.3"
 agp = "8.13.2"
 kotlin = "2.3.0"
 coreKtx = "1.17.0"
 appcompat = "1.7.1"
+lifecycleViewmodelKtx = "2.10.0"
 material = "1.13.0"
 activity = "1.12.3"
 constraintlayout = "2.2.1"
@@ -10,8 +12,10 @@ detekt = "2.0.0-alpha.2"
 ktlintGradle = "14.0.1"
 
 [libraries]
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }

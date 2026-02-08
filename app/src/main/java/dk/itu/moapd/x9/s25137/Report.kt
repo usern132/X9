@@ -1,3 +1,5 @@
+package dk.itu.moapd.x9.s25137
+
 import java.util.Date
 
 data class Report(

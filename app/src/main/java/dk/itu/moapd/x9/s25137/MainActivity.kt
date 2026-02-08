@@ -1,8 +1,11 @@
 package dk.itu.moapd.x9.s25137
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,15 +15,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val reportDateInput = binding.reportDateInput
-    private val reportTypeInput = binding.reportTypeInput
-    private val reportTitleInput = binding.reportTitleInput
-    private val reportLocationInput = binding.reportLocationInput
-    private val reportDescriptionInput = binding.reportDescriptionInput
-    private val severityRadioGroup = binding.severityRadioGroup
-    private val submitButton = binding.submitButton
+    private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,18 +32,52 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val reportTitleInput = binding.reportTitleInput
+        val reportLocationInput = binding.reportLocationInput
+        val reportDateInput = binding.reportDateInput
+        val reportTypeInput = binding.reportTypeInput
+        val reportDescriptionInput = binding.reportDescriptionInput
+        val reportSeverityRadioGroup = binding.reportSeverityRadioGroup
+        val submitButton = binding.submitButton
+
+        var reportDate = Date(System.currentTimeMillis())
+
         reportDateInput.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker().build()
             datePicker.show(supportFragmentManager, "datePicker")
             datePicker.addOnPositiveButtonClickListener { selection ->
-                val date = Date(selection)
+                reportDate = Date(selection)
                 val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                binding.reportDateInput.setText(format.format(date))
+                binding.reportDateInput.setText(format.format(reportDate))
             }
         }
 
         val items = resources.getStringArray(R.array.report_types)
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
         binding.reportTypeInput.setAdapter(adapter)
+
+        submitButton.setOnClickListener {
+            val savedReport = Report(
+                title = reportTitleInput.text.toString(),
+                location = reportLocationInput.text.toString(),
+                date = reportDate,
+                type = when (reportTypeInput.text.toString()) {
+                    items[0] -> Type.SPEED_CAMERA
+                    items[1] -> Type.HEAVY_TRAFFIC
+                    items[2] -> Type.ROAD_INCIDENTS
+                    items[3] -> Type.BROKEN_VEHICLES
+                    else -> Type.OTHER
+                },
+                description = reportDescriptionInput.text.toString(),
+                severity = when (reportSeverityRadioGroup.checkedRadioButtonId) {
+                    R.id.minor_button -> Severity.MINOR
+                    R.id.moderate_button -> Severity.MODERATE
+                    else -> Severity.MAJOR
+                }
+            )
+            Log.d(TAG, "Report saved successfully!\n$savedReport")
+            AlertDialog.Builder(this).setTitle("Report").setMessage(savedReport.toString())
+                .setPositiveButton("OK") { _, _ -> }.show()
+        }
     }
 }
