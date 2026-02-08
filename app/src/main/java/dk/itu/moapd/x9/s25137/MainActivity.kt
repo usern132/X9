@@ -14,6 +14,13 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val reportDateInput = binding.reportDateInput
+    private val reportTypeInput = binding.reportTypeInput
+    private val reportTitleInput = binding.reportTitleInput
+    private val reportLocationInput = binding.reportLocationInput
+    private val reportDescriptionInput = binding.reportDescriptionInput
+    private val severityRadioGroup = binding.severityRadioGroup
+    private val submitButton = binding.submitButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        binding.reportDateInput.setOnClickListener {
+        reportDateInput.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker().build()
             datePicker.show(supportFragmentManager, "datePicker")
             datePicker.addOnPositiveButtonClickListener { selection ->
