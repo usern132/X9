@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">X9</string>
+    <string name="report_title">Report title</string>
+    <string name="report_location">Report location</string>
+    <string name="report_date">Report date</string>
+    <string name="report_type">Report type</string>
+    <string-array name="report_types">
+        <item>Speed Camera</item>
+        <item>Heavy Traffic</item>
+        <item>Road Incidents</item>
+        <item>Broken Vehicles</item>
+        <item>Other</item>
+    </string-array>
+    <string name="report_description">Report description</string>
+    <string name="minor">Minor</string>
+    <string name="moderate">Moderate</string>
+    <string name="major">Major</string>
+    <string name="submit">Submit</string>
 </resources>
