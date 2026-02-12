@@ -16,4 +16,6 @@
     <string name="moderate">Moderate</string>
     <string name="major">Major</string>
     <string name="submit">Submit</string>
+
+    <string name="field_is_required">This field is required.</string>
 </resources>
