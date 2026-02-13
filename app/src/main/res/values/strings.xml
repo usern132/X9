@@ -18,4 +18,5 @@
     <string name="submit">Submit</string>
 
     <string name="field_is_required">This field is required.</string>
+    <string name="no_report_yet">No report yet!</string>
 </resources>
