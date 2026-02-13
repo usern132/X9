@@ -4,5 +4,5 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
 class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
-
+    var savedReportString: String? = null
 }

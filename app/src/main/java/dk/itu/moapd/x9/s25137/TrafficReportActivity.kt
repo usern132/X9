@@ -22,6 +22,8 @@ import java.util.Locale
 
 const val TAG = "TrafficReportActivity"
 
+const val SAVED_REPORT_EXTRA = "dk.itu.moapd.x9.s25137.saved_report"
+
 class TrafficReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTrafficReportBinding
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
@@ -38,6 +40,8 @@ class TrafficReportActivity : AppCompatActivity() {
     private lateinit var reportDescriptionInputLayout: TextInputLayout
     private lateinit var reportSeverityRadioGroup: RadioGroup
     private lateinit var submitButton: Button
+
+    private var savedReport: Report? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +87,7 @@ class TrafficReportActivity : AppCompatActivity() {
             val areThereEmptyFields = checkForEmptyFields()
             if (areThereEmptyFields) return@setOnClickListener
 
-            val savedReport = Report(
+            savedReport = Report(
                 title = reportTitleInput.text.toString(),
                 location = reportLocationInput.text.toString(),
                 date = reportDate,
@@ -102,6 +106,8 @@ class TrafficReportActivity : AppCompatActivity() {
                 }
             )
             Log.d(TAG, "Report saved successfully!\n$savedReport")
+            val data = intent.putExtra(SAVED_REPORT_EXTRA, savedReport.toString())
+            setResult(RESULT_OK, data)
             AlertDialog.Builder(this).setTitle("Report").setMessage(savedReport.toString())
                 .setPositiveButton("OK") { _, _ -> }.show()
         }
