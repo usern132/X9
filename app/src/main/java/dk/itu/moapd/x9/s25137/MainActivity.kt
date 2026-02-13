@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.s25137
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate() called")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -47,5 +49,25 @@ class MainActivity : AppCompatActivity() {
         binding.reportTextView.text =
             mainActivityViewModel.savedReportString ?: getString(R.string.no_report_yet)
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
     }
 }
