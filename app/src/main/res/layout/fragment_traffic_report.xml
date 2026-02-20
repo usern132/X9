@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".TrafficReportActivity">
+    tools:context=".TrafficReportFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/report_type_input_layout"

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="dk.itu.moapd.x9.s25137.DashboardFragment"
+        android:label="fragment_dashboard"
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/show_traffic_report_form"
+            app:destination="@id/trafficReportFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/trafficReportFragment"
+        android:name="dk.itu.moapd.x9.s25137.TrafficReportFragment"
+        android:label="fragment_traffic_report"
+        tools:layout="@layout/fragment_traffic_report" />
+</navigation>

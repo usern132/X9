@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TrafficReportActivity"
+            android:name=".TrafficReportFragment"
             android:exported="false"></activity>
     </application>
 

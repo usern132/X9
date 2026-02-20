@@ -2,31 +2,31 @@ package dk.itu.moapd.x9.s25137
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.RadioGroup
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import dk.itu.moapd.x9.s25137.databinding.ActivityTrafficReportBinding
+import dk.itu.moapd.x9.s25137.databinding.FragmentTrafficReportBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-const val TAG = "TrafficReportActivity"
+private const val TAG = "TrafficReportFragment"
 
-const val SAVED_REPORT_EXTRA = "dk.itu.moapd.x9.s25137.saved_report"
-
-class TrafficReportActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityTrafficReportBinding
-    private val mainActivityViewModel: MainActivityViewModel by viewModels()
+class TrafficReportFragment : Fragment() {
+    private var _binding: FragmentTrafficReportBinding? = null
+    private val binding
+        get() = checkNotNull(_binding) {
+            "Cannot access binding because it is null. Is the view visible?"
+        }
 
     private lateinit var reportTitleInput: TextInputEditText
     private lateinit var reportTitleInputLayout: TextInputLayout
@@ -35,7 +35,7 @@ class TrafficReportActivity : AppCompatActivity() {
     private lateinit var reportDateInput: TextInputEditText
     private lateinit var reportDateInputLayout: TextInputLayout
     private lateinit var reportTypeInput: AutoCompleteTextView
-    private lateinit var reportTypeInputLayout: TextInputLayout // ???
+    private lateinit var reportTypeInputLayout: TextInputLayout
     private lateinit var reportDescriptionInput: TextInputEditText
     private lateinit var reportDescriptionInputLayout: TextInputLayout
     private lateinit var reportSeverityRadioGroup: RadioGroup
@@ -43,16 +43,15 @@ class TrafficReportActivity : AppCompatActivity() {
 
     private var savedReport: Report? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityTrafficReportBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.traffic_report)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTrafficReportBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         reportTitleInput = binding.reportTitleInput
         reportTitleInputLayout = binding.reportTitleInputLayout
@@ -71,7 +70,7 @@ class TrafficReportActivity : AppCompatActivity() {
 
         reportDateInput.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker().build()
-            datePicker.show(supportFragmentManager, "datePicker")
+            datePicker.show(parentFragmentManager, "datePicker")
             datePicker.addOnPositiveButtonClickListener { selection ->
                 reportDate = Date(selection)
                 val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -80,7 +79,7 @@ class TrafficReportActivity : AppCompatActivity() {
         }
 
         val items = resources.getStringArray(R.array.report_types)
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
         binding.reportTypeInput.setAdapter(adapter)
 
         submitButton.setOnClickListener {
@@ -106,11 +105,14 @@ class TrafficReportActivity : AppCompatActivity() {
                 }
             )
             Log.d(TAG, "Report saved successfully!\n$savedReport")
-            val data = intent.putExtra(SAVED_REPORT_EXTRA, savedReport.toString())
-            setResult(RESULT_OK, data)
-            AlertDialog.Builder(this).setTitle("Report").setMessage(savedReport.toString())
-                .setPositiveButton("OK") { _, _ -> }.show()
+            AlertDialog.Builder(requireContext()).setTitle("Report")
+                .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun checkForEmptyFields(): Boolean {
