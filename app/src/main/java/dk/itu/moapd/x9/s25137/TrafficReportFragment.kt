@@ -46,12 +46,14 @@ class TrafficReportFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        Log.d(TAG, "onCreateView() called")
         _binding = FragmentTrafficReportBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated() called")
 
         reportTitleInput = binding.reportTitleInput
         reportTitleInputLayout = binding.reportTitleInputLayout
@@ -110,8 +112,24 @@ class TrafficReportFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate() called")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d(TAG, "onDestroyView() called")
         _binding = null
     }
 
