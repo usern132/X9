@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -27,7 +28,7 @@ class TrafficReportFragment : Fragment() {
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-
+    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
     private lateinit var reportTitleInput: TextInputEditText
     private lateinit var reportTitleInputLayout: TextInputLayout
     private lateinit var reportLocationInput: TextInputEditText
@@ -106,6 +107,7 @@ class TrafficReportFragment : Fragment() {
                     else -> Severity.MAJOR
                 }
             )
+            mainActivityViewModel.savedReportString = savedReport.toString()
             Log.d(TAG, "Report saved successfully!\n$savedReport")
             AlertDialog.Builder(requireContext()).setTitle("Report")
                 .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
