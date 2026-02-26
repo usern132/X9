@@ -109,7 +109,7 @@ class TrafficReportFragment : Fragment() {
             )
             mainActivityViewModel.savedReportString = savedReport.toString()
             Log.d(TAG, "Report saved successfully!\n$savedReport")
-            AlertDialog.Builder(requireContext()).setTitle("Report")
+            AlertDialog.Builder(requireContext()).setTitle(R.string.report_saved)
                 .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
         }
     }
