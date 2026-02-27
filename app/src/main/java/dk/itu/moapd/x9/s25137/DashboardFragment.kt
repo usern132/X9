@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
 
 private const val TAG = "DashboardFragment"
@@ -31,6 +32,12 @@ class DashboardFragment : Fragment() {
     ): View? {
         Log.d(TAG, "onCreateView() called")
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        binding.trafficReportRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        val reports = mainActivityViewModel.trafficReports
+        val adapter = TrafficReportListAdapter(reports)
+        binding.trafficReportRecyclerView.adapter = adapter
+
         return binding.root
     }
 
@@ -40,9 +47,6 @@ class DashboardFragment : Fragment() {
         binding.trafficReportButton.setOnClickListener {
             findNavController().navigate(R.id.show_traffic_report_form)
         }
-
-        binding.reportTextView.text =
-            mainActivityViewModel.savedReportString ?: getString(R.string.no_report_yet)
     }
 
     override fun onStart() {

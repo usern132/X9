@@ -2,6 +2,7 @@
 activityKtx = "1.12.3"
 agp = "8.13.2"
 androidxNavigationFragmentKtx = "2.4.1"
+faker = "2.0.4"
 fragmentKtx = "1.4.1"
 kotlin = "2.3.0"
 coreKtx = "1.17.0"
@@ -25,6 +26,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-fragment-ktx-v241 = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+faker = { module = "io.bloco:faker", version.ref = "faker" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
