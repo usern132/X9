@@ -9,9 +9,10 @@ private val TAG = "MainActivityViewModel"
 
 class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val trafficReports = mutableListOf<Report>()
-    val faker = Faker()
 
-    init {
+    fun addFakeReports(): Unit {
+        val faker = Faker()
+
         for (i in 1..100) {
             val trafficReport = Report(
                 title = faker.lorem.sentence(wordCount = 3),

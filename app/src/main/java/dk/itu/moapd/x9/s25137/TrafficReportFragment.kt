@@ -107,6 +107,7 @@ class TrafficReportFragment : Fragment() {
                     else -> Severity.MAJOR
                 }
             )
+            savedReport?.let { mainActivityViewModel.trafficReports.add(it) }
             Log.d(TAG, "Report saved successfully!\n$savedReport")
             AlertDialog.Builder(requireContext()).setTitle(R.string.report_saved)
                 .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
