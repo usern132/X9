@@ -3,20 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/report_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title"
         tools:text="Broken car in road" />
 
     <TextView
-        android:id="@+id/report_date"
+        android:id="@+id/report_subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        tools:text="11/02/2023" />
+        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
+        tools:text="11/02/2023 · Barcelona" />
 
 </LinearLayout>

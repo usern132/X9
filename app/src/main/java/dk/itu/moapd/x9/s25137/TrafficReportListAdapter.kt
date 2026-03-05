@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137
 
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +26,8 @@ class TrafficReportListAdapter(
         val report = trafficReports[position]
         holder.apply {
             binding.reportTitle.text = report.title
-            binding.reportDate.text = report.date.toString()
+            val dateText = DateFormat.format("dd/MM/yyyy", report.date)
+            binding.reportSubtitle.text = "$dateText · ${report.location}"
         }
     }
 
