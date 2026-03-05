@@ -9,9 +9,10 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.RadioGroup
-import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -109,8 +110,10 @@ class TrafficReportFragment : Fragment() {
             )
             savedReport?.let { mainActivityViewModel.trafficReports.add(it) }
             Log.d(TAG, "Report saved successfully!\n$savedReport")
-            AlertDialog.Builder(requireContext()).setTitle(R.string.report_saved)
-                .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
+            Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
+//            AlertDialog.Builder(requireContext()).setTitle(R.string.report_saved)
+//                .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
         }
     }
 
