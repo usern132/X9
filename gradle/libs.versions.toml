@@ -1,21 +1,23 @@
 [versions]
-activityKtx = "1.12.3"
+activityKtx = "1.12.4"
 agp = "8.13.2"
-androidxNavigationFragmentKtx = "2.4.1"
+androidxNavigationFragmentKtx = "2.9.7"
 faker = "2.0.4"
-fragmentKtx = "1.4.1"
-kotlin = "2.3.0"
+fragmentKtx = "1.8.9"
+kotlin = "2.3.10"
 coreKtx = "1.17.0"
 appcompat = "1.7.1"
 lifecycleViewmodelKtx = "2.10.0"
 material = "1.13.0"
-activity = "1.12.3"
+activity = "1.12.4"
 constraintlayout = "2.2.1"
 detekt = "2.0.0-alpha.2"
 ktlintGradle = "14.0.1"
 navigationFragmentKtx = "2.9.7"
 fragment = "1.8.9"
 recyclerview = "1.4.0"
+composeBom = "2026.02.01"
+activityCompose = "1.12.4"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -27,15 +29,25 @@ androidx-navigation-fragment-ktx-v241 = { module = "androidx.navigation:navigati
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 faker = { module = "io.bloco:faker", version.ref = "faker" }
+graphics-x-x0-x = { module = "libs.androidx.compose.ui.graphics:1.10.3" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
