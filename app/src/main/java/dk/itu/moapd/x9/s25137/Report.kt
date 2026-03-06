@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137
 
+import io.bloco.faker.Faker
 import java.util.Date
 
 data class Report(
@@ -17,6 +18,26 @@ data class Report(
                 "Type: ${enumToString(type)}\n" +
                 "Description: $description\n" +
                 "Severity: ${enumToString(severity)}"
+
+    companion object {
+        fun generateRandomReports(n: Int = 100): List<Report> {
+            val faker = Faker()
+            val trafficReports = mutableListOf<Report>()
+
+            for (i in 1..n) {
+                val trafficReport = Report(
+                    title = faker.lorem.sentence(wordCount = 3),
+                    location = faker.address.streetAddress(),
+                    date = faker.date.backward(),
+                    type = Type.entries.random(),
+                    description = faker.lorem.paragraphs(1).toString(),
+                    severity = Severity.entries.random()
+                )
+                trafficReports.add(trafficReport)
+            }
+            return trafficReports
+        }
+    }
 }
 
 enum class Type {
