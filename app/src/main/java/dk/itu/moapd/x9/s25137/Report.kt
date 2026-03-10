@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137
 
+import androidx.annotation.StringRes
 import io.bloco.faker.Faker
 import java.util.Date
 
@@ -15,9 +16,9 @@ data class Report(
         "Title: $title\n" +
                 "Location: $location\n" +
                 "Date: $date\n" +
-                "Type: ${enumToString(type)}\n" +
+                "Type: ${type.name}\n" +
                 "Description: $description\n" +
-                "Severity: ${enumToString(severity)}"
+                "Severity: ${severity.name}"
 
     companion object {
         fun generateRandomReports(n: Int = 100): List<Report> {
@@ -40,16 +41,20 @@ data class Report(
     }
 }
 
-enum class Type {
-    SPEED_CAMERA,
-    HEAVY_TRAFFIC,
-    ROAD_INCIDENTS,
-    BROKEN_VEHICLES,
-    OTHER;
+enum class Type(
+    @StringRes val nameResId: Int
+) {
+    SPEED_CAMERA(R.string.speed_camera),
+    HEAVY_TRAFFIC(R.string.heavy_traffic),
+    ROAD_INCIDENTS(R.string.road_incidents),
+    BROKEN_VEHICLES(R.string.broken_vehicles),
+    OTHER(R.string.other)
 }
 
-enum class Severity {
-    MINOR,
-    MODERATE,
-    MAJOR
+enum class Severity(
+    @StringRes val nameResId: Int
+) {
+    MINOR(R.string.minor),
+    MODERATE(R.string.moderate),
+    MAJOR(R.string.major)
 }

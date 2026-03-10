@@ -4,13 +4,21 @@
     <string name="report_location">Report location</string>
     <string name="report_date">Report date</string>
     <string name="report_type">Report type</string>
+
+    <string name="speed_camera">Speed camera</string>
+    <string name="heavy_traffic">Heavy traffic</string>
+    <string name="road_incidents">Road incidents</string>
+    <string name="broken_vehicles">Broken vehicles</string>
+    <string name="other">Other</string>
+
     <string-array name="report_types">
-        <item>Speed Camera</item>
-        <item>Heavy Traffic</item>
-        <item>Road Incidents</item>
-        <item>Broken Vehicles</item>
-        <item>Other</item>
+        <item>@string/speed_camera</item>
+        <item>@string/heavy_traffic</item>
+        <item>@string/road_incidents</item>
+        <item>@string/broken_vehicles</item>
+        <item>@string/other</item>
     </string-array>
+
     <string name="report_description">Report description</string>
     <string name="minor">Minor</string>
     <string name="moderate">Moderate</string>

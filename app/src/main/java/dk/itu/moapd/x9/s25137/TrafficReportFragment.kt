@@ -82,8 +82,8 @@ class TrafficReportFragment : Fragment() {
             }
         }
 
-        val items = resources.getStringArray(R.array.report_types)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
+        val typeNames = Type.entries.map { getString(it.nameResId) }
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, typeNames)
         binding.reportTypeInput.setAdapter(adapter)
 
         submitButton.setOnClickListener {
@@ -94,13 +94,9 @@ class TrafficReportFragment : Fragment() {
                 title = reportTitleInput.text.toString(),
                 location = reportLocationInput.text.toString(),
                 date = reportDate,
-                type = when (reportTypeInput.text.toString()) {
-                    items[0] -> Type.SPEED_CAMERA
-                    items[1] -> Type.HEAVY_TRAFFIC
-                    items[2] -> Type.ROAD_INCIDENTS
-                    items[3] -> Type.BROKEN_VEHICLES
-                    else -> Type.OTHER
-                },
+                type = Type.entries.find {
+                    getString(it.nameResId) == reportTypeInput.text.toString()
+                } ?: Type.OTHER,
                 description = reportDescriptionInput.text.toString(),
                 severity = when (reportSeverityRadioGroup.checkedRadioButtonId) {
                     R.id.minor_button -> Severity.MINOR
@@ -112,8 +108,6 @@ class TrafficReportFragment : Fragment() {
             Log.d(TAG, "Report saved successfully!\n$savedReport")
             Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
-//            AlertDialog.Builder(requireContext()).setTitle(R.string.report_saved)
-//                .setMessage(savedReport.toString()).setPositiveButton("OK") { _, _ -> }.show()
         }
     }
 
