@@ -1,6 +1,7 @@
-package dk.itu.moapd.x9.s25137
+package dk.itu.moapd.x9.s25137.domain.models
 
 import androidx.annotation.StringRes
+import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
 
@@ -23,10 +24,10 @@ data class Report(
     companion object {
         fun generateRandomReports(n: Int = 100): List<Report> {
             val faker = Faker()
-            val trafficReports = mutableListOf<Report>()
+            val reports = mutableListOf<Report>()
 
             for (i in 1..n) {
-                val trafficReport = Report(
+                val report = Report(
                     title = faker.lorem.sentence(wordCount = 3),
                     location = faker.address.streetAddress(),
                     date = faker.date.backward(),
@@ -34,9 +35,9 @@ data class Report(
                     description = faker.lorem.paragraphs(1).toString(),
                     severity = Severity.entries.random()
                 )
-                trafficReports.add(trafficReport)
+                reports.add(report)
             }
-            return trafficReports
+            return reports
         }
     }
 }

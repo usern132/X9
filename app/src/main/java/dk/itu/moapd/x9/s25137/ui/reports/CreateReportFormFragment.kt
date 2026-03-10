@@ -1,5 +1,6 @@
-package dk.itu.moapd.x9.s25137
+package dk.itu.moapd.x9.s25137.ui.reports
 
+import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,15 +17,19 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import dk.itu.moapd.x9.s25137.databinding.FragmentTrafficReportBinding
+import dk.itu.moapd.x9.s25137.databinding.FragmentCreateReportFormBinding
+import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.domain.models.Severity
+import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val TAG = "TrafficReportFragment"
+private const val TAG = "CreateReportFormFragment"
 
-class TrafficReportFragment : Fragment() {
-    private var _binding: FragmentTrafficReportBinding? = null
+class CreateReportFormFragment : Fragment() {
+    private var _binding: FragmentCreateReportFormBinding? = null
     private val binding
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -49,7 +54,7 @@ class TrafficReportFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         Log.d(TAG, "onCreateView() called")
-        _binding = FragmentTrafficReportBinding.inflate(inflater, container, false)
+        _binding = FragmentCreateReportFormBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -83,7 +88,7 @@ class TrafficReportFragment : Fragment() {
         }
 
         val typeNames = Type.entries.map { getString(it.nameResId) }
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, typeNames)
+        val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, typeNames)
         binding.reportTypeInput.setAdapter(adapter)
 
         submitButton.setOnClickListener {
@@ -99,14 +104,18 @@ class TrafficReportFragment : Fragment() {
                 } ?: Type.OTHER,
                 description = reportDescriptionInput.text.toString(),
                 severity = when (reportSeverityRadioGroup.checkedRadioButtonId) {
-                    R.id.minor_button -> Severity.MINOR
-                    R.id.moderate_button -> Severity.MODERATE
+                    dk.itu.moapd.x9.s25137.R.id.minor_button -> Severity.MINOR
+                    dk.itu.moapd.x9.s25137.R.id.moderate_button -> Severity.MODERATE
                     else -> Severity.MAJOR
                 }
             )
-            savedReport?.let { mainActivityViewModel.trafficReports.add(it) }
+            savedReport?.let { mainActivityViewModel.reports.add(it) }
             Log.d(TAG, "Report saved successfully!\n$savedReport")
-            Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                dk.itu.moapd.x9.s25137.R.string.report_saved,
+                Toast.LENGTH_SHORT
+            ).show()
             findNavController().popBackStack()
         }
     }
@@ -144,7 +153,7 @@ class TrafficReportFragment : Fragment() {
         for ((input, layout) in fields) {
             if (input.text.toString().isBlank()) {
                 areThereEmptyFields = true
-                layout.error = getString(R.string.field_is_required)
+                layout.error = getString(dk.itu.moapd.x9.s25137.R.string.field_is_required)
             } else {
                 layout.error = null
             }

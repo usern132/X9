@@ -1,21 +1,24 @@
-package dk.itu.moapd.x9.s25137
+package dk.itu.moapd.x9.s25137.ui.main
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.domain.models.Severity
+import dk.itu.moapd.x9.s25137.domain.models.Type
 import io.bloco.faker.Faker
 
-private val TAG = "MainActivityViewModel"
+private const val TAG = "ReportViewModel"
 
 class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
-    val trafficReports = mutableStateListOf<Report>()
+    val reports = mutableStateListOf<Report>()
 
     fun addFakeReports() {
         val faker = Faker()
 
         for (i in 1..100) {
-            val trafficReport = Report(
+            val report = Report(
                 title = faker.lorem.sentence(wordCount = 3),
                 location = faker.address.streetAddress(),
                 date = faker.date.backward(),
@@ -23,13 +26,13 @@ class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : Vi
                 description = faker.lorem.paragraphs(1).toString(),
                 severity = Severity.entries.random()
             )
-            trafficReports.add(trafficReport)
+            reports.add(report)
         }
-        Log.d(TAG, trafficReports.toString())
+        Log.d(TAG, reports.toString())
     }
 
     fun addReport(report: Report) {
         // Add a report at the top of the list
-        trafficReports.add(0, report)
+        reports.add(0, report)
     }
 }

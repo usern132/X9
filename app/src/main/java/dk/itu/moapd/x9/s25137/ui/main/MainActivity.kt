@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.s25137
+package dk.itu.moapd.x9.s25137.ui.main
 
 import android.os.Bundle
 import android.util.Log

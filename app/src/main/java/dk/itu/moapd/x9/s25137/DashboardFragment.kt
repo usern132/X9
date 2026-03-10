@@ -10,7 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
-import dk.itu.moapd.x9.s25137.ui.TrafficReportList
+import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
+import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 
 private const val TAG = "DashboardFragment"
 
@@ -38,7 +39,7 @@ class DashboardFragment : Fragment() {
             // Dispose the Composition when the view's LifecycleOwner is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                TrafficReportList(trafficReports = mainActivityViewModel.trafficReports)
+                ReportList(reports = mainActivityViewModel.reports)
             }
         }
 
@@ -48,8 +49,8 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated() called")
-        binding.trafficReportButton.setOnClickListener {
-            findNavController().navigate(R.id.show_traffic_report_form)
+        binding.createReportButton.setOnClickListener {
+            findNavController().navigate(R.id.show_create_report_form)
         }
     }
 
