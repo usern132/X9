@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -13,12 +14,16 @@ fun TrafficReportList(
     modifier: Modifier = Modifier,
     trafficReports: List<Report> = generateRandomReports()
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
         items(trafficReports) { report ->
             TrafficReportListItem(report = report)
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

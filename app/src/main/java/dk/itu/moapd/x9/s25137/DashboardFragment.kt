@@ -5,11 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
+import dk.itu.moapd.x9.s25137.ui.TrafficReportList
 
 private const val TAG = "DashboardFragment"
 
@@ -32,11 +33,15 @@ class DashboardFragment : Fragment() {
     ): View? {
         Log.d(TAG, "onCreateView() called")
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        binding.trafficReportRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        val reports = mainActivityViewModel.trafficReports
-        val adapter = TrafficReportListAdapter(reports)
-        binding.trafficReportRecyclerView.adapter = adapter
+        mainActivityViewModel.addFakeReports()
+        binding.reportsList.apply {
+            // Dispose the Composition when the view's LifecycleOwner is destroyed
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                TrafficReportList(trafficReports = mainActivityViewModel.trafficReports)
+            }
+        }
 
         return binding.root
     }
