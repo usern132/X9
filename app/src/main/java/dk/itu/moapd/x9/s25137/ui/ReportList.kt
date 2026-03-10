@@ -24,7 +24,6 @@ fun TrafficReportList(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun TrafficReportListPreview() {

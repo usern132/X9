@@ -34,7 +34,6 @@ class DashboardFragment : Fragment() {
         Log.d(TAG, "onCreateView() called")
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
-        mainActivityViewModel.addFakeReports()
         binding.reportsList.apply {
             // Dispose the Composition when the view's LifecycleOwner is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
