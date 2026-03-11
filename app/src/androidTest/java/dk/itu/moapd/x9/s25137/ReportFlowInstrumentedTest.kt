@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.s25137
 
 import android.view.View
 import android.widget.TextView
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
@@ -38,7 +39,7 @@ class ReportFlowInstrumentedTest {
     }
 
     @Test
-    fun savingValidReportReturnsToListAndShowsNewReport() {
+    fun savingValidReportReturnsToListAndShowsNewReportAtTheTop() {
         val reportTitle = "UI test report ${System.currentTimeMillis()}"
         val reportLocation = "Copenhagen"
         val reportDate = "10/03/2026"
@@ -54,8 +55,8 @@ class ReportFlowInstrumentedTest {
             composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
         }
 
-        composeRule.onNodeWithText(reportTitle).assertExists()
-        composeRule.onNodeWithText(expectedSubtitle).assertExists()
+        composeRule.onAllNodesWithText(reportTitle)[0].assertIsDisplayed()
+        composeRule.onAllNodesWithText(expectedSubtitle)[0].assertIsDisplayed()
     }
 
     @Test

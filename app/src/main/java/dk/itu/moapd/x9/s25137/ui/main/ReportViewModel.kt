@@ -10,9 +10,14 @@ import dk.itu.moapd.x9.s25137.domain.models.Type
 import io.bloco.faker.Faker
 
 private const val TAG = "ReportViewModel"
+private const val addFakeReports = true
 
 class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val reports = mutableStateListOf<Report>()
+
+    init {
+        if (addFakeReports) addFakeReports()
+    }
 
     fun addFakeReports() {
         val faker = Faker()

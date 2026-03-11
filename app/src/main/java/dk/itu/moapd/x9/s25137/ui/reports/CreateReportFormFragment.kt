@@ -115,7 +115,7 @@ class CreateReportFormFragment : Fragment() {
                     else -> Severity.MAJOR
                 }
             )
-            savedReport?.let { mainActivityViewModel.reports.add(it) }
+            savedReport?.let { mainActivityViewModel.addReport(it) }
             Log.d(TAG, "Report saved successfully!\n$savedReport")
             Toast.makeText(
                 context,
