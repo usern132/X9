@@ -22,6 +22,9 @@
       <SelectionState runConfigName="ReportFlowInstrumentedTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="savingValidReportReturnsToListAndShowsNewReport()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

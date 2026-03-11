@@ -1,11 +1,14 @@
 package dk.itu.moapd.x9.s25137.ui.reports.list
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
@@ -16,17 +19,16 @@ fun ReportListItem(
     report: Report,
     modifier: Modifier = Modifier
 ) {
-    MaterialTheme {
-        Column(modifier = modifier) {
-            Text(
-                text = report.title,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = report.location,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+    Column(modifier = modifier.padding(8.dp)) {
+        Text(
+            text = report.title,
+            style = MaterialTheme.typography.titleMedium
+        )
+        val dateText = DateFormat.format("dd/MM/yyyy", report.date)
+        Text(
+            text = "$dateText · ${report.location}",
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 

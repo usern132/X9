@@ -5,7 +5,7 @@
     android:id="@+id/dashboard"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DashboardFragment">
+    tools:context=".ui.dashboard.DashboardFragment">
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/reports_list"

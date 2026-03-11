@@ -75,15 +75,14 @@ class CreateReportFormFragment : Fragment() {
         reportSeverityRadioGroup = binding.reportSeverityRadioGroup
         submitButton = binding.submitButton
 
-        var reportDate = Date(System.currentTimeMillis())
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         reportDateInput.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker().build()
             datePicker.show(parentFragmentManager, "datePicker")
             datePicker.addOnPositiveButtonClickListener { selection ->
-                reportDate = Date(selection)
-                val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                binding.reportDateInput.setText(format.format(reportDate))
+                val reportDate = Date(selection)
+                binding.reportDateInput.setText(dateFormat.format(reportDate))
             }
         }
 
@@ -94,6 +93,13 @@ class CreateReportFormFragment : Fragment() {
         submitButton.setOnClickListener {
             val areThereEmptyFields = checkForEmptyFields()
             if (areThereEmptyFields) return@setOnClickListener
+
+            val dateString = reportDateInput.text.toString()
+            val reportDate = try {
+                dateFormat.parse(dateString) ?: Date()
+            } catch (e: Exception) {
+                Date()
+            }
 
             savedReport = Report(
                 title = reportTitleInput.text.toString(),

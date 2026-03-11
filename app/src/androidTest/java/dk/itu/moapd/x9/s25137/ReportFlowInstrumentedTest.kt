@@ -40,9 +40,12 @@ class ReportFlowInstrumentedTest {
     @Test
     fun savingValidReportReturnsToListAndShowsNewReport() {
         val reportTitle = "UI test report ${System.currentTimeMillis()}"
+        val reportLocation = "Copenhagen"
+        val reportDate = "10/03/2026"
+        val expectedSubtitle = "$reportDate · $reportLocation"
 
         openCreateReportForm()
-        fillRequiredFields(reportTitle)
+        fillRequiredFields(reportTitle, reportLocation, reportDate)
 
         onView(withId(R.id.submit_button)).perform(click())
 
@@ -50,7 +53,9 @@ class ReportFlowInstrumentedTest {
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
         }
+
         composeRule.onNodeWithText(reportTitle).assertExists()
+        composeRule.onNodeWithText(expectedSubtitle).assertExists()
     }
 
     @Test
@@ -79,19 +84,19 @@ class ReportFlowInstrumentedTest {
         onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
     }
 
-    private fun fillRequiredFields(reportTitle: String) {
+    private fun fillRequiredFields(reportTitle: String, location: String, date: String) {
         onView(withId(R.id.report_title_input)).perform(
             replaceText(reportTitle),
             closeSoftKeyboard()
         )
         onView(withId(R.id.report_location_input)).perform(
-            replaceText("Copenhagen"),
+            replaceText(location),
             closeSoftKeyboard()
         )
-        onView(withId(R.id.report_date_input)).perform(setText("10/03/2026"))
+        onView(withId(R.id.report_date_input)).perform(setText(date))
         onView(withId(R.id.report_type_input)).perform(setText("Other"), closeSoftKeyboard())
         onView(withId(R.id.report_description_input)).perform(
-            replaceText("Synthetic report created by instrumentation test."),
+            replaceText("This is a test report!"),
             closeSoftKeyboard()
         )
         onView(withId(R.id.moderate_button)).perform(click())

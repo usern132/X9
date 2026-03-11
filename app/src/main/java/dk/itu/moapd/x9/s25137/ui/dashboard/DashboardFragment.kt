@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.s25137
+package dk.itu.moapd.x9.s25137.ui.dashboard
 
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
 import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
