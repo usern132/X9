@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.s25137.ui.main
+package dk.itu.moapd.x9.s25137.ui.reports
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf

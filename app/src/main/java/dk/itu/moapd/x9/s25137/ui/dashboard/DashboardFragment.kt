@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
-import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
+import dk.itu.moapd.x9.s25137.ui.reports.MainActivityViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 
 private const val TAG = "DashboardFragment"

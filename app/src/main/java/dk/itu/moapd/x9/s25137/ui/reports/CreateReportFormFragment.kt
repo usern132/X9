@@ -21,7 +21,6 @@ import dk.itu.moapd.x9.s25137.databinding.FragmentCreateReportFormBinding
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
-import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

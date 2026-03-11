@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import dk.itu.moapd.x9.s25137.databinding.FragmentReportDetailsBinding
-import dk.itu.moapd.x9.s25137.ui.main.MainActivityViewModel
+import dk.itu.moapd.x9.s25137.ui.reports.MainActivityViewModel
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 class ReportDetailsFragment : Fragment() {
