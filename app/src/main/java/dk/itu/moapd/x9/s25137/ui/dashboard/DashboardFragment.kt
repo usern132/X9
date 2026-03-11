@@ -40,7 +40,13 @@ class DashboardFragment : Fragment() {
             // Dispose the Composition when the view's LifecycleOwner is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                ReportList(reports = mainActivityViewModel.reports)
+                ReportList(
+                    reports = mainActivityViewModel.reports,
+                    onItemClick = { index ->
+                        val action = DashboardFragmentDirections.showReportDetails(index)
+                        findNavController().navigate(action)
+                    }
+                )
             }
         }
 

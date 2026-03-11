@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.compose.compiler)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {

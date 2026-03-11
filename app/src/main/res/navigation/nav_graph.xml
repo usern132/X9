@@ -16,9 +16,24 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/show_report_details"
+            app:destination="@id/reportDetailsFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/createReportFormFragment"
         android:name="dk.itu.moapd.x9.s25137.ui.reports.CreateReportFormFragment"
         tools:layout="@layout/fragment_create_report_form" />
+    <fragment
+        android:id="@+id/reportDetailsFragment"
+        android:name="dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsFragment"
+        tools:layout="@layout/fragment_report_details">
+        <argument
+            android:name="reportIndex"
+            app:argType="integer" />
+    </fragment>
 </navigation>
