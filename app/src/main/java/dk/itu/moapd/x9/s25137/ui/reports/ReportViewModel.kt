@@ -12,7 +12,7 @@ import io.bloco.faker.Faker
 private const val TAG = "ReportViewModel"
 private const val addFakeReports = true
 
-class MainActivityViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class ReportViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val reports = mutableStateListOf<Report>()
 
     init {

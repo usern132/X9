@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.databinding.FragmentDashboardBinding
-import dk.itu.moapd.x9.s25137.ui.reports.MainActivityViewModel
+import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 
 private const val TAG = "DashboardFragment"
@@ -23,7 +23,7 @@ class DashboardFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+    private val reportViewModel: ReportViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ class DashboardFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 ReportList(
-                    reports = mainActivityViewModel.reports,
+                    reports = reportViewModel.reports,
                     onItemClick = { index ->
                         val action = DashboardFragmentDirections.showReportDetails(index)
                         findNavController().navigate(action)

@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import dk.itu.moapd.x9.s25137.databinding.FragmentReportDetailsBinding
-import dk.itu.moapd.x9.s25137.ui.reports.MainActivityViewModel
+import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 class ReportDetailsFragment : Fragment() {
@@ -19,7 +19,7 @@ class ReportDetailsFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+    private val reportViewModel: ReportViewModel by activityViewModels()
     private val args: ReportDetailsFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -30,7 +30,7 @@ class ReportDetailsFragment : Fragment() {
         binding.reportDetailsComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val report = mainActivityViewModel.reports[args.reportIndex]
+                val report = reportViewModel.reports[args.reportIndex]
                 AppTheme {
                     ReportDetailsPage(report = report)
                 }

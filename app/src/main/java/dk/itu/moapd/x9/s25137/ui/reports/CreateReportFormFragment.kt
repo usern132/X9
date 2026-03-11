@@ -33,7 +33,7 @@ class CreateReportFormFragment : Fragment() {
         get() = checkNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+    private val reportViewModel: ReportViewModel by activityViewModels()
     private lateinit var reportTitleInput: TextInputEditText
     private lateinit var reportTitleInputLayout: TextInputLayout
     private lateinit var reportLocationInput: TextInputEditText
@@ -114,7 +114,7 @@ class CreateReportFormFragment : Fragment() {
                     else -> Severity.MAJOR
                 }
             )
-            savedReport?.let { mainActivityViewModel.addReport(it) }
+            savedReport?.let { reportViewModel.addReport(it) }
             Log.d(TAG, "Report saved successfully!\n$savedReport")
             Toast.makeText(
                 context,
