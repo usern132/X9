@@ -29,6 +29,10 @@ fun ReportDetailsPage(
         ) {
             Text(text = report.title)
             Text(text = report.location)
+            Text(text = report.date.toString())
+            Text(text = report.type.toString())
+            Text(text = report.description)
+            Text(text = report.severity.toString())
         }
     }
 }

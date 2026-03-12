@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
@@ -43,14 +44,18 @@ class ReportFlowInstrumentedTest {
         val reportTitle = "UI test report ${System.currentTimeMillis()}"
         val reportLocation = "Copenhagen"
         val reportDate = "10/03/2026"
+        val reportDescription = "This is a test report!"
         val expectedSubtitle = "$reportDate · $reportLocation"
 
         openCreateReportForm()
-        fillRequiredFields(reportTitle, reportLocation, reportDate)
+        fillRequiredFields(reportTitle, reportLocation, reportDate, reportDescription)
 
         onView(withId(R.id.submit_button)).perform(click())
 
         onView(withId(R.id.create_report_button)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.reports_list)).check(matches(isDisplayed()))
+
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
         }
@@ -77,7 +82,32 @@ class ReportFlowInstrumentedTest {
         )
 
         onView(withId(R.id.create_report_button)).check(doesNotExist())
+
         composeRule.onNodeWithText(reportTitle).assertDoesNotExist()
+    }
+
+    @Test
+    fun clickingReportItemFromTheListTakesToTheCorrectDetailsPage() {
+        val reportTitle = "Detail Test Title ${System.currentTimeMillis()}"
+        val reportLocation = "Barcelona"
+        val reportDate = "11/03/2026"
+        val reportDescription = "This is a test report!"
+
+        openCreateReportForm()
+        fillRequiredFields(reportTitle, reportLocation, reportDate, reportDescription)
+        onView(withId(R.id.submit_button)).perform(click())
+
+        onView(withId(R.id.reports_list)).check(matches(isDisplayed()))
+
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onAllNodesWithText(reportTitle)[0].performClick()
+
+        onView(withId(R.id.report_details_compose_view)).check(matches(isDisplayed()))
+        composeRule.onNodeWithText(reportTitle).assertIsDisplayed()
+        composeRule.onNodeWithText(reportLocation).assertIsDisplayed()
+        composeRule.onNodeWithText(reportDescription).assertIsDisplayed()
     }
 
     private fun openCreateReportForm() {
@@ -85,9 +115,14 @@ class ReportFlowInstrumentedTest {
         onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
     }
 
-    private fun fillRequiredFields(reportTitle: String, location: String, date: String) {
+    private fun fillRequiredFields(
+        title: String,
+        location: String,
+        date: String,
+        description: String
+    ) {
         onView(withId(R.id.report_title_input)).perform(
-            replaceText(reportTitle),
+            replaceText(title),
             closeSoftKeyboard()
         )
         onView(withId(R.id.report_location_input)).perform(
@@ -97,7 +132,7 @@ class ReportFlowInstrumentedTest {
         onView(withId(R.id.report_date_input)).perform(setText(date))
         onView(withId(R.id.report_type_input)).perform(setText("Other"), closeSoftKeyboard())
         onView(withId(R.id.report_description_input)).perform(
-            replaceText("This is a test report!"),
+            replaceText(description),
             closeSoftKeyboard()
         )
         onView(withId(R.id.moderate_button)).perform(click())
