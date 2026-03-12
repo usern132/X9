@@ -40,6 +40,28 @@ class ReportFlowInstrumentedTest {
     }
 
     @Test
+    fun savingInvalidReportStaysOnFormAndDoesNotCreateReport() {
+        val reportTitle = "Invalid report ${System.currentTimeMillis()}"
+
+        openCreateReportForm()
+        onView(withId(R.id.report_title_input)).perform(
+            replaceText(reportTitle),
+            closeSoftKeyboard()
+        )
+
+        onView(withId(R.id.submit_button)).perform(click())
+
+        onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
+        onView(withId(R.id.report_location_input_layout)).check(
+            matches(hasTextInputLayoutErrorText(R.string.field_is_required))
+        )
+
+        onView(withId(R.id.create_report_button)).check(doesNotExist())
+
+        composeRule.onNodeWithText(reportTitle).assertDoesNotExist()
+    }
+
+    @Test
     fun savingValidReportReturnsToListAndShowsNewReportAtTheTop() {
         val reportTitle = "UI test report ${System.currentTimeMillis()}"
         val reportLocation = "Copenhagen"
@@ -62,28 +84,6 @@ class ReportFlowInstrumentedTest {
 
         composeRule.onAllNodesWithText(reportTitle)[0].assertIsDisplayed()
         composeRule.onAllNodesWithText(expectedSubtitle)[0].assertIsDisplayed()
-    }
-
-    @Test
-    fun savingInvalidReportStaysOnFormAndDoesNotCreateReport() {
-        val reportTitle = "Invalid report ${System.currentTimeMillis()}"
-
-        openCreateReportForm()
-        onView(withId(R.id.report_title_input)).perform(
-            replaceText(reportTitle),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.submit_button)).perform(click())
-
-        onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
-        onView(withId(R.id.report_location_input_layout)).check(
-            matches(hasTextInputLayoutErrorText(R.string.field_is_required))
-        )
-
-        onView(withId(R.id.create_report_button)).check(doesNotExist())
-
-        composeRule.onNodeWithText(reportTitle).assertDoesNotExist()
     }
 
     @Test
