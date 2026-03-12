@@ -8,11 +8,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import java.util.Date
 
@@ -29,10 +31,10 @@ fun ReportDetailsPage(
         ) {
             Text(text = report.title)
             Text(text = report.location)
-            Text(text = report.date.toString())
-            Text(text = report.type.toString())
+            Text(text = report.date.toFormattedString())
+            Text(text = stringResource(report.type.nameResId))
             Text(text = report.description)
-            Text(text = report.severity.toString())
+            Text(text = stringResource(report.severity.nameResId))
         }
     }
 }

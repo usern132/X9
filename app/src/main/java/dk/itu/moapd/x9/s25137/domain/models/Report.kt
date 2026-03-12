@@ -1,9 +1,14 @@
 package dk.itu.moapd.x9.s25137.domain.models
 
+import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
+
+fun Date.toFormattedString(): String {
+    return DateFormat.format("dd/MM/yyyy", this).toString()
+}
 
 data class Report(
     val title: String,
@@ -16,7 +21,7 @@ data class Report(
     override fun toString() =
         "Title: $title\n" +
                 "Location: $location\n" +
-                "Date: $date\n" +
+                "Date: ${date.toFormattedString()}\n" +
                 "Type: ${type.name}\n" +
                 "Description: $description\n" +
                 "Severity: ${severity.name}"

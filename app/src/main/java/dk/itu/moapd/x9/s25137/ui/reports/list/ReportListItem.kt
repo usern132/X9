@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.s25137.ui.reports.list
 
-import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
 import java.util.Date
 
 @Composable
@@ -24,9 +24,8 @@ fun ReportListItem(
             text = report.title,
             style = MaterialTheme.typography.titleMedium
         )
-        val dateText = DateFormat.format("dd/MM/yyyy", report.date)
         Text(
-            text = "$dateText · ${report.location}",
+            text = "${report.date.toFormattedString()} · ${report.location}",
             style = MaterialTheme.typography.bodyMedium
         )
     }
