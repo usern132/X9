@@ -6,8 +6,10 @@ import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
 
-fun Date.toFormattedString(): String {
-    return DateFormat.format("dd/MM/yyyy", this).toString()
+fun Date.toFormattedString(includeTime: Boolean = false): String {
+    var result: String = DateFormat.format("dd/MM/yyyy", this).toString()
+    if (includeTime) result += " - ${DateFormat.format("HH:mm", this)}"
+    return result
 }
 
 data class Report(

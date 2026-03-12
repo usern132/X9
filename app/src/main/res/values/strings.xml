@@ -4,6 +4,7 @@
     <string name="report_location">Report location</string>
     <string name="report_date">Report date</string>
     <string name="report_type">Report type</string>
+    <string name="report_severity">Report severity</string>
 
     <string name="speed_camera">Speed camera</string>
     <string name="heavy_traffic">Heavy traffic</string>
