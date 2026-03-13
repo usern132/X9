@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.compose.compiler)
     id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -100,6 +101,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit.jupiter)
 
     testImplementation(libs.hamcrest)

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="dk.itu.moapd.x9.s25137" />
+                  <option name="mobileSdkAppId" value="1:198347121754:android:1b9ed8c48e06b4bb022463" />
+                  <option name="projectId" value="dk-itu-moapd-x9-s25137" />
+                  <option name="projectNumber" value="198347121754" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
