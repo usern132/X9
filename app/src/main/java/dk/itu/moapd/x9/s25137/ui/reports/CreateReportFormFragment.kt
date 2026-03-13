@@ -125,24 +125,8 @@ class CreateReportFormFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate() called")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart() called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop() called")
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "onDestroyView() called")
         _binding = null
     }
 
