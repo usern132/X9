@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,7 +32,8 @@ class ReportDetailsFragment : Fragment() {
         binding.reportDetailsComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val report = reportViewModel.reports[args.reportIndex]
+                val reports by reportViewModel.reports.collectAsState()
+                val report = reports[args.reportIndex]
                 AppTheme {
                     ReportDetailsPage(report = report)
                 }

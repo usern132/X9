@@ -33,7 +33,6 @@ class DashboardFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        Log.d(TAG, "onCreateView() called")
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
         binding.reportsList.apply {
@@ -55,25 +54,13 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "onViewCreated() called")
         binding.createReportButton.setOnClickListener {
             findNavController().navigate(R.id.show_create_report_form)
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart() called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop() called")
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "onDestroyView() called")
         _binding = null
     }
 }

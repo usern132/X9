@@ -1,29 +1,30 @@
 package dk.itu.moapd.x9.s25137.ui.reports
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import io.bloco.faker.Faker
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 private const val TAG = "ReportViewModel"
-private const val addFakeReports = true
+private const val addFakeReports = false
 
 class ReportViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
-    val reports = mutableStateListOf<Report>()
+    private var _reports = MutableStateFlow<List<Report>>(emptyList())
+    val reports: StateFlow<List<Report>> = _reports
 
     init {
         if (addFakeReports) addFakeReports()
     }
 
-    fun addFakeReports() {
+    fun addFakeReports(n: Int = 100) {
         val faker = Faker()
-
-        for (i in 1..100) {
-            val report = Report(
+        val fakeReports = List(n) {
+            Report(
                 title = faker.lorem.sentence(wordCount = 3),
                 location = faker.address.streetAddress(),
                 date = faker.date.backward(),
@@ -31,13 +32,14 @@ class ReportViewModel(private val savedStateHandle: SavedStateHandle) : ViewMode
                 description = faker.lorem.paragraphs(1).toString(),
                 severity = Severity.entries.random()
             )
-            reports.add(report)
         }
-        Log.d(TAG, reports.toString())
+        _reports.value = fakeReports
     }
 
     fun addReport(report: Report) {
         // Add a report at the top of the list
-        reports.add(0, report)
+        _reports.update { currentReportsList ->
+            listOf(report) + currentReportsList
+        }
     }
 }
