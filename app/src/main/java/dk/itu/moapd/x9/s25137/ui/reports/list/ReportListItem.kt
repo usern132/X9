@@ -19,7 +19,7 @@ fun ReportListItem(
     report: Report,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(8.dp)) {
+    Column(modifier = modifier.padding(12.dp)) {
         Text(
             text = report.title,
             style = MaterialTheme.typography.titleMedium

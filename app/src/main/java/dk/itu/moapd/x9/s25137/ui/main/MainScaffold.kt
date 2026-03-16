@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,13 +27,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
+import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
 import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
-import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
+import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -131,7 +136,27 @@ fun MainScaffold(
             }
         ) {
             composable("home") {
-                ReportList(reports = viewModel.reports)
+                DashboardPage(
+                    reports = viewModel.reports,
+                    onCreateReportClick = { navController.navigate("create_report") },
+                    onReportClick = { index -> navController.navigate("report_details/$index") }
+                )
+            }
+            composable("create_report") {
+                CreateReportScreen(
+                    reportViewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                "report_details/{reportIndex}",
+                arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
+                val reports by viewModel.reports.collectAsState()
+                if (reportIndex in reports.indices) {
+                    ReportDetailsPage(report = reports[reportIndex])
+                }
             }
             composable("calendar") {
                 Box(
