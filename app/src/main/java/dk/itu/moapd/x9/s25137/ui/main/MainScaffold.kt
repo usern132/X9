@@ -1,10 +1,9 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -20,7 +19,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -38,6 +36,7 @@ import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
 import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
+import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -116,24 +115,16 @@ fun MainScaffold(
             }
         },
     ) { innerPadding ->
+        val enterTransition: EnterTransition = fadeIn(animationSpec = tween(ANIM_DURATION))
+        val exitTransition = fadeOut(animationSpec = tween(ANIM_DURATION))
         NavHost(
             navController = navController,
             startDestination = destinations.first().route,
             modifier = Modifier.padding(innerPadding),
-            enterTransition = {
-                fadeIn(
-                    animationSpec = tween(ANIM_DURATION)
-                )
-            },
-            exitTransition = {
-                fadeOut(animationSpec = tween(ANIM_DURATION))
-            },
-            popEnterTransition = {
-                fadeIn(animationSpec = tween(ANIM_DURATION))
-            },
-            popExitTransition = {
-                fadeOut(animationSpec = tween(ANIM_DURATION))
-            }
+            enterTransition = { enterTransition },
+            exitTransition = { exitTransition },
+            popEnterTransition = { enterTransition },
+            popExitTransition = { exitTransition }
         ) {
             composable("home") {
                 DashboardPage(
@@ -159,20 +150,10 @@ fun MainScaffold(
                 }
             }
             composable("calendar") {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Calendar Screen - Work in Progress")
-                }
+                PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Account Screen - Work in Progress")
-                }
+                PlaceholderScreen(name = "account")
             }
         }
     }
