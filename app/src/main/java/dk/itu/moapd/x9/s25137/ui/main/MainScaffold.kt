@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
 import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
@@ -155,7 +156,7 @@ fun MainScaffold(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                PlaceholderScreen(name = "account")
+                AccountScreen(onLogout)
             }
         }
     }
