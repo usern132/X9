@@ -97,6 +97,8 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.ui.auth)
 
+    implementation(libs.compose)
+
     // Compose
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

@@ -156,7 +156,12 @@ fun MainScaffold(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                AccountScreen(onLogout)
+                AccountScreen(
+                    onLogout = onLogout,
+                    name = auth.currentUser?.displayName ?: "N/A",
+                    email = auth.currentUser?.email ?: "N/A",
+                    profilePictureUrl = auth.currentUser?.photoUrl?.toString()
+                )
             }
         }
     }

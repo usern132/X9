@@ -2,6 +2,7 @@
 activityKtx = "1.13.0"
 agp = "8.13.2"
 androidxNavigationFragmentKtx = "2.9.7"
+compose = "1.0.0-beta08"
 faker = "2.0.4"
 firebaseAuthKtx = "23.2.1"
 firebaseUiAuth = "9.1.1"
@@ -43,6 +44,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-fragment-ktx-v241 = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+compose = { module = "com.github.bumptech.glide:compose", version.ref = "compose" }
 faker = { module = "io.bloco:faker", version.ref = "faker" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
