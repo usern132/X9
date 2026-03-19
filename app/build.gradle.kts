@@ -93,6 +93,9 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.recyclerview)
     implementation(libs.faker)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.ui.auth)
 
     // Compose
     implementation(libs.androidx.activity.compose)

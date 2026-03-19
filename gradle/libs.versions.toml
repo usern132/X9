@@ -3,6 +3,8 @@ activityKtx = "1.13.0"
 agp = "8.13.2"
 androidxNavigationFragmentKtx = "2.9.7"
 faker = "2.0.4"
+firebaseAuthKtx = "23.2.1"
+firebaseUiAuth = "9.1.1"
 fragmentKtx = "1.8.9"
 kotlin = "2.3.10"
 coreKtx = "1.18.0"
@@ -30,6 +32,7 @@ firebaseAuth = "24.0.1"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.2.0"
+firebaseBom = "34.10.0"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -41,6 +44,8 @@ androidx-navigation-fragment-ktx-v241 = { module = "androidx.navigation:navigati
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidxNavigationFragmentKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 faker = { module = "io.bloco:faker", version.ref = "faker" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 graphics-x-x0-x = { module = "libs.androidx.compose.ui.graphics:1.10.3" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
@@ -68,6 +73,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
