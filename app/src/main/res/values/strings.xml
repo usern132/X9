@@ -34,4 +34,6 @@
     <string name="calendar">Calendar</string>
     <string name="account">Account</string>
 
+    <string name="email">Email</string>
+
 </resources>
