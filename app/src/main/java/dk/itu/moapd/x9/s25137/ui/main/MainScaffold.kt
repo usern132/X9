@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
@@ -31,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
@@ -80,7 +80,9 @@ private const val ANIM_DURATION = 150
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
-    viewModel: ReportViewModel = viewModel()
+    viewModel: ReportViewModel = viewModel(),
+    auth: FirebaseAuth,
+    onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -157,10 +159,4 @@ fun MainScaffold(
             }
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun MainScaffoldPreview() {
-    MainScaffold()
 }

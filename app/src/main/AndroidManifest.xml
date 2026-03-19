@@ -20,8 +20,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.reports.CreateReportFormFragment"
-            android:exported="false" />
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.X9" />
     </application>
 
 </manifest>
