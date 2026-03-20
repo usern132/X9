@@ -283,7 +283,16 @@ fun CreateReportContent(
                 typeError = (selectedType == null)
                 descriptionError = description.isBlank()
 
-                if (!titleError && !locationError && !dateError && !typeError && !descriptionError) {
+                val hasErrors = listOf(
+                    titleError,
+                    locationError,
+                    dateError,
+                    typeError,
+                    descriptionError
+                )
+                    .any { it } // check if any value is true (it == true)
+
+                if (!hasErrors) {
                     val report = Report(
                         title = title,
                         location = location,
