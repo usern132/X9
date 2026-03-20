@@ -24,13 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
+import coil3.compose.AsyncImage
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AccountScreen(
     name: String,
@@ -47,36 +44,28 @@ fun AccountScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            GlideImage(
-                model = profilePictureUrl,
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                loading = placeholder {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    )
-                },
-                failure = placeholder {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            )
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                // Placeholder/fallback icon displayed while AsyncImage is still not ready (either loading or just unavailable)
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                // AsyncImage will draw on top of the placeholder image once loaded
+                AsyncImage(
+                    model = profilePictureUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = name,
