@@ -31,11 +31,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dk.itu.moapd.x9.s25137.R
-import dk.itu.moapd.x9.s25137.data.repositories.AuthRepository
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
-import dk.itu.moapd.x9.s25137.ui.reports.ReportViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
 
@@ -77,12 +75,10 @@ private val destinations = listOf(
 
 private const val ANIM_DURATION = 150
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
-    viewModel: ReportViewModel = viewModel(),
-    authRepository: AuthRepository,
+    viewModel: MainViewModel = viewModel(),
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -138,7 +134,7 @@ fun MainScaffold(
             }
             composable("create_report") {
                 CreateReportScreen(
-                    reportViewModel = viewModel,
+                    mainViewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
@@ -158,9 +154,9 @@ fun MainScaffold(
             composable("account") {
                 AccountScreen(
                     onLogout = onLogout,
-                    name = authRepository.currentUser?.name ?: "N/A",
-                    email = authRepository.currentUser?.email ?: "N/A",
-                    profilePictureUrl = authRepository.currentUser?.photoUrl?.toString()
+                    name = viewModel.currentUser?.name ?: "N/A",
+                    email = viewModel.currentUser?.email ?: "N/A",
+                    profilePictureUrl = viewModel.currentUser?.photoUrl?.toString()
                 )
             }
         }

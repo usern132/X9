@@ -51,6 +51,7 @@ import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.ui.main.MainViewModel
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -58,13 +59,13 @@ import java.util.Locale
 
 @Composable
 fun CreateReportScreen(
-    reportViewModel: ReportViewModel,
+    mainViewModel: MainViewModel,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
     CreateReportContent(
         onSubmit = { report ->
-            reportViewModel.addReport(report)
+            mainViewModel.addReport(report)
             Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
             onNavigateBack()
         }
