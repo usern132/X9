@@ -41,9 +41,9 @@ private const val ADD_FAKE_REPORTS = false
 
 class MainViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val authRepository: AuthRepository,
-    private val reportRepository: ReportRepository
 ) : ViewModel() {
+    private val authRepository = AuthRepository()
+    private val reportRepository = ReportRepository()
     private val _uiState = MutableStateFlow(MainUiState(userId = authRepository.currentUser?.uid))
     val uiState: StateFlow<MainUiState> = _uiState
     private var _reports = MutableStateFlow<List<Report>>(emptyList())

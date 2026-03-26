@@ -18,12 +18,12 @@ data class Report(
     // After inserting the Report, we can obtain the key created by Firebase
     // and make a copy of the object with that key assigned to it. We do NOT have control over the key creation.
     @get:Exclude val key: String? = null,
-    val title: String,
-    val location: String,
-    val timestamp: Long,
-    val type: Type,
-    val description: String,
-    val severity: Severity
+    val title: String = "",
+    val location: String = "",
+    val timestamp: Long = 0L,
+    val type: Type = Type.OTHER,
+    val description: String = "",
+    val severity: Severity = Severity.MINOR
 ) {
     override fun toString() =
         "Title: $title\n" +
