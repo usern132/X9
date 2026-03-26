@@ -1,15 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
-import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-
-private const val TAG = "MainActivity"
+import dk.itu.moapd.x9.s25137.domain.models.Report
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -34,34 +25,7 @@ private const val TAG = "MainActivity"
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        setContent {
-            AppTheme {
-                MainScaffold(
-                    viewModel = viewModel,
-                    onLogout = {
-                        viewModel.signOut()
-                        startLoginActivity()
-                    }
-                )
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.currentUser ?: startLoginActivity()
-    }
-
-    private fun startLoginActivity() {
-        Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }.let(::startActivity)
-    }
-}
+data class MainUiState(
+    val userId: String? = null,
+    val reports: List<Report> = emptyList()
+)

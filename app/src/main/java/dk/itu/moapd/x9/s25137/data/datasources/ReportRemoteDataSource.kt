@@ -40,27 +40,24 @@ class ReportRemoteDataSource(
         private const val PATH_USERS = "users"
     }
 
-    fun reportsQuery(userId: String) =
+    fun getAllQuery(userId: String) =
         root
             .child(PATH_USERS)
             .child(userId)
             .orderByChild("timestamp")
 
-    fun insert(userId: String, report: Report) {
-        fun newChild(): DatabaseReference = root
+    fun insert(userId: String, report: Report): String? {
+        val newChild = root
             .child(PATH_USERS)
             .child(userId)
             .push()
 
-        val newChildKey = newChild().key ?: return
-        root
-            .child(PATH_USERS)
-            .child(userId)
-            .child(newChildKey)
-            .setValue(report)
+        newChild.setValue(report)
+        return newChild.key
     }
 
-    fun update(userId: String, key: String, report: Report) {
+    fun update(userId: String, report: Report) {
+        val key = report.key ?: return
         root
             .child(PATH_USERS)
             .child(userId)

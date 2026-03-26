@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.s25137.domain.models
 
 import android.text.format.DateFormat
 import androidx.annotation.StringRes
+import com.google.firebase.database.Exclude
 import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
@@ -13,6 +14,10 @@ fun Date.toFormattedString(includeTime: Boolean = false): String {
 }
 
 data class Report(
+    // The "key" attribute gets excluded when serialising a Report to save it to Firebase Realtime Database.
+    // After inserting the Report, we can obtain the key created by Firebase
+    // and make a copy of the object with that key assigned to it. We do NOT have control over the key creation.
+    @get:Exclude val key: String? = null,
     val title: String,
     val location: String,
     val timestamp: Long,
@@ -33,7 +38,7 @@ data class Report(
             val faker = Faker()
             val reports = mutableListOf<Report>()
 
-            for (i in 1..n) {
+            repeat(n) {
                 val report = Report(
                     title = faker.lorem.sentence(wordCount = 3),
                     location = faker.address.streetAddress(),
@@ -50,7 +55,7 @@ data class Report(
 }
 
 enum class Type(
-    @StringRes val nameResId: Int
+    @param:StringRes val nameResId: Int
 ) {
     SPEED_CAMERA(R.string.speed_camera),
     HEAVY_TRAFFIC(R.string.heavy_traffic),
@@ -60,7 +65,7 @@ enum class Type(
 }
 
 enum class Severity(
-    @StringRes val nameResId: Int
+    @param:StringRes val nameResId: Int
 ) {
     MINOR(R.string.minor),
     MODERATE(R.string.moderate),

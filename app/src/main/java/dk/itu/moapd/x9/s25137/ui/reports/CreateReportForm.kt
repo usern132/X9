@@ -65,7 +65,7 @@ fun CreateReportScreen(
     val context = LocalContext.current
     CreateReportContent(
         onSubmit = { report ->
-            mainViewModel.addReport(report)
+            mainViewModel.insertReport(report)
             Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
             onNavigateBack()
         }
