@@ -36,6 +36,7 @@ import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
+import kotlinx.coroutines.flow.StateFlow
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -78,6 +79,7 @@ private const val ANIM_DURATION = 150
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
+    uiState: StateFlow<MainUiState>,
     viewModel: MainViewModel = viewModel(),
     onLogout: () -> Unit
 ) {
@@ -127,7 +129,7 @@ fun MainScaffold(
         ) {
             composable("home") {
                 DashboardPage(
-                    reports = viewModel.reports,
+                    uiState = uiState,
                     onCreateReportClick = { navController.navigate("create_report") },
                     onReportClick = { index -> navController.navigate("report_details/$index") }
                 )
@@ -143,9 +145,9 @@ fun MainScaffold(
                 arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
             ) { backStackEntry ->
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
-                val reports by viewModel.reports.collectAsState()
-                if (reportIndex in reports.indices) {
-                    ReportDetailsPage(report = reports[reportIndex])
+                val state by uiState.collectAsState()
+                if (reportIndex in state.reports.indices) {
+                    ReportDetailsPage(report = state.reports[reportIndex])
                 }
             }
             composable("calendar") {

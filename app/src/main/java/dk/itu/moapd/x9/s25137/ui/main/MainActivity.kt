@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 MainScaffold(
+                    uiState = viewModel.uiState,
                     viewModel = viewModel,
                     onLogout = {
                         viewModel.signOut()

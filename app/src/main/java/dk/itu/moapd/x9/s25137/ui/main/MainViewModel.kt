@@ -47,7 +47,6 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUiState(userId = authRepository.currentUser?.uid))
     val uiState: StateFlow<MainUiState> = _uiState
     private var _reports = MutableStateFlow<List<Report>>(emptyList())
-    val reports: StateFlow<List<Report>> = _reports
     val currentUser: User?
         get() = authRepository.currentUser
 

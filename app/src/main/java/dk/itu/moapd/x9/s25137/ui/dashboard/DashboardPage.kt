@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.s25137.ui.dashboard
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,24 +10,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.ui.main.MainUiState
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
-import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun DashboardPage(
+    uiState: StateFlow<MainUiState>,
     onCreateReportClick: () -> Unit,
     onReportClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    reports: StateFlow<List<Report>>
+    modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         ReportList(
-            reports = reports,
+            uiState = uiState,
             onItemClick = onReportClick
         )
 
@@ -43,15 +39,14 @@ fun DashboardPage(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun DashboardPagePreview() {
-    AppTheme {
-        DashboardPage(
-            onCreateReportClick = {},
-            onReportClick = {},
-            reports = MutableStateFlow(Report.generateRandomReports(20))
-        )
-    }
-}
+//@SuppressLint("ViewModelConstructorInComposable")
+//@Preview(showBackground = true)
+//@Composable
+//fun DashboardPagePreview() {
+//    AppTheme {
+//        DashboardPage(
+//            onCreateReportClick = {},
+//            onReportClick = {},
+//        )
+//    }
+//}

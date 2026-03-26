@@ -40,6 +40,7 @@ data class Report(
 
             repeat(n) {
                 val report = Report(
+                    key = faker.number.hexadecimal(8),
                     title = faker.lorem.sentence(wordCount = 3),
                     location = faker.address.streetAddress(),
                     timestamp = faker.date.backward().time,
