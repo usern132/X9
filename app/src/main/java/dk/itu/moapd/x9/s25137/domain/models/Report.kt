@@ -15,7 +15,7 @@ fun Date.toFormattedString(includeTime: Boolean = false): String {
 data class Report(
     val title: String,
     val location: String,
-    val date: Date,
+    val timestamp: Long,
     val type: Type,
     val description: String,
     val severity: Severity
@@ -23,7 +23,7 @@ data class Report(
     override fun toString() =
         "Title: $title\n" +
                 "Location: $location\n" +
-                "Date: ${date.toFormattedString()}\n" +
+                "Date: ${Date(timestamp).toFormattedString()}\n" +
                 "Type: ${type.name}\n" +
                 "Description: $description\n" +
                 "Severity: ${severity.name}"
@@ -37,7 +37,7 @@ data class Report(
                 val report = Report(
                     title = faker.lorem.sentence(wordCount = 3),
                     location = faker.address.streetAddress(),
-                    date = faker.date.backward(),
+                    timestamp = faker.date.backward().time,
                     type = Type.entries.random(),
                     description = faker.lorem.paragraphs(1).toString(),
                     severity = Severity.entries.random()

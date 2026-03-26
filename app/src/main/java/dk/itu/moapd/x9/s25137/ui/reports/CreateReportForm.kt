@@ -86,7 +86,7 @@ fun CreateReportContent(
 
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    val selectedDate = datePickerState.selectedDateMillis?.let { Date(it) }
+    val selectedDate = datePickerState.selectedDateMillis
     val formattedDate = selectedDate?.let {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
     } ?: ""
@@ -106,7 +106,6 @@ fun CreateReportContent(
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         // Title Input
@@ -289,19 +288,17 @@ fun CreateReportContent(
                     dateError,
                     typeError,
                     descriptionError
-                )
-                    .any { it } // check if any value is true (it == true)
+                ).any { it } // check if any value is true (it == true)
 
                 if (!hasErrors) {
                     val report = Report(
                         title = title,
                         location = location,
-                        date = selectedDate ?: Date(),
+                        timestamp = selectedDate ?: Date().time,
                         type = selectedType ?: Type.OTHER,
                         description = description,
                         severity = selectedSeverity
                     )
-
                     onSubmit(report)
                 }
             },

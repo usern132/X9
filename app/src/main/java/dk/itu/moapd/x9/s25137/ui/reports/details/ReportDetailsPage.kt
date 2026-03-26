@@ -50,7 +50,7 @@ fun ReportDetailsPage(
             )
             ReportDetailsItem(
                 label = stringResource(R.string.report_date),
-                value = report.date.toFormattedString()
+                value = Date(report.timestamp).toFormattedString()
             )
             ReportDetailsItem(
                 label = stringResource(R.string.report_type),
@@ -77,7 +77,7 @@ fun ReportDetailsPagePreview() {
         val sampleReport = Report(
             title = "Large pothole on Main St affecting cyclists",
             location = "Main St, 123",
-            date = Date(),
+            timestamp = Date().time,
             type = Type.OTHER,
             description = "Large pothole in the middle of the road. It has been there for several weeks and is causing issues for cyclists.",
             severity = Severity.MODERATE

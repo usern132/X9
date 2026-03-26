@@ -3,9 +3,7 @@ package dk.itu.moapd.x9.s25137.ui.reports
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dk.itu.moapd.x9.s25137.domain.models.Report
-import dk.itu.moapd.x9.s25137.domain.models.Severity
-import dk.itu.moapd.x9.s25137.domain.models.Type
-import io.bloco.faker.Faker
+import dk.itu.moapd.x9.s25137.domain.models.Report.Companion.generateRandomReports
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -22,18 +20,7 @@ class ReportViewModel(private val savedStateHandle: SavedStateHandle) : ViewMode
     }
 
     fun addFakeReports(n: Int = 100) {
-        val faker = Faker()
-        val fakeReports = List(n) {
-            Report(
-                title = faker.lorem.sentence(wordCount = 3),
-                location = faker.address.streetAddress(),
-                date = faker.date.backward(),
-                type = Type.entries.random(),
-                description = faker.lorem.paragraphs(1).toString(),
-                severity = Severity.entries.random()
-            )
-        }
-        _reports.value = fakeReports
+        _reports.value = generateRandomReports(n)
     }
 
     fun addReport(report: Report) {

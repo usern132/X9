@@ -25,7 +25,7 @@ fun ReportListItem(
             style = MaterialTheme.typography.titleMedium
         )
         Text(
-            text = "${report.date.toFormattedString()} · ${report.location}",
+            text = "${Date(report.timestamp).toFormattedString()} · ${report.location}",
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -37,7 +37,7 @@ fun ReportListItemPreview() {
     val report = Report(
         title = "Broken car in road",
         location = "Barcelona",
-        date = Date(),
+        timestamp = Date().time,
         type = Type.BROKEN_VEHICLES,
         description = "A broken car is parked in the road",
         severity = Severity.MODERATE
