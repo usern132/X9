@@ -5,26 +5,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.google.firebase.auth.FirebaseAuth
+import dk.itu.moapd.x9.s25137.data.repositories.AuthRepository
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 private const val TAG = "MainActivity"
 
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
+    private lateinit var authRepository: AuthRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        auth = FirebaseAuth.getInstance()
+        authRepository = AuthRepository()
+
         setContent {
             AppTheme {
                 MainScaffold(
-                    auth = auth,
+                    authRepository = authRepository,
                     onLogout = {
-                        auth.signOut()
+                        authRepository.signOut()
                         startLoginActivity()
                     }
                 )
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        auth.currentUser ?: startLoginActivity()
+        authRepository.currentUser ?: startLoginActivity()
     }
 
     private fun startLoginActivity() {

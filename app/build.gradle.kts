@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.dotenv.kotlin)
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -111,6 +112,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit.jupiter)
 
     testImplementation(libs.hamcrest)

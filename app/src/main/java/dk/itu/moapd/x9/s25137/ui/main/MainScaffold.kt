@@ -30,8 +30,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.data.repositories.AuthRepository
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
@@ -82,7 +82,7 @@ private const val ANIM_DURATION = 150
 @Composable
 fun MainScaffold(
     viewModel: ReportViewModel = viewModel(),
-    auth: FirebaseAuth,
+    authRepository: AuthRepository,
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -158,9 +158,9 @@ fun MainScaffold(
             composable("account") {
                 AccountScreen(
                     onLogout = onLogout,
-                    name = auth.currentUser?.displayName ?: "N/A",
-                    email = auth.currentUser?.email ?: "N/A",
-                    profilePictureUrl = auth.currentUser?.photoUrl?.toString()
+                    name = authRepository.currentUser?.name ?: "N/A",
+                    email = authRepository.currentUser?.email ?: "N/A",
+                    profilePictureUrl = authRepository.currentUser?.photoUrl?.toString()
                 )
             }
         }
