@@ -1,7 +1,9 @@
 package dk.itu.moapd.x9.s25137.ui.reports.details
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,8 +22,11 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
+import dk.itu.moapd.x9.s25137.ui.common.ProfilePicture
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import java.util.Date
+
+private const val VERTICAL_SPACING = 12
 
 @Composable
 fun ReportDetailsPage(
@@ -35,7 +41,7 @@ fun ReportDetailsPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(VERTICAL_SPACING.dp)
         ) {
             Text(
                 text = report.title,
@@ -43,6 +49,11 @@ fun ReportDetailsPage(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
+
+            AuthorDetails(report)
+
+            // This empty box adds VERTICAL_SPACING dp of spacing
+            Box {}
 
             ReportDetailsItem(
                 label = stringResource(R.string.report_location),
@@ -69,6 +80,20 @@ fun ReportDetailsPage(
     }
 }
 
+@Composable
+private fun AuthorDetails(report: Report) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ProfilePicture(
+            profilePictureUri = report.userImageUri,
+            size = 30
+        )
+        Text(text = report.userName, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -79,8 +104,12 @@ fun ReportDetailsPagePreview() {
             location = "Main St, 123",
             timestamp = Date().time,
             type = Type.OTHER,
-            description = "Large pothole in the middle of the road. It has been there for several weeks and is causing issues for cyclists.",
-            severity = Severity.MODERATE
+            description = "Large pothole in the middle of the road." +
+                    " It has been there for several weeks and is causing issues for cyclists.",
+            severity = Severity.MODERATE,
+            userId = "123",
+            userName = "John Doe",
+            userImageUri = null
         )
         ReportDetailsPage(report = sampleReport)
     }

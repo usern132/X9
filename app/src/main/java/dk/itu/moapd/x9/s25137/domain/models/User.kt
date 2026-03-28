@@ -6,5 +6,5 @@ data class User(
     var uid: String = "",
     var name: String? = null,
     var email: String? = null,
-    var photoUrl: Uri? = null
+    var photoUri: Uri? = null
 )

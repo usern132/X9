@@ -37,40 +37,31 @@ class ReportRemoteDataSource(
             directory = "/assets"
             filename = "env"
         }["DATABASE_URL"]
-        private const val PATH_USERS = "users"
         private const val PATH_REPORTS = "reports"
     }
 
-    private fun userReportsReference(userId: String): DatabaseReference = root
-        .child(PATH_USERS)
-        .child(userId)
+    private fun reportsReference(): DatabaseReference = root
         .child(PATH_REPORTS)
 
-    private fun userReportReference(
-        userId: String,
-        key: String
-    ): DatabaseReference = userReportsReference(userId)
+    private fun reportReference(key: String): DatabaseReference = reportsReference()
         .child(key)
 
-    fun getAllQuery(userId: String) =
-        userReportsReference(userId)
+    fun getAllQuery() =
+        reportsReference()
             .orderByChild("timestamp")
 
-    fun insert(userId: String, report: Report): String? {
-        val newChild = userReportsReference(userId)
-            .push()
+    fun insert(report: Report): String? {
+        val newChild = reportsReference().push()
         newChild.setValue(report)
         return newChild.key
     }
 
-    fun update(userId: String, report: Report) {
+    fun update(report: Report) {
         val key = report.key ?: return
-        userReportReference(userId, key)
-            .setValue(report)
+        reportReference(key).setValue(report)
     }
 
-    fun delete(userId: String, key: String) {
-        userReportReference(userId, key)
-            .removeValue()
+    fun delete(key: String) {
+        reportReference(key).removeValue()
     }
 }

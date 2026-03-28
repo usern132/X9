@@ -12,7 +12,7 @@ class AuthRemoteDataSource(
                 uid = user.uid,
                 name = user.displayName,
                 email = user.email,
-                photoUrl = user.photoUrl
+                photoUri = user.photoUrl
             )
         }
 

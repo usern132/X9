@@ -74,38 +74,42 @@ class MainViewModel(
                     val report = child.getValue(Report::class.java) ?: return@mapNotNull null
                     // Assign Firebase's generated key to the Report object
                     report.copy(key = key)
-                }.sortedBy { it.timestamp }
+                }.sortedByDescending { it.timestamp }
+                
                 _uiState.update { it.copy(reports = items) }
             }
 
             override fun onCancelled(error: DatabaseError) {
-
                 // Keep previous state; errors will be handled by Firebase SDK logs.
             }
         }
 
-        // Update the listener and add it to the query.
         reportsListener = valueListener
         query.addValueEventListener(valueListener)
     }
 
     fun insertReport(report: Report) {
-        val userId = currentUser?.uid ?: return
-        reportRepository.insert(userId = userId, report = report)
+        val user = currentUser ?: return
+        val reportWithUser = report.copy(
+            userId = user.uid,
+            userName = user.name ?: "",
+            userImageUri = user.photoUri?.toString()
+        )
+        reportRepository.insert(report = reportWithUser)
     }
 
     fun updateReport(report: Report) {
-        val userId = currentUser?.uid ?: return
-        reportRepository.update(userId = userId, report = report)
+        currentUser?.uid ?: return
+        reportRepository.update(report = report)
     }
 
     fun deleteReport(key: String) {
-        val userId = currentUser?.uid ?: return
-        reportRepository.delete(userId = userId, key = key)
+        currentUser?.uid ?: return
+        reportRepository.delete(key = key)
     }
 
     fun getAllReportsQuery(userId: String) =
-        reportRepository.getAllQuery(userId = userId)
+        reportRepository.getAllQuery()
 
     fun signOut() = authRepository.signOut()
 
@@ -117,5 +121,4 @@ class MainViewModel(
             getAllReportsQuery(currentUserId).removeEventListener(l)
         }
     }
-
 }

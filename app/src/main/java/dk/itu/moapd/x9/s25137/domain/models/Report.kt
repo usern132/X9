@@ -24,7 +24,10 @@ data class Report(
     val timestamp: Long = 0L,
     val type: Type = Type.OTHER,
     val description: String = "",
-    val severity: Severity = Severity.MINOR
+    val severity: Severity = Severity.MINOR,
+    val userId: String = "",
+    val userName: String = "",
+    val userImageUri: String? = null
 ) {
     override fun toString() =
         "Title: $title\n" +
@@ -32,7 +35,10 @@ data class Report(
                 "Date: ${Date(timestamp).toFormattedString()}\n" +
                 "Type: ${type.name}\n" +
                 "Description: $description\n" +
-                "Severity: ${severity.name}"
+                "Severity: ${severity.name}" +
+                "User: $userId" +
+                "User Name: $userName" +
+                "User Image Uri: $userImageUri"
 
     companion object {
         fun generateRandomReports(n: Int = 100): List<Report> {
@@ -47,7 +53,10 @@ data class Report(
                     timestamp = faker.date.backward().time,
                     type = Type.entries.random(),
                     description = faker.lorem.paragraphs(1).toString(),
-                    severity = Severity.entries.random()
+                    severity = Severity.entries.random(),
+                    userId = faker.number.hexadecimal(digits = 8),
+                    userName = faker.name.name(),
+                    userImageUri = null
                 )
                 reports.add(report)
             }

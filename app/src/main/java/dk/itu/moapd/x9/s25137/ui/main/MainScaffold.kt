@@ -158,7 +158,7 @@ fun MainScaffold(
                     onLogout = onLogout,
                     name = viewModel.currentUser?.name ?: "N/A",
                     email = viewModel.currentUser?.email ?: "N/A",
-                    profilePictureUrl = viewModel.currentUser?.photoUrl?.toString()
+                    profilePictureUrl = viewModel.currentUser?.photoUri?.toString()
                 )
             }
         }

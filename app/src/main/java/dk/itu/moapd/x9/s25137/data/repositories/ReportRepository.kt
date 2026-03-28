@@ -6,15 +6,15 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 class ReportRepository(
     private val reportRemoteDataSource: ReportRemoteDataSource = ReportRemoteDataSource()
 ) {
-    fun getAllQuery(userId: String) =
-        reportRemoteDataSource.getAllQuery(userId = userId)
+    fun getAllQuery() =
+        reportRemoteDataSource.getAllQuery()
 
-    fun insert(userId: String, report: Report): String? =
-        reportRemoteDataSource.insert(userId = userId, report = report)
+    fun insert(report: Report): String? =
+        reportRemoteDataSource.insert(report = report)
 
-    fun update(userId: String, report: Report) =
-        reportRemoteDataSource.update(userId = userId, report = report)
+    fun update(report: Report) =
+        reportRemoteDataSource.update(report = report)
 
-    fun delete(userId: String, key: String) =
-        reportRemoteDataSource.delete(userId = userId, key = key)
+    fun delete(key: String) =
+        reportRemoteDataSource.delete(key = key)
 }

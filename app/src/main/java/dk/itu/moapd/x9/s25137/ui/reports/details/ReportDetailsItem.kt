@@ -16,7 +16,7 @@ fun ReportDetailsItem(label: String, value: String) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.secondary,
             fontWeight = FontWeight.SemiBold
         )
