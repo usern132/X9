@@ -7,7 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,51 +38,66 @@ private const val VERTICAL_SPACING = 12
 @Composable
 fun ReportDetailsPage(
     report: Report,
+    isEditable: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
+    val scrollState = rememberScrollState()
+
+    Scaffold(
+        modifier = modifier,
+        floatingActionButton = {
+            if (isEditable) {
+                FloatingActionButton(onClick = { /* TODO: Navigate to Edit Screen */ }) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit report")
+                }
+            }
+        }
+    ) { _ ->
+        Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(VERTICAL_SPACING.dp)
+                .fillMaxSize(),
+            color = MaterialTheme.colorScheme.background,
         ) {
-            Text(
-                text = report.title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(VERTICAL_SPACING.dp)
+            ) {
+                Text(
+                    text = report.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
 
-            AuthorDetails(report)
+                AuthorDetails(report)
 
-            // This empty box adds VERTICAL_SPACING dp of spacing
-            Box {}
+                // This empty box adds VERTICAL_SPACING dp of spacing
+                Box {}
 
-            ReportDetailsItem(
-                label = stringResource(R.string.report_location),
-                value = report.location
-            )
-            ReportDetailsItem(
-                label = stringResource(R.string.report_date),
-                value = Date(report.timestamp).toFormattedString()
-            )
-            ReportDetailsItem(
-                label = stringResource(R.string.report_type),
-                value = stringResource(report.type.nameResId)
-            )
-            ReportDetailsItem(
-                label = stringResource(R.string.report_severity),
-                value = stringResource(report.severity.nameResId)
-            )
-
-            ReportDetailsItem(
-                label = stringResource(R.string.report_description),
-                value = report.description
-            )
+                ReportDetailsItem(
+                    label = stringResource(R.string.report_location),
+                    value = report.location
+                )
+                ReportDetailsItem(
+                    label = stringResource(R.string.report_date),
+                    value = Date(report.timestamp).toFormattedString()
+                )
+                ReportDetailsItem(
+                    label = stringResource(R.string.report_type),
+                    value = stringResource(report.type.nameResId)
+                )
+                ReportDetailsItem(
+                    label = stringResource(R.string.report_severity),
+                    value = stringResource(report.severity.nameResId)
+                )
+                ReportDetailsItem(
+                    label = stringResource(R.string.report_description),
+                    value = report.description
+                )
+            }
         }
     }
 }
@@ -95,9 +117,8 @@ private fun AuthorDetails(report: Report) {
 }
 
 
-@Preview(showBackground = true)
 @Composable
-fun ReportDetailsPagePreview() {
+private fun ReportDetailsPagePreview(isEditable: Boolean) {
     AppTheme {
         val sampleReport = Report(
             title = "Large pothole on Main St affecting cyclists",
@@ -111,6 +132,14 @@ fun ReportDetailsPagePreview() {
             userName = "John Doe",
             userImageUri = null
         )
-        ReportDetailsPage(report = sampleReport)
+        ReportDetailsPage(report = sampleReport, isEditable = isEditable)
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun ReportDetailsPageEditablePreview() = ReportDetailsPagePreview(isEditable = true)
+
+@Preview(showBackground = true)
+@Composable
+private fun ReportDetailsPageNotEditablePreview() = ReportDetailsPagePreview(isEditable = false)

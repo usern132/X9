@@ -147,7 +147,13 @@ fun MainScaffold(
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
                 val state by uiState.collectAsState()
                 if (reportIndex in state.reports.indices) {
-                    ReportDetailsPage(report = state.reports[reportIndex])
+                    val report = state.reports[reportIndex]
+                    // A logged in user can only edit their own reports
+                    val isEditable = report.userId == viewModel.currentUser?.uid
+                    ReportDetailsPage(
+                        report = report,
+                        isEditable = isEditable
+                    )
                 }
             }
             composable("calendar") {
