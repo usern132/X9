@@ -1,16 +1,17 @@
 package dk.itu.moapd.x9.s25137
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,8 +31,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ReportFlowInstrumentedTest {
 
+    companion object {
+        private const val MILLIS_PER_DAY = 24L * 60L * 60L * 1000L
+    }
+
     @get:Rule
-    val composeRule = createComposeRule()
+    val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun dashboardCallbacksAreTriggeredFromFabAndReportClick() {
@@ -67,6 +71,7 @@ class ReportFlowInstrumentedTest {
                 )
             }
         }
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("dashboard:createReport").performClick()
         composeRule.onNodeWithText("Second report").performClick()
@@ -84,6 +89,7 @@ class ReportFlowInstrumentedTest {
                 CreateReportContent(onSubmit = { submittedReport = it })
             }
         }
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithTag("createReport:submit").performClick()
 
@@ -93,6 +99,7 @@ class ReportFlowInstrumentedTest {
 
     @Test
     fun createReportValidSubmitEmitsReport() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val selectedDate = 1_710_000_000_000L
         val submittedReport = mutableStateOf<Report?>(null)
 
@@ -104,21 +111,25 @@ class ReportFlowInstrumentedTest {
                 )
             }
         }
+        composeRule.waitForIdle()
 
-        val textFields = composeRule.onAllNodes(hasSetTextAction())
-        textFields[0].performTextInput("Road blocked")
-        textFields[1].performTextInput("Copenhagen")
-        textFields[2].performTextInput("Two lanes blocked by a truck")
+        composeRule.onNodeWithTag("createReport:title").performTextInput("Road blocked")
+        composeRule.onNodeWithTag("createReport:location").performTextInput("Copenhagen")
+        composeRule.onNodeWithTag("createReport:description")
+            .performTextInput("Two lanes blocked by a truck")
 
         composeRule.onNodeWithTag("createReport:type").performClick()
-        composeRule.onNodeWithText("Other").performClick()
+        composeRule.onNodeWithText(context.getString(Type.OTHER.nameResId)).performClick()
 
         composeRule.onNodeWithTag("createReport:submit").performClick()
 
         assertNotNull(submittedReport.value)
         assertEquals("Road blocked", submittedReport.value?.title)
         assertEquals("Copenhagen", submittedReport.value?.location)
-        assertEquals(selectedDate, submittedReport.value?.timestamp)
+        assertEquals(
+            selectedDate / MILLIS_PER_DAY,
+            (submittedReport.value?.timestamp ?: 0L) / MILLIS_PER_DAY
+        )
         assertEquals(Type.OTHER, submittedReport.value?.type)
         assertEquals(Severity.MINOR, submittedReport.value?.severity)
         assertEquals("Two lanes blocked by a truck", submittedReport.value?.description)
@@ -126,6 +137,7 @@ class ReportFlowInstrumentedTest {
 
     @Test
     fun reportDetailsRendersAllCoreFields() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val report = Report(
             key = "detail-1",
             title = "Large pothole",
@@ -141,34 +153,93 @@ class ReportFlowInstrumentedTest {
                 ReportDetailsPage(report = report)
             }
         }
+        composeRule.waitForIdle()
 
         composeRule.onNodeWithText("Large pothole").assertIsDisplayed()
         composeRule.onNodeWithText("Main St 42").assertIsDisplayed()
         composeRule.onNodeWithText("Dangerous pothole near bike lane").assertIsDisplayed()
-        composeRule.onNodeWithText("Road incidents").assertIsDisplayed()
-        composeRule.onNodeWithText("Major").assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(Type.ROAD_INCIDENTS.nameResId))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(Severity.MAJOR.nameResId)).assertIsDisplayed()
     }
 
     @Test
-    fun createReportDateValidationPreventsSubmissionWithoutDate() {
+    fun createReportWhitespaceInputShowsRequiredErrors() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val selectedDate = 1_710_000_000_000L
         var submittedReport: Report? = null
 
         composeRule.setContent {
             AppTheme {
-                CreateReportContent(onSubmit = { submittedReport = it })
+                CreateReportContent(
+                    initialSelectedDateMillis = selectedDate,
+                    onSubmit = { submittedReport = it }
+                )
             }
         }
+        composeRule.waitForIdle()
 
-        val textFields = composeRule.onAllNodes(hasSetTextAction())
-        textFields[0].performTextInput("Title")
-        textFields[1].performTextInput("Location")
-        textFields[2].performTextInput("Description")
-
+        composeRule.onNodeWithTag("createReport:title").performTextInput("   ")
+        composeRule.onNodeWithTag("createReport:location").performTextInput("   ")
+        composeRule.onNodeWithTag("createReport:description").performTextInput("   ")
         composeRule.onNodeWithTag("createReport:type").performClick()
-        composeRule.onNodeWithText("Other").performClick()
+        composeRule.onNodeWithText(context.getString(Type.OTHER.nameResId)).performClick()
+        composeRule.onNodeWithTag("createReport:submit").performClick()
+
+        composeRule.onAllNodesWithText("This field is required.").assertCountEquals(3)
+        assertNull(submittedReport)
+    }
+
+    @Test
+    fun createReportTypeValidationPreventsSubmissionWithoutType() {
+        val selectedDate = 1_710_000_000_000L
+        var submittedReport: Report? = null
+
+        composeRule.setContent {
+            AppTheme {
+                CreateReportContent(
+                    initialSelectedDateMillis = selectedDate,
+                    onSubmit = { submittedReport = it }
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag("createReport:title").performTextInput("Title")
+        composeRule.onNodeWithTag("createReport:location").performTextInput("Location")
+        composeRule.onNodeWithTag("createReport:description").performTextInput("Description")
         composeRule.onNodeWithTag("createReport:submit").performClick()
 
         composeRule.onAllNodesWithText("This field is required.").assertCountEquals(1)
-        assertTrue(submittedReport == null)
+        assertNull(submittedReport)
+    }
+
+    @Test
+    fun createReportSelectedSeverityIsUsedOnSubmit() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val selectedDate = 1_710_000_000_000L
+        val submittedReport = mutableStateOf<Report?>(null)
+
+        composeRule.setContent {
+            AppTheme {
+                CreateReportContent(
+                    initialSelectedDateMillis = selectedDate,
+                    onSubmit = { submittedReport.value = it }
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag("createReport:title").performTextInput("Broken light")
+        composeRule.onNodeWithTag("createReport:location").performTextInput("Crossing")
+        composeRule.onNodeWithTag("createReport:description")
+            .performTextInput("Traffic light is out")
+        composeRule.onNodeWithTag("createReport:type").performClick()
+        composeRule.onNodeWithText(context.getString(Type.OTHER.nameResId)).performClick()
+        composeRule.onNodeWithText(context.getString(Severity.MAJOR.nameResId)).performClick()
+        composeRule.onNodeWithTag("createReport:submit").performClick()
+
+        assertNotNull(submittedReport.value)
+        assertEquals(Severity.MAJOR, submittedReport.value?.severity)
     }
 }

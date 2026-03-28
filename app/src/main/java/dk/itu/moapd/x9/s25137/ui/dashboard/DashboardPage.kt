@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.s25137.ui.dashboard
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,8 +19,8 @@ import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-private enum class DashboardTags(val tag: String) {
-    CREATE_REPORT("dashboard:createReport")
+private enum class DashboardElements(val testTag: String) {
+    CREATE_REPORT_BUTTON("dashboard:createReport")
 }
 
 @Composable
@@ -42,14 +41,13 @@ fun DashboardPage(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
-                .testTag(DashboardTags.CREATE_REPORT.tag),
+                .testTag(DashboardElements.CREATE_REPORT_BUTTON.testTag),
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "Add Report")
         }
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun DashboardPagePreview() {
@@ -57,7 +55,7 @@ fun DashboardPagePreview() {
         DashboardPage(
             uiState = MutableStateFlow(MainUiState()),
             onCreateReportClick = {},
-            onReportClick = {},
+            onReportClick = { _ -> },
         )
     }
 }

@@ -14,9 +14,10 @@ fun Date.toFormattedString(includeTime: Boolean = false): String {
 }
 
 data class Report(
-    // The "key" attribute gets excluded when serialising a Report to save it to Firebase Realtime Database.
-    // After inserting the Report, we can obtain the key created by Firebase
-    // and make a copy of the object with that key assigned to it. We do NOT have control over the key creation.
+    /* The "key" attribute gets excluded when serialising a Report to save it to Firebase Realtime Database.
+     * After inserting the Report, we can obtain the key created by Firebase
+     * and make a copy of the object with that key assigned to it. We do NOT have control over the key creation.
+     */
     @get:Exclude val key: String? = null,
     val title: String = "",
     val location: String = "",
@@ -40,7 +41,7 @@ data class Report(
 
             repeat(n) {
                 val report = Report(
-                    key = faker.number.hexadecimal(8),
+                    key = faker.number.hexadecimal(digits = 8),
                     title = faker.lorem.sentence(wordCount = 3),
                     location = faker.address.streetAddress(),
                     timestamp = faker.date.backward().time,

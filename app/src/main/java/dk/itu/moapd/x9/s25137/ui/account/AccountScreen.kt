@@ -51,7 +51,9 @@ fun AccountScreen(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder/fallback icon displayed while AsyncImage is still not ready (either loading or just unavailable)
+                /* Placeholder/fallback icon displayed while AsyncImage is still
+                 * not ready (either loading or just unavailable)
+                 */
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
