@@ -1,28 +1,29 @@
 package dk.itu.moapd.x9.s25137
 
-import android.view.View
-import android.widget.TextView
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
-import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.material.textfield.TextInputLayout
-import dk.itu.moapd.x9.s25137.ui.main.MainActivity
-import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.TypeSafeMatcher
+import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.domain.models.Severity
+import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
+import dk.itu.moapd.x9.s25137.ui.main.MainUiState
+import dk.itu.moapd.x9.s25137.ui.reports.CreateReportContent
+import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
+import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,134 +32,143 @@ import org.junit.runner.RunWith
 class ReportFlowInstrumentedTest {
 
     @get:Rule
-    val composeRule = createAndroidComposeRule<MainActivity>()
+    val composeRule = createComposeRule()
 
     @Test
-    fun clickingCreateReportButtonNavigatesToCreateForm() {
-        openCreateReportForm()
-        onView(withId(R.id.submit_button)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun savingInvalidReportStaysOnFormAndDoesNotCreateReport() {
-        val reportTitle = "Invalid report ${System.currentTimeMillis()}"
-
-        openCreateReportForm()
-        onView(withId(R.id.report_title_input)).perform(
-            replaceText(reportTitle),
-            closeSoftKeyboard()
+    fun dashboardCallbacksAreTriggeredFromFabAndReportClick() {
+        val first = Report(
+            key = "key-1",
+            title = "First report",
+            location = "A",
+            timestamp = 1L,
+            type = Type.OTHER,
+            description = "First",
+            severity = Severity.MINOR
         )
-
-        onView(withId(R.id.submit_button)).perform(click())
-
-        onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
-        onView(withId(R.id.report_location_input_layout)).check(
-            matches(hasTextInputLayoutErrorText(R.string.field_is_required))
+        val second = Report(
+            key = "key-2",
+            title = "Second report",
+            location = "B",
+            timestamp = 2L,
+            type = Type.OTHER,
+            description = "Second",
+            severity = Severity.MODERATE
         )
+        val state = MutableStateFlow(MainUiState(reports = listOf(first, second)))
+        var createClicks = 0
+        var clickedIndex: Int? = null
 
-        onView(withId(R.id.create_report_button)).check(doesNotExist())
-
-        composeRule.onNodeWithText(reportTitle).assertDoesNotExist()
-    }
-
-    @Test
-    fun savingValidReportReturnsToListAndShowsNewReportAtTheTop() {
-        val reportTitle = "UI test report ${System.currentTimeMillis()}"
-        val reportLocation = "Copenhagen"
-        val reportDate = "10/03/2026"
-        val reportDescription = "This is a test report!"
-        val expectedSubtitle = "$reportDate · $reportLocation"
-
-        openCreateReportForm()
-        fillRequiredFields(reportTitle, reportLocation, reportDate, reportDescription)
-
-        onView(withId(R.id.submit_button)).perform(click())
-
-        onView(withId(R.id.create_report_button)).check(matches(isDisplayed()))
-
-        onView(withId(R.id.reports_list)).check(matches(isDisplayed()))
-
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
-        }
-
-        composeRule.onAllNodesWithText(reportTitle)[0].assertIsDisplayed()
-        composeRule.onAllNodesWithText(expectedSubtitle)[0].assertIsDisplayed()
-    }
-
-    @Test
-    fun clickingReportItemFromTheListTakesToTheCorrectDetailsPage() {
-        val reportTitle = "Detail Test Title ${System.currentTimeMillis()}"
-        val reportLocation = "Barcelona"
-        val reportDate = "11/03/2026"
-        val reportDescription = "This is a test report!"
-
-        openCreateReportForm()
-        fillRequiredFields(reportTitle, reportLocation, reportDate, reportDescription)
-        onView(withId(R.id.submit_button)).perform(click())
-
-        onView(withId(R.id.reports_list)).check(matches(isDisplayed()))
-
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText(reportTitle).fetchSemanticsNodes().isNotEmpty()
-        }
-        composeRule.onAllNodesWithText(reportTitle)[0].performClick()
-
-        onView(withId(R.id.report_details_compose_view)).check(matches(isDisplayed()))
-        composeRule.onNodeWithText(reportTitle).assertIsDisplayed()
-        composeRule.onNodeWithText(reportLocation).assertIsDisplayed()
-        composeRule.onNodeWithText(reportDescription).assertIsDisplayed()
-    }
-
-    private fun openCreateReportForm() {
-        onView(withId(R.id.create_report_button)).perform(click())
-        onView(withId(R.id.create_report_form)).check(matches(isDisplayed()))
-    }
-
-    private fun fillRequiredFields(
-        title: String,
-        location: String,
-        date: String,
-        description: String
-    ) {
-        onView(withId(R.id.report_title_input)).perform(
-            replaceText(title),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.report_location_input)).perform(
-            replaceText(location),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.report_date_input)).perform(setText(date))
-        onView(withId(R.id.report_type_input)).perform(setText("Other"), closeSoftKeyboard())
-        onView(withId(R.id.report_description_input)).perform(
-            replaceText(description),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.moderate_button)).perform(click())
-    }
-
-    private fun setText(text: String): ViewAction = object : ViewAction {
-        override fun getDescription(): String = "Set text on a TextView without requiring focus"
-
-        override fun getConstraints(): Matcher<View> = isAssignableFrom(TextView::class.java)
-
-        override fun perform(uiController: androidx.test.espresso.UiController, view: View) {
-            (view as TextView).text = text
-        }
-    }
-
-    private fun hasTextInputLayoutErrorText(errorTextResId: Int): Matcher<View> {
-        return object : TypeSafeMatcher<View>() {
-            override fun describeTo(description: Description) {
-                description.appendText("TextInputLayout error should match expected string resource")
-            }
-
-            override fun matchesSafely(view: View): Boolean {
-                if (view !is TextInputLayout) return false
-                val expectedError = view.context.getString(errorTextResId)
-                return view.error?.toString() == expectedError
+        composeRule.setContent {
+            AppTheme {
+                DashboardPage(
+                    uiState = state,
+                    onCreateReportClick = { createClicks += 1 },
+                    onReportClick = { clickedIndex = it }
+                )
             }
         }
+
+        composeRule.onNodeWithTag("dashboard:createReport").performClick()
+        composeRule.onNodeWithText("Second report").performClick()
+
+        assertEquals(1, createClicks)
+        assertEquals(1, clickedIndex)
+    }
+
+    @Test
+    fun createReportEmptySubmitShowsAllRequiredErrors() {
+        var submittedReport: Report? = null
+
+        composeRule.setContent {
+            AppTheme {
+                CreateReportContent(onSubmit = { submittedReport = it })
+            }
+        }
+
+        composeRule.onNodeWithTag("createReport:submit").performClick()
+
+        composeRule.onAllNodesWithText("This field is required.").assertCountEquals(5)
+        assertNull(submittedReport)
+    }
+
+    @Test
+    fun createReportValidSubmitEmitsReport() {
+        val selectedDate = 1_710_000_000_000L
+        val submittedReport = mutableStateOf<Report?>(null)
+
+        composeRule.setContent {
+            AppTheme {
+                CreateReportContent(
+                    initialSelectedDateMillis = selectedDate,
+                    onSubmit = { submittedReport.value = it }
+                )
+            }
+        }
+
+        val textFields = composeRule.onAllNodes(hasSetTextAction())
+        textFields[0].performTextInput("Road blocked")
+        textFields[1].performTextInput("Copenhagen")
+        textFields[2].performTextInput("Two lanes blocked by a truck")
+
+        composeRule.onNodeWithTag("createReport:type").performClick()
+        composeRule.onNodeWithText("Other").performClick()
+
+        composeRule.onNodeWithTag("createReport:submit").performClick()
+
+        assertNotNull(submittedReport.value)
+        assertEquals("Road blocked", submittedReport.value?.title)
+        assertEquals("Copenhagen", submittedReport.value?.location)
+        assertEquals(selectedDate, submittedReport.value?.timestamp)
+        assertEquals(Type.OTHER, submittedReport.value?.type)
+        assertEquals(Severity.MINOR, submittedReport.value?.severity)
+        assertEquals("Two lanes blocked by a truck", submittedReport.value?.description)
+    }
+
+    @Test
+    fun reportDetailsRendersAllCoreFields() {
+        val report = Report(
+            key = "detail-1",
+            title = "Large pothole",
+            location = "Main St 42",
+            timestamp = 1_710_000_000_000L,
+            type = Type.ROAD_INCIDENTS,
+            description = "Dangerous pothole near bike lane",
+            severity = Severity.MAJOR
+        )
+
+        composeRule.setContent {
+            AppTheme {
+                ReportDetailsPage(report = report)
+            }
+        }
+
+        composeRule.onNodeWithText("Large pothole").assertIsDisplayed()
+        composeRule.onNodeWithText("Main St 42").assertIsDisplayed()
+        composeRule.onNodeWithText("Dangerous pothole near bike lane").assertIsDisplayed()
+        composeRule.onNodeWithText("Road incidents").assertIsDisplayed()
+        composeRule.onNodeWithText("Major").assertIsDisplayed()
+    }
+
+    @Test
+    fun createReportDateValidationPreventsSubmissionWithoutDate() {
+        var submittedReport: Report? = null
+
+        composeRule.setContent {
+            AppTheme {
+                CreateReportContent(onSubmit = { submittedReport = it })
+            }
+        }
+
+        val textFields = composeRule.onAllNodes(hasSetTextAction())
+        textFields[0].performTextInput("Title")
+        textFields[1].performTextInput("Location")
+        textFields[2].performTextInput("Description")
+
+        composeRule.onNodeWithTag("createReport:type").performClick()
+        composeRule.onNodeWithText("Other").performClick()
+        composeRule.onNodeWithTag("createReport:submit").performClick()
+
+        composeRule.onAllNodesWithText("This field is required.").assertCountEquals(1)
+        assertTrue(submittedReport == null)
     }
 }

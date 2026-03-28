@@ -79,6 +79,7 @@ class MainViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
+
                 // Keep previous state; errors will be handled by Firebase SDK logs.
             }
         }

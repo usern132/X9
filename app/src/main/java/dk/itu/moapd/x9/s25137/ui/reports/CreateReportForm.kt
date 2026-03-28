@@ -37,12 +37,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +58,15 @@ import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private enum class ReportField(val testTag: String) {
+    TITLE("createReport:title"),
+    LOCATION("createReport:location"),
+    DATE("createReport:date"),
+    TYPE("createReport:type"),
+    DESCRIPTION("createReport:description"),
+    SUBMIT("createReport:submit")
+}
 
 @Composable
 fun CreateReportScreen(
@@ -75,6 +86,7 @@ fun CreateReportScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateReportContent(
+    initialSelectedDateMillis: Long? = null,
     onSubmit: (Report) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -86,7 +98,8 @@ fun CreateReportContent(
     var selectedSeverity by remember { mutableStateOf(Severity.MINOR) }
 
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState =
+        rememberDatePickerState(initialSelectedDateMillis = initialSelectedDateMillis)
     val selectedDate = datePickerState.selectedDateMillis
     val formattedDate = selectedDate?.let {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
@@ -94,11 +107,7 @@ fun CreateReportContent(
 
     var expandedDropdown by remember { mutableStateOf(false) }
 
-    var titleError by remember { mutableStateOf(false) }
-    var locationError by remember { mutableStateOf(false) }
-    var dateError by remember { mutableStateOf(false) }
-    var typeError by remember { mutableStateOf(false) }
-    var descriptionError by remember { mutableStateOf(false) }
+    val errors = remember { mutableStateMapOf<ReportField, Boolean>() }
 
     val requiredErrorMessage = stringResource(R.string.field_is_required)
 
@@ -112,7 +121,7 @@ fun CreateReportContent(
         // Title Input
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it; titleError = false },
+            onValueChange = { title = it; errors[ReportField.TITLE] = false },
             label = { Text(stringResource(R.string.report_title)) },
             leadingIcon = {
                 Icon(
@@ -120,15 +129,17 @@ fun CreateReportContent(
                     contentDescription = null
                 )
             },
-            isError = titleError,
-            supportingText = { if (titleError) Text(requiredErrorMessage) },
-            modifier = Modifier.fillMaxWidth()
+            isError = errors[ReportField.TITLE] ?: false,
+            supportingText = { if (errors[ReportField.TITLE] == true) Text(requiredErrorMessage) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(ReportField.TITLE.testTag)
         )
 
         // Location Input
         OutlinedTextField(
             value = location,
-            onValueChange = { location = it; locationError = false },
+            onValueChange = { location = it; errors[ReportField.LOCATION] = false },
             label = { Text(stringResource(R.string.report_location)) },
             leadingIcon = {
                 Icon(
@@ -136,9 +147,11 @@ fun CreateReportContent(
                     contentDescription = null
                 )
             },
-            isError = locationError,
-            supportingText = { if (locationError) Text(requiredErrorMessage) },
-            modifier = Modifier.fillMaxWidth()
+            isError = errors[ReportField.LOCATION] ?: false,
+            supportingText = { if (errors[ReportField.LOCATION] == true) Text(requiredErrorMessage) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(ReportField.LOCATION.testTag)
         )
 
         // Date Input
@@ -153,11 +166,12 @@ fun CreateReportContent(
                 )
             },
             readOnly = true,
-            isError = dateError,
-            supportingText = { if (dateError) Text(requiredErrorMessage) },
+            isError = errors[ReportField.DATE] ?: false,
+            supportingText = { if (errors[ReportField.DATE] == true) Text(requiredErrorMessage) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { showDatePicker = true },
+                .clickable { showDatePicker = true }
+                .testTag(ReportField.DATE.testTag),
             enabled = false,
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -173,7 +187,7 @@ fun CreateReportContent(
                 confirmButton = {
                     TextButton(onClick = {
                         showDatePicker = false
-                        dateError = false
+                        errors[ReportField.DATE] = false
                     }) {
                         Text("OK")
                     }
@@ -203,11 +217,12 @@ fun CreateReportContent(
                     Icon(imageVector = Icons.Outlined.Traffic, contentDescription = null)
                 },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
-                isError = typeError,
-                supportingText = { if (typeError) Text(requiredErrorMessage) },
+                isError = errors[ReportField.TYPE] ?: false,
+                supportingText = { if (errors[ReportField.TYPE] == true) Text(requiredErrorMessage) },
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                     .fillMaxWidth()
+                    .testTag(ReportField.TYPE.testTag)
             )
             ExposedDropdownMenu(
                 expanded = expandedDropdown,
@@ -219,7 +234,7 @@ fun CreateReportContent(
                         onClick = {
                             selectedType = type
                             expandedDropdown = false
-                            typeError = false
+                            errors[ReportField.TYPE] = false
                         }
                     )
                 }
@@ -229,13 +244,18 @@ fun CreateReportContent(
         // Description Input
         OutlinedTextField(
             value = description,
-            onValueChange = { description = it; descriptionError = false },
+            onValueChange = { description = it; errors[ReportField.DESCRIPTION] = false },
             label = { Text(stringResource(R.string.report_description)) },
-            isError = descriptionError,
-            supportingText = { if (descriptionError) Text(requiredErrorMessage) },
+            isError = errors[ReportField.DESCRIPTION] ?: false,
+            supportingText = {
+                if (errors[ReportField.DESCRIPTION] == true) Text(
+                    requiredErrorMessage
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp),
+                .height(160.dp)
+                .testTag(ReportField.DESCRIPTION.testTag),
             maxLines = 5
         )
 
@@ -277,19 +297,13 @@ fun CreateReportContent(
         // Submit Button
         Button(
             onClick = {
-                titleError = title.isBlank()
-                locationError = location.isBlank()
-                dateError = (selectedDate == null)
-                typeError = (selectedType == null)
-                descriptionError = description.isBlank()
+                errors[ReportField.TITLE] = title.isBlank()
+                errors[ReportField.LOCATION] = location.isBlank()
+                errors[ReportField.DATE] = (selectedDate == null)
+                errors[ReportField.TYPE] = (selectedType == null)
+                errors[ReportField.DESCRIPTION] = description.isBlank()
 
-                val hasErrors = listOf(
-                    titleError,
-                    locationError,
-                    dateError,
-                    typeError,
-                    descriptionError
-                ).any { it } // check if any value is true (it == true)
+                val hasErrors = errors.values.any { it } // check if any value is true (it == true)
 
                 if (!hasErrors) {
                     val report = Report(
@@ -306,6 +320,7 @@ fun CreateReportContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
+                .testTag(ReportField.SUBMIT.testTag)
         ) {
             Text(stringResource(R.string.submit), modifier = Modifier.padding(8.dp))
         }
