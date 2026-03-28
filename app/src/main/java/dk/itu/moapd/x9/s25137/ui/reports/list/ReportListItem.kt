@@ -21,6 +21,7 @@ import java.util.Date
 @Composable
 fun ReportListItem(
     report: Report,
+    isDeletable: Boolean,
     onDelete: (key: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -31,11 +32,13 @@ fun ReportListItem(
             onDelete(report.key)
     }
 
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {},
-        content = { ReportListItemContent(modifier, report) }
-    )
+    if (isDeletable)
+        SwipeToDismissBox(
+            state = dismissState,
+            backgroundContent = {},
+            content = { ReportListItemContent(modifier, report) }
+        )
+    else ReportListItemContent(modifier, report)
 }
 
 @Composable
@@ -66,5 +69,5 @@ fun ReportListItemPreview() {
         description = "A broken car is parked in the road",
         severity = Severity.MODERATE
     )
-    ReportListItem(report = report, onDelete = {})
+    ReportListItem(report = report, onDelete = {}, isDeletable = false)
 }

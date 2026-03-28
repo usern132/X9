@@ -31,6 +31,7 @@ fun ReportList(
                 ReportListItem(
                     report = report,
                     onDelete = onDeleteReport,
+                    isDeletable = report.userId == state.userId,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onItemClick(state.reports.indexOf(report)) }
