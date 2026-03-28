@@ -1,9 +1,11 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.widget.Toast
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -21,7 +23,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
@@ -31,11 +35,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
+import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -83,11 +91,29 @@ fun MainScaffold(
     viewModel: MainViewModel = viewModel(),
     onLogout: () -> Unit
 ) {
+    MainScaffoldContent(
+        uiState = uiState,
+        currentUser = viewModel.currentUser,
+        onLogout = onLogout,
+        onInsertReport = { viewModel.insertReport(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainScaffoldContent(
+    uiState: StateFlow<MainUiState>,
+    currentUser: User?,
+    onLogout: () -> Unit,
+    onInsertReport: (Report) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
 
     Scaffold(
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
@@ -121,7 +147,9 @@ fun MainScaffold(
         NavHost(
             navController = navController,
             startDestination = destinations.first().route,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             enterTransition = { enterTransition },
             exitTransition = { exitTransition },
             popEnterTransition = { enterTransition },
@@ -131,13 +159,18 @@ fun MainScaffold(
                 DashboardPage(
                     uiState = uiState,
                     onCreateReportClick = { navController.navigate("create_report") },
-                    onReportClick = { index -> navController.navigate("report_details/$index") }
+                    onReportClick = { index -> navController.navigate("report_details/$index") },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             composable("create_report") {
+                val context = LocalContext.current
                 CreateReportScreen(
-                    mainViewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onSubmit = { report ->
+                        onInsertReport(report)
+                        Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
                 )
             }
             composable(
@@ -149,10 +182,11 @@ fun MainScaffold(
                 if (reportIndex in state.reports.indices) {
                     val report = state.reports[reportIndex]
                     // A logged in user can only edit their own reports
-                    val isEditable = report.userId == viewModel.currentUser?.uid
+                    val isEditable = report.userId == currentUser?.uid
                     ReportDetailsPage(
                         report = report,
-                        isEditable = isEditable
+                        isEditable = isEditable,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -162,11 +196,34 @@ fun MainScaffold(
             composable("account") {
                 AccountScreen(
                     onLogout = onLogout,
-                    name = viewModel.currentUser?.name ?: "N/A",
-                    email = viewModel.currentUser?.email ?: "N/A",
-                    profilePictureUrl = viewModel.currentUser?.photoUri?.toString()
+                    name = currentUser?.name ?: "",
+                    email = currentUser?.email ?: "",
+                    profilePictureUrl = currentUser?.photoUri?.toString()
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScaffoldPreview() {
+    val user = User(
+        uid = "user123",
+        name = "John Doe",
+        email = "john@example.com"
+    )
+    val reports = Report.generateRandomReports(20).mapIndexed { index, report ->
+        if (index == 0) report.copy(userId = "user123") else report
+    }
+    val uiState = MutableStateFlow(MainUiState(userId = "user123", reports = reports))
+
+    AppTheme {
+        MainScaffoldContent(
+            uiState = uiState,
+            currentUser = user,
+            onLogout = {},
+            onInsertReport = {}
+        )
     }
 }

@@ -1,5 +1,8 @@
 package dk.itu.moapd.x9.s25137.ui.dashboard
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -9,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.ui.main.MainUiState
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
@@ -28,6 +32,8 @@ fun DashboardPage(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0.dp),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateReportClick,
@@ -36,10 +42,11 @@ fun DashboardPage(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Report")
             }
-        }) { _ ->
+        }) { innerPadding ->
         ReportList(
             uiState = uiState,
             onItemClick = onReportClick,
+            modifier = Modifier.padding(innerPadding)
         )
     }
 }

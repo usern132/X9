@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,7 +45,8 @@ fun ReportDetailsPage(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0.dp),
         floatingActionButton = {
             if (isEditable) {
                 FloatingActionButton(onClick = { /* TODO: Navigate to Edit Screen */ }) {
@@ -52,10 +54,11 @@ fun ReportDetailsPage(
                 }
             }
         }
-    ) { _ ->
+    ) { innerPadding ->
         Surface(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(innerPadding),
             color = MaterialTheme.colorScheme.background,
         ) {
             Column(
