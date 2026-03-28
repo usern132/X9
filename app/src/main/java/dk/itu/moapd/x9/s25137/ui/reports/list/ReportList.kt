@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun ReportList(
     uiState: StateFlow<MainUiState>,
     modifier: Modifier = Modifier,
+    onDeleteReport: (key: String) -> Unit = {},
     onItemClick: (Int) -> Unit = {}
 ) {
     val state by uiState.collectAsState()
@@ -29,6 +30,7 @@ fun ReportList(
             items(items = state.reports, key = { it.key!! }) { report ->
                 ReportListItem(
                     report = report,
+                    onDelete = onDeleteReport,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onItemClick(state.reports.indexOf(report)) }

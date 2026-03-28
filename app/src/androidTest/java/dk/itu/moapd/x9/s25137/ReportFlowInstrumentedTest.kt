@@ -17,7 +17,7 @@ import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.main.MainUiState
-import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
+import dk.itu.moapd.x9.s25137.ui.reports.ReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,7 +86,7 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                CreateReportScreen(onSubmit = { submittedReport = it })
+                ReportForm(onSubmit = { submittedReport = it })
             }
         }
         composeRule.waitForIdle()
@@ -105,8 +105,8 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                CreateReportScreen(
-                    initialSelectedDateMillis = selectedDate,
+                ReportForm(
+                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport.value = it }
                 )
             }
@@ -171,8 +171,8 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                CreateReportScreen(
-                    initialSelectedDateMillis = selectedDate,
+                ReportForm(
+                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport = it }
                 )
             }
@@ -197,8 +197,8 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                CreateReportScreen(
-                    initialSelectedDateMillis = selectedDate,
+                ReportForm(
+                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport = it }
                 )
             }
@@ -222,8 +222,8 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                CreateReportScreen(
-                    initialSelectedDateMillis = selectedDate,
+                ReportForm(
+                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport.value = it }
                 )
             }

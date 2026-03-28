@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.DataSnapshot
@@ -80,6 +81,7 @@ class MainViewModel(
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Error listening to Realtime Database changes: $error")
                 // Keep previous state; errors will be handled by Firebase SDK logs.
             }
         }

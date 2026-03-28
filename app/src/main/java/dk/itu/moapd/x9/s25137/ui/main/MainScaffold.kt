@@ -39,7 +39,7 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
-import dk.itu.moapd.x9.s25137.ui.reports.CreateReportScreen
+import dk.itu.moapd.x9.s25137.ui.reports.ReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
@@ -95,7 +95,9 @@ fun MainScaffold(
         uiState = uiState,
         currentUser = viewModel.currentUser,
         onLogout = onLogout,
-        onInsertReport = { viewModel.insertReport(it) }
+        onInsertReport = { viewModel.insertReport(it) },
+        onEditReport = { viewModel.updateReport(it) },
+        onDeleteReport = { viewModel.deleteReport(it) }
     )
 }
 
@@ -106,6 +108,8 @@ private fun MainScaffoldContent(
     currentUser: User?,
     onLogout: () -> Unit,
     onInsertReport: (Report) -> Unit,
+    onEditReport: (Report) -> Unit,
+    onDeleteReport: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -160,12 +164,13 @@ private fun MainScaffoldContent(
                     uiState = uiState,
                     onCreateReportClick = { navController.navigate("create_report") },
                     onReportClick = { index -> navController.navigate("report_details/$index") },
+                    onDeleteReport = { key -> onDeleteReport(key) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
             composable("create_report") {
                 val context = LocalContext.current
-                CreateReportScreen(
+                ReportForm(
                     onSubmit = { report ->
                         onInsertReport(report)
                         Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
@@ -186,7 +191,28 @@ private fun MainScaffoldContent(
                     ReportDetailsPage(
                         report = report,
                         isEditable = isEditable,
+                        onEditButtonClick = { navController.navigate("edit_report/$reportIndex") },
                         modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            composable(
+                "edit_report/{reportIndex}",
+                arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
+                val state by uiState.collectAsState()
+                if (reportIndex in state.reports.indices) {
+                    val report = state.reports[reportIndex]
+                    val context = LocalContext.current
+                    ReportForm(
+                        report = report,
+                        onSubmit = { report ->
+                            onEditReport(report)
+                            Toast.makeText(context, R.string.report_edited, Toast.LENGTH_SHORT)
+                                .show()
+                            navController.popBackStack()
+                        }
                     )
                 }
             }
@@ -223,7 +249,9 @@ fun MainScaffoldPreview() {
             uiState = uiState,
             currentUser = user,
             onLogout = {},
-            onInsertReport = {}
+            onInsertReport = {},
+            onEditReport = {},
+            onDeleteReport = {}
         )
     }
 }

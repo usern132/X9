@@ -29,6 +29,7 @@
     <string name="field_is_required">This field is required.</string>
     <string name="no_report_yet">No report yet!</string>
     <string name="report_saved">Report saved successfully!</string>
+    <string name="report_edited">Report edited successfully!</string>
 
     <string name="home">Home</string>
     <string name="calendar">Calendar</string>

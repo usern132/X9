@@ -40,6 +40,7 @@ private const val VERTICAL_SPACING = 12
 fun ReportDetailsPage(
     report: Report,
     isEditable: Boolean,
+    onEditButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -49,7 +50,7 @@ fun ReportDetailsPage(
         contentWindowInsets = WindowInsets(0.dp),
         floatingActionButton = {
             if (isEditable) {
-                FloatingActionButton(onClick = { /* TODO: Navigate to Edit Screen */ }) {
+                FloatingActionButton(onClick = { onEditButtonClick() }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit report")
                 }
             }
@@ -135,7 +136,11 @@ private fun ReportDetailsPagePreview(isEditable: Boolean) {
             userName = "John Doe",
             userImageUri = null
         )
-        ReportDetailsPage(report = sampleReport, isEditable = isEditable)
+        ReportDetailsPage(
+            report = sampleReport,
+            isEditable = isEditable,
+            onEditButtonClick = {}
+        )
     }
 }
 

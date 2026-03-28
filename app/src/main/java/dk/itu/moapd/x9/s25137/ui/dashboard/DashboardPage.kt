@@ -28,6 +28,7 @@ private enum class DashboardElements(val testTag: String) {
 fun DashboardPage(
     uiState: StateFlow<MainUiState>,
     onCreateReportClick: () -> Unit,
+    onDeleteReport: (key: String) -> Unit,
     onReportClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -46,6 +47,7 @@ fun DashboardPage(
         ReportList(
             uiState = uiState,
             onItemClick = onReportClick,
+            onDeleteReport = onDeleteReport,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -60,7 +62,8 @@ fun DashboardPagePreview() {
                 MainUiState(reports = Report.generateRandomReports(20))
             ),
             onCreateReportClick = {},
-            onReportClick = { _ -> },
+            onReportClick = {},
+            onDeleteReport = {}
         )
     }
 }

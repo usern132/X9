@@ -57,31 +57,34 @@ import java.util.Date
 import java.util.Locale
 
 private enum class ReportField(val testTag: String) {
-    TITLE("createReport:title"),
-    LOCATION("createReport:location"),
-    DATE("createReport:date"),
-    TYPE("createReport:type"),
-    DESCRIPTION("createReport:description"),
-    SUBMIT("createReport:submit")
+    TITLE("createReport:title"), LOCATION("createReport:location"), DATE("createReport:date"), TYPE(
+        "createReport:type"
+    ),
+    DESCRIPTION("createReport:description"), SUBMIT("createReport:submit")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateReportScreen(
-    initialSelectedDateMillis: Long? = null,
-    onSubmit: (Report) -> Unit
+fun ReportForm(
+    report: Report? = null,
+    onSubmit: (Report) -> Unit,
+    submitButtonText: String = stringResource(R.string.submit),
+    testInitialSelectedDateMillis: Long? = null
 ) {
     val scrollState = rememberScrollState()
 
-    var title by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf<Type?>(null) }
-    var selectedSeverity by remember { mutableStateOf(Severity.MINOR) }
+    var title by remember { mutableStateOf(report?.title ?: "") }
+    var location by remember { mutableStateOf(report?.location ?: "") }
+    var description by remember { mutableStateOf(report?.description ?: "") }
+    var selectedType by remember { mutableStateOf(report?.type) }
+    var selectedSeverity by remember { mutableStateOf(report?.severity ?: Severity.MINOR) }
 
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState =
-        rememberDatePickerState(initialSelectedDateMillis = initialSelectedDateMillis)
+        rememberDatePickerState(
+            initialSelectedDateMillis =
+                report?.timestamp ?: testInitialSelectedDateMillis
+        )
     val selectedDate = datePickerState.selectedDateMillis
     val formattedDate = selectedDate?.let {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
@@ -107,8 +110,7 @@ fun CreateReportScreen(
             label = { Text(stringResource(R.string.report_title)) },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Outlined.DirectionsCar,
-                    contentDescription = null
+                    imageVector = Icons.Outlined.DirectionsCar, contentDescription = null
                 )
             },
             isError = errors[ReportField.TITLE] ?: false,
@@ -125,8 +127,7 @@ fun CreateReportScreen(
             label = { Text(stringResource(R.string.report_location)) },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Outlined.AddLocationAlt,
-                    contentDescription = null
+                    imageVector = Icons.Outlined.AddLocationAlt, contentDescription = null
                 )
             },
             isError = errors[ReportField.LOCATION] ?: false,
@@ -143,8 +144,7 @@ fun CreateReportScreen(
             label = { Text(stringResource(R.string.report_date)) },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Outlined.CalendarToday,
-                    contentDescription = null
+                    imageVector = Icons.Outlined.CalendarToday, contentDescription = null
                 )
             },
             readOnly = true,
@@ -160,26 +160,21 @@ fun CreateReportScreen(
                 disabledBorderColor = MaterialTheme.colorScheme.outline,
                 disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
+            ))
 
         if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showDatePicker = false
-                        errors[ReportField.DATE] = false
-                    }) {
-                        Text("OK")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancel")
-                    }
+            DatePickerDialog(onDismissRequest = { showDatePicker = false }, confirmButton = {
+                TextButton(onClick = {
+                    showDatePicker = false
+                    errors[ReportField.DATE] = false
+                }) {
+                    Text("OK")
                 }
-            ) {
+            }, dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }) {
                 DatePicker(state = datePickerState)
             }
         }
@@ -202,23 +197,20 @@ fun CreateReportScreen(
                 isError = errors[ReportField.TYPE] ?: false,
                 supportingText = { if (errors[ReportField.TYPE] == true) Text(requiredErrorMessage) },
                 modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                    .menuAnchor(
+                        ExposedDropdownMenuAnchorType.PrimaryNotEditable, true
+                    )
                     .fillMaxWidth()
                     .testTag(ReportField.TYPE.testTag)
             )
             ExposedDropdownMenu(
-                expanded = expandedDropdown,
-                onDismissRequest = { expandedDropdown = false }
-            ) {
+                expanded = expandedDropdown, onDismissRequest = { expandedDropdown = false }) {
                 Type.entries.forEach { type ->
-                    DropdownMenuItem(
-                        text = { Text(stringResource(type.nameResId)) },
-                        onClick = {
-                            selectedType = type
-                            expandedDropdown = false
-                            errors[ReportField.TYPE] = false
-                        }
-                    )
+                    DropdownMenuItem(text = { Text(stringResource(type.nameResId)) }, onClick = {
+                        selectedType = type
+                        expandedDropdown = false
+                        errors[ReportField.TYPE] = false
+                    })
                 }
             }
         }
@@ -256,8 +248,7 @@ fun CreateReportScreen(
 
             severities.forEach { (severity, labelResId) ->
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                         .selectable(
                             selected = (severity == selectedSeverity),
                             onClick = { selectedSeverity = severity },
@@ -266,8 +257,7 @@ fun CreateReportScreen(
                         .padding(8.dp)
                 ) {
                     RadioButton(
-                        selected = (severity == selectedSeverity),
-                        onClick = null
+                        selected = (severity == selectedSeverity), onClick = null
                     )
                     Text(text = stringResource(labelResId), modifier = Modifier.padding(8.dp))
                 }
@@ -288,14 +278,25 @@ fun CreateReportScreen(
                 val hasErrors = errors.values.any { it } // check if any value is true (it == true)
 
                 if (!hasErrors) {
-                    val report = Report(
-                        title = title,
-                        location = location,
-                        timestamp = selectedDate ?: Date().time,
-                        type = selectedType ?: Type.OTHER,
-                        description = description,
-                        severity = selectedSeverity
-                    )
+                    val isNewReport = report == null
+                    val report =
+                        if (isNewReport)
+                            Report(
+                                title = title,
+                                location = location,
+                                timestamp = selectedDate ?: Date().time,
+                                type = selectedType ?: Type.OTHER,
+                                description = description,
+                                severity = selectedSeverity
+                            )
+                        else report.copy(
+                            title = title,
+                            location = location,
+                            timestamp = selectedDate ?: Date().time,
+                            type = selectedType ?: Type.OTHER,
+                            description = description,
+                            severity = selectedSeverity
+                        )
                     onSubmit(report)
                 }
             },
@@ -304,17 +305,16 @@ fun CreateReportScreen(
                 .padding(bottom = 16.dp)
                 .testTag(ReportField.SUBMIT.testTag)
         ) {
-            Text(stringResource(R.string.submit), modifier = Modifier.padding(8.dp))
+            Text(text = submitButtonText, modifier = Modifier.padding(8.dp))
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CreateReportScreenPreview() {
+fun ReportFormPreview() {
     AppTheme {
-        CreateReportScreen(
-            onSubmit = {}
-        )
+        ReportForm(
+            onSubmit = {})
     }
 }
