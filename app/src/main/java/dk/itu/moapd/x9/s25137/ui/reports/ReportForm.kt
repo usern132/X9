@@ -264,7 +264,8 @@ fun ReportForm(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f)) // Pushes the button to the bottom if screen is large
+        // Push submit button to the bottom of the screen
+        Spacer(modifier = Modifier.weight(1f))
 
         // Submit Button
         Button(
@@ -314,7 +315,6 @@ fun ReportForm(
 @Composable
 fun ReportFormPreview() {
     AppTheme {
-        ReportForm(
-            onSubmit = {})
+        ReportForm(onSubmit = {})
     }
 }

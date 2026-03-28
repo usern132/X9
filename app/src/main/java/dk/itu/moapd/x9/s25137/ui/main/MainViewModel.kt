@@ -66,7 +66,7 @@ class MainViewModel(
         val currentUserId = currentUser?.uid ?: return
         _uiState.update { it.copy(userId = currentUserId) }
 
-        val query = getAllReportsQuery(currentUserId)
+        val query = getAllReportsQuery()
 
         val valueListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -82,7 +82,7 @@ class MainViewModel(
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "Error listening to Realtime Database changes: $error")
-                // Keep previous state; errors will be handled by Firebase SDK logs.
+                _uiState.update { it.copy(errorMessage = error.message) }
             }
         }
 
@@ -97,20 +97,36 @@ class MainViewModel(
             userName = user.name ?: "",
             userImageUri = user.photoUri?.toString()
         )
-        reportRepository.insert(report = reportWithUser)
+        reportRepository.insert(report = reportWithUser) { error ->
+            if (error != null) {
+                _uiState.update { it.copy(errorMessage = error.message) }
+            }
+        }
     }
 
     fun updateReport(report: Report) {
         currentUser?.uid ?: return
-        reportRepository.update(report = report)
+        reportRepository.update(report = report) { error ->
+            if (error != null) {
+                _uiState.update { it.copy(errorMessage = error.message) }
+            }
+        }
     }
 
     fun deleteReport(key: String) {
         currentUser?.uid ?: return
-        reportRepository.delete(key = key)
+        reportRepository.delete(key = key) { error ->
+            if (error != null) {
+                _uiState.update { it.copy(errorMessage = error.message) }
+            }
+        }
     }
 
-    fun getAllReportsQuery(userId: String) =
+    fun errorConsumed() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun getAllReportsQuery() =
         reportRepository.getAllQuery()
 
     fun signOut() = authRepository.signOut()
@@ -120,7 +136,7 @@ class MainViewModel(
         val currentUserId = currentUser?.uid
         val l = reportsListener
         if (currentUserId != null && l != null) {
-            getAllReportsQuery(currentUserId).removeEventListener(l)
+            getAllReportsQuery().removeEventListener(l)
         }
     }
 }

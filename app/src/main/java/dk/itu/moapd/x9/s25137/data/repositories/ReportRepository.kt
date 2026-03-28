@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.data.repositories
 
+import com.google.firebase.database.DatabaseError
 import dk.itu.moapd.x9.s25137.data.datasources.ReportRemoteDataSource
 import dk.itu.moapd.x9.s25137.domain.models.Report
 
@@ -9,12 +10,12 @@ class ReportRepository(
     fun getAllQuery() =
         reportRemoteDataSource.getAllQuery()
 
-    fun insert(report: Report): String? =
-        reportRemoteDataSource.insert(report = report)
+    fun insert(report: Report, onComplete: (DatabaseError?) -> Unit): String? =
+        reportRemoteDataSource.insert(report = report, onComplete = onComplete)
 
-    fun update(report: Report) =
-        reportRemoteDataSource.update(report = report)
+    fun update(report: Report, onComplete: (DatabaseError?) -> Unit) =
+        reportRemoteDataSource.update(report = report, onComplete = onComplete)
 
-    fun delete(key: String) =
-        reportRemoteDataSource.delete(key = key)
+    fun delete(key: String, onComplete: (DatabaseError?) -> Unit) =
+        reportRemoteDataSource.delete(key = key, onComplete = onComplete)
 }

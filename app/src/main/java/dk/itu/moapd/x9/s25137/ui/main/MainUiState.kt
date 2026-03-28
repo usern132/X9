@@ -27,5 +27,6 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 
 data class MainUiState(
     val userId: String? = null,
-    val reports: List<Report> = emptyList()
+    val reports: List<Report> = emptyList(),
+    val errorMessage: String? = null
 )

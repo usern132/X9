@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.s25137.data.datasources
 
 import com.google.firebase.Firebase
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import dk.itu.moapd.x9.s25137.domain.models.Report
@@ -50,18 +51,24 @@ class ReportRemoteDataSource(
         reportsReference()
             .orderByChild("timestamp")
 
-    fun insert(report: Report): String? {
+    fun insert(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
         val newChild = reportsReference().push()
-        newChild.setValue(report)
+        newChild.setValue(report) { error, _ ->
+            onComplete(error)
+        }
         return newChild.key
     }
 
-    fun update(report: Report) {
+    fun update(report: Report, onComplete: (DatabaseError?) -> Unit) {
         val key = report.key ?: return
-        reportReference(key).setValue(report)
+        reportReference(key).setValue(report) { error, _ ->
+            onComplete(error)
+        }
     }
 
-    fun delete(key: String) {
-        reportReference(key).removeValue()
+    fun delete(key: String, onComplete: (DatabaseError?) -> Unit) {
+        reportReference(key).removeValue { error, _ ->
+            onComplete(error)
+        }
     }
 }

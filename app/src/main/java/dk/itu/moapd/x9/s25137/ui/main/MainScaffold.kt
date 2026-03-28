@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
-import android.widget.Toast
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -23,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -169,11 +167,9 @@ private fun MainScaffoldContent(
                 )
             }
             composable("create_report") {
-                val context = LocalContext.current
                 ReportForm(
                     onSubmit = { report ->
                         onInsertReport(report)
-                        Toast.makeText(context, R.string.report_saved, Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
                     }
                 )
@@ -204,13 +200,10 @@ private fun MainScaffoldContent(
                 val state by uiState.collectAsState()
                 if (reportIndex in state.reports.indices) {
                     val report = state.reports[reportIndex]
-                    val context = LocalContext.current
                     ReportForm(
                         report = report,
                         onSubmit = { report ->
                             onEditReport(report)
-                            Toast.makeText(context, R.string.report_edited, Toast.LENGTH_SHORT)
-                                .show()
                             navController.popBackStack()
                         }
                     )
