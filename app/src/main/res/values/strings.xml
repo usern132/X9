@@ -42,5 +42,9 @@
     <string name="cancel">Cancel</string>
     <string name="error_occurred">An error has occurred</string>
     <string name="dismiss">Dismiss</string>
+    <string name="restricted_feature_title">Restricted feature\n</string>
+    <string name="restricted_feature_message">This feature is restricted to our users! Please log in or sign up in order to access this.</string>
+    <string name="log_in">Log in</string>
+    <string name="log_in_message">Logging in will grant you full access to all functionality. Become a member of the community!</string>
 
 </resources>

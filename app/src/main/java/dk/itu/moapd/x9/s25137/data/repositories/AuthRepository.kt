@@ -10,6 +10,6 @@ class AuthRepository @Inject constructor(
     val currentUser: User?
         get() = authRemoteDataSource.currentUser
 
-    fun signOut() = authRemoteDataSource.signOut()
+    fun logOut() = authRemoteDataSource.signOut()
 
 }

@@ -7,11 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -60,42 +63,65 @@ class MainActivity : ComponentActivity() {
 
                 MainScaffold(
                     uiState = viewModel.uiState,
-                    viewModel = viewModel,
-                    onLogout = {
-                        viewModel.signOut()
-                        startLoginActivity()
-                    }
+                    viewModel = viewModel
                 )
 
                 uiState.errorMessage?.let { errorMessage ->
-                    AlertDialog(
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = Color(red = 200, green = 100, blue = 100)
-                            )
-                        },
-                        title = { Text(text = stringResource(R.string.error_occurred)) },
-                        text = { Text(text = errorMessage) },
-                        onDismissRequest = { viewModel.errorConsumed() },
-                        confirmButton = {},
-                        dismissButton = {
-                            TextButton(onClick = { viewModel.errorConsumed() }) {
-                                Text(
-                                    text = stringResource(R.string.dismiss)
-                                )
-                            }
-                        }
-                    )
+                    ErrorAlertDialog(errorMessage, dismiss = { viewModel.errorConsumed() })
                 }
+
+                if (uiState.showLoginAlertDialog)
+                    LoginAlertDialog(dismiss = { viewModel.hideLoginAlertDialog() })
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.currentUser ?: startLoginActivity()
+    @Composable
+    private fun ErrorAlertDialog(errorMessage: String, dismiss: () -> Unit) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = Color(red = 200, green = 100, blue = 100)
+                )
+            },
+            title = { Text(text = stringResource(R.string.error_occurred)) },
+            text = { Text(text = errorMessage) },
+            onDismissRequest = dismiss,
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(
+                        text = stringResource(R.string.dismiss)
+                    )
+                }
+            }
+        )
+    }
+
+    @Composable
+    private fun LoginAlertDialog(dismiss: () -> Unit) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text(text = stringResource(R.string.restricted_feature_title)) },
+            text = { Text(text = stringResource(R.string.restricted_feature_message)) },
+            onDismissRequest = dismiss,
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(
+                        text = stringResource(R.string.dismiss)
+                    )
+                }
+            }
+        )
     }
 
     private fun startLoginActivity() {

@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.content.Intent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -36,6 +37,8 @@ import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
+import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
+import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
@@ -87,15 +90,15 @@ private const val ANIM_DURATION = 150
 fun MainScaffold(
     uiState: StateFlow<MainUiState>,
     viewModel: MainViewModel = viewModel(),
-    onLogout: () -> Unit
 ) {
     MainScaffoldContent(
         uiState = uiState,
         currentUser = viewModel.currentUser,
-        onLogout = onLogout,
+        onLogout = { viewModel.logOut() },
         onInsertReport = { viewModel.insertReport(it) },
         onEditReport = { viewModel.updateReport(it) },
         onDeleteReport = { viewModel.deleteReport(it) },
+        showLoginAlertDialog = { viewModel.showLoginAlertDialog() }
     )
 }
 
@@ -108,7 +111,8 @@ private fun MainScaffoldContent(
     onInsertReport: (Report) -> Unit,
     onEditReport: (Report) -> Unit,
     onDeleteReport: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showLoginAlertDialog: () -> Unit
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -160,7 +164,11 @@ private fun MainScaffoldContent(
             composable("home") {
                 DashboardPage(
                     uiState = uiState,
-                    onCreateReportClick = { navController.navigate("create_report") },
+                    onCreateReportClick = {
+                        if (currentUser != null)
+                            navController.navigate("create_report")
+                        else showLoginAlertDialog()
+                    },
                     onReportClick = { index -> navController.navigate("report_details/$index") },
                     onDeleteReport = { key -> onDeleteReport(key) },
                     modifier = Modifier.fillMaxSize()
@@ -182,7 +190,7 @@ private fun MainScaffoldContent(
                 val state by uiState.collectAsState()
                 if (reportIndex in state.reports.indices) {
                     val report = state.reports[reportIndex]
-                    // A logged in user can only edit their own reports
+                    // A logged-in user can only edit their own reports
                     val isEditable = report.userId == currentUser?.uid
                     ReportDetailsPage(
                         report = report,
@@ -213,12 +221,25 @@ private fun MainScaffoldContent(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                AccountScreen(
-                    onLogout = onLogout,
-                    name = currentUser?.name ?: "",
-                    email = currentUser?.email ?: "",
-                    profilePictureUrl = currentUser?.photoUri?.toString()
-                )
+                if (currentUser != null)
+                    AccountScreen(
+                        onLogout = onLogout,
+                        name = currentUser.name ?: "",
+                        email = currentUser.email ?: "",
+                        profilePictureUrl = currentUser.photoUri?.toString()
+                    )
+                else {
+                    LoggedOutAccountScreen(
+                        navigateToLoginScreen = { context ->
+                            context.startActivity(
+                                Intent(context, LoginActivity::class.java).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -245,6 +266,6 @@ fun MainScaffoldPreview() {
             onInsertReport = {},
             onEditReport = {},
             onDeleteReport = {}
-        )
+        ) {}
     }
 }

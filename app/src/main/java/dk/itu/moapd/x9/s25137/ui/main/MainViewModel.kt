@@ -123,7 +123,10 @@ class MainViewModel @Inject constructor(
     fun getAllReportsQuery() =
         reportRepository.getAllQuery()
 
-    fun signOut() = authRepository.signOut()
+    fun logOut() {
+        authRepository.logOut()
+        _uiState.update { it.copy(userId = null) }
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -132,5 +135,13 @@ class MainViewModel @Inject constructor(
         if (currentUserId != null && l != null) {
             getAllReportsQuery().removeEventListener(l)
         }
+    }
+
+    fun showLoginAlertDialog() {
+        _uiState.value.showLoginAlertDialog = true
+    }
+
+    fun hideLoginAlertDialog() {
+        _uiState.value.showLoginAlertDialog = false
     }
 }
