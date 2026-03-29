@@ -3,9 +3,10 @@ package dk.itu.moapd.x9.s25137.data.repositories
 import com.google.firebase.database.DatabaseError
 import dk.itu.moapd.x9.s25137.data.datasources.ReportRemoteDataSource
 import dk.itu.moapd.x9.s25137.domain.models.Report
+import javax.inject.Inject
 
-class ReportRepository(
-    private val reportRemoteDataSource: ReportRemoteDataSource = ReportRemoteDataSource()
+class ReportRepository @Inject constructor(
+    private val reportRemoteDataSource: ReportRemoteDataSource
 ) {
     fun getAllQuery() =
         reportRemoteDataSource.getAllQuery()

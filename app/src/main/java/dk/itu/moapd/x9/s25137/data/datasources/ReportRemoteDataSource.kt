@@ -1,11 +1,10 @@
 package dk.itu.moapd.x9.s25137.data.datasources
 
-import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.database
+import com.google.firebase.database.FirebaseDatabase
 import dk.itu.moapd.x9.s25137.domain.models.Report
-import io.github.cdimascio.dotenv.dotenv
+import javax.inject.Inject
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -30,16 +29,14 @@ import io.github.cdimascio.dotenv.dotenv
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class ReportRemoteDataSource(
-    private val root: DatabaseReference = Firebase.database(DATABASE_URL).reference
+class ReportRemoteDataSource @Inject constructor(
+    database: FirebaseDatabase
 ) {
     companion object {
-        val DATABASE_URL: String = dotenv {
-            directory = "/assets"
-            filename = "env"
-        }["DATABASE_URL"]
         private const val PATH_REPORTS = "reports"
     }
+
+    private val root: DatabaseReference = database.reference
 
     private fun reportsReference(): DatabaseReference = root
         .child(PATH_REPORTS)

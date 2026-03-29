@@ -1,11 +1,11 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dk.itu.moapd.x9.s25137.data.repositories.AuthRepository
 import dk.itu.moapd.x9.s25137.data.repositories.ReportRepository
 import dk.itu.moapd.x9.s25137.domain.models.Report
@@ -13,6 +13,7 @@ import dk.itu.moapd.x9.s25137.domain.models.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -40,11 +41,11 @@ import kotlinx.coroutines.flow.update
 private const val TAG = "MainViewModel"
 private const val ADD_FAKE_REPORTS = false
 
-class MainViewModel(
-    private val savedStateHandle: SavedStateHandle,
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val reportRepository: ReportRepository
 ) : ViewModel() {
-    private val authRepository = AuthRepository()
-    private val reportRepository = ReportRepository()
     private val _uiState = MutableStateFlow(MainUiState(userId = authRepository.currentUser?.uid))
     val uiState: StateFlow<MainUiState> = _uiState
     private var _reports = MutableStateFlow<List<Report>>(emptyList())

@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
@@ -45,6 +46,7 @@ private const val TAG = "MainActivity"
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 

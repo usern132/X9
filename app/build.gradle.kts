@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.google.ksp)
 }
 
 android {
@@ -114,7 +116,8 @@ dependencies {
     implementation(libs.androidx.compose.navigation)
     implementation(libs.firebase.database)
     testImplementation(libs.junit.jupiter)
-
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.hamcrest)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
