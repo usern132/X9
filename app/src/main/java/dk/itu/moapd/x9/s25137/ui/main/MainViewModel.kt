@@ -57,8 +57,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun observeReports() {
-        val currentUserId = currentUser?.uid ?: return
-        _uiState.update { it.copy(userId = currentUserId) }
+        _uiState.update { it.copy(userId = currentUser?.uid) }
 
         val query = getAllReportsQuery()
 
@@ -130,18 +129,17 @@ class MainViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        val currentUserId = currentUser?.uid
         val l = reportsListener
-        if (currentUserId != null && l != null) {
+        if (l != null) {
             getAllReportsQuery().removeEventListener(l)
         }
     }
 
     fun showLoginAlertDialog() {
-        _uiState.value.showLoginAlertDialog = true
+        _uiState.update { it.copy(showLoginAlertDialog = true) }
     }
 
     fun hideLoginAlertDialog() {
-        _uiState.value.showLoginAlertDialog = false
+        _uiState.update { it.copy(showLoginAlertDialog = false) }
     }
 }

@@ -29,5 +29,5 @@ data class MainUiState(
     val userId: String? = null,
     val reports: List<Report> = emptyList(),
     val errorMessage: String? = null,
-    var showLoginAlertDialog: Boolean = false
+    val showLoginAlertDialog: Boolean = false
 )
