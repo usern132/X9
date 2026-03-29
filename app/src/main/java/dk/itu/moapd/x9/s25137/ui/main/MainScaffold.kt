@@ -94,8 +94,7 @@ fun MainScaffold(
     val state by uiState.collectAsState()
     MainScaffoldContent(
         uiState = uiState,
-        currentUserId = state.userId,
-        currentUser = viewModel.currentUser,
+        currentUser = state.currentUser,
         onLogout = { viewModel.logOut() },
         onInsertReport = { viewModel.insertReport(it) },
         onEditReport = { viewModel.updateReport(it) },
@@ -108,7 +107,6 @@ fun MainScaffold(
 @Composable
 private fun MainScaffoldContent(
     uiState: StateFlow<MainUiState>,
-    currentUserId: String?,
     currentUser: User?,
     onLogout: () -> Unit,
     onInsertReport: (Report) -> Unit,
@@ -168,7 +166,7 @@ private fun MainScaffoldContent(
                 DashboardPage(
                     uiState = uiState,
                     onCreateReportClick = {
-                        if (currentUserId != null)
+                        if (currentUser != null)
                             navController.navigate("create_report")
                         else showLoginAlertDialog()
                     },
@@ -194,7 +192,7 @@ private fun MainScaffoldContent(
                 if (reportIndex in state.reports.indices) {
                     val report = state.reports[reportIndex]
                     // A logged-in user can only edit their own reports
-                    val isEditable = report.userId == currentUserId
+                    val isEditable = report.userId == currentUser?.uid
                     ReportDetailsPage(
                         report = report,
                         isEditable = isEditable,
@@ -224,12 +222,12 @@ private fun MainScaffoldContent(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                if (currentUserId != null)
+                if (currentUser != null)
                     AccountScreen(
                         onLogout = onLogout,
-                        name = currentUser?.name ?: "",
-                        email = currentUser?.email ?: "",
-                        profilePictureUrl = currentUser?.photoUri?.toString()
+                        name = currentUser.name ?: "",
+                        email = currentUser.email ?: "",
+                        profilePictureUrl = currentUser.photoUri?.toString()
                     )
                 else {
                     LoggedOutAccountScreen(
@@ -259,12 +257,11 @@ fun MainScaffoldPreview() {
     val reports = Report.generateRandomReports(20).mapIndexed { index, report ->
         if (index == 0) report.copy(userId = "user123") else report
     }
-    val uiState = MutableStateFlow(MainUiState(userId = "user123", reports = reports))
+    val uiState = MutableStateFlow(MainUiState(currentUser = user, reports = reports))
 
     AppTheme {
         MainScaffoldContent(
             uiState = uiState,
-            currentUserId = user.uid,
             currentUser = user,
             onLogout = {},
             onInsertReport = {},

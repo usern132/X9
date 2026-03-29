@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import dk.itu.moapd.x9.s25137.domain.models.Report
+import dk.itu.moapd.x9.s25137.domain.models.User
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -26,7 +27,7 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
  */
 
 data class MainUiState(
-    val userId: String? = null,
+    val currentUser: User? = null,
     val reports: List<Report> = emptyList(),
     val errorMessage: String? = null,
     val showLoginAlertDialog: Boolean = false

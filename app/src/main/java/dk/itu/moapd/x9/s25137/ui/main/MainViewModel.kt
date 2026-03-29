@@ -45,7 +45,7 @@ class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val reportRepository: ReportRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MainUiState(userId = authRepository.currentUser?.uid))
+    private val _uiState = MutableStateFlow(MainUiState(currentUser = authRepository.currentUser))
     val uiState: StateFlow<MainUiState> = _uiState
     val currentUser: User?
         get() = authRepository.currentUser
@@ -57,7 +57,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun observeReports() {
-        _uiState.update { it.copy(userId = currentUser?.uid) }
+        _uiState.update { it.copy(currentUser = currentUser) }
 
         val query = getAllReportsQuery()
 
@@ -124,7 +124,7 @@ class MainViewModel @Inject constructor(
 
     fun logOut() {
         authRepository.logOut()
-        _uiState.update { it.copy(userId = null) }
+        _uiState.update { it.copy(currentUser = null) }
     }
 
     override fun onCleared() {
