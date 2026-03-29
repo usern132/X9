@@ -35,11 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
@@ -56,43 +55,34 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class ReportField(val testTag: String) {
-    TITLE("createReport:title"), LOCATION("createReport:location"), DATE("createReport:date"), TYPE(
-        "createReport:type"
-    ),
-    DESCRIPTION("createReport:description"), SUBMIT("createReport:submit")
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportForm(
     report: Report? = null,
+    viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit),
     testInitialSelectedDateMillis: Long? = null
 ) {
+    LaunchedEffect(report) {
+        viewModel.setReport(report, testInitialSelectedDateMillis)
+    }
+
+    val uiState by viewModel.uiState.collectAsState()
+
     val scrollState = rememberScrollState()
 
-    var title by remember { mutableStateOf(report?.title ?: "") }
-    var location by remember { mutableStateOf(report?.location ?: "") }
-    var description by remember { mutableStateOf(report?.description ?: "") }
-    var selectedType by remember { mutableStateOf(report?.type) }
-    var selectedSeverity by remember { mutableStateOf(report?.severity ?: Severity.MINOR) }
-
-    var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState =
         rememberDatePickerState(
-            initialSelectedDateMillis =
-                report?.timestamp ?: testInitialSelectedDateMillis
+            initialSelectedDateMillis = uiState.selectedDateMillis
         )
-    val selectedDate = datePickerState.selectedDateMillis
+
+    val selectedDate = uiState.selectedDateMillis?.let { Date(it) }
+
     val formattedDate = selectedDate?.let {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
     } ?: ""
-
-    var expandedDropdown by remember { mutableStateOf(false) }
-
-    val errors = remember { mutableStateMapOf<ReportField, Boolean>() }
 
     val requiredErrorMessage = stringResource(R.string.field_is_required)
 
@@ -105,16 +95,20 @@ fun ReportForm(
 
         // Title Input
         OutlinedTextField(
-            value = title,
-            onValueChange = { title = it; errors[ReportField.TITLE] = false },
+            value = uiState.title,
+            onValueChange = { uiState.title = it; uiState.errors[ReportField.TITLE] = false },
             label = { Text(stringResource(R.string.report_title)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.DirectionsCar, contentDescription = null
                 )
             },
-            isError = errors[ReportField.TITLE] ?: false,
-            supportingText = { if (errors[ReportField.TITLE] == true) Text(requiredErrorMessage) },
+            isError = uiState.errors[ReportField.TITLE] ?: false,
+            supportingText = {
+                if (uiState.errors[ReportField.TITLE] == true) Text(
+                    requiredErrorMessage
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(ReportField.TITLE.testTag)
@@ -122,16 +116,20 @@ fun ReportForm(
 
         // Location Input
         OutlinedTextField(
-            value = location,
-            onValueChange = { location = it; errors[ReportField.LOCATION] = false },
+            value = uiState.location,
+            onValueChange = { uiState.location = it; uiState.errors[ReportField.LOCATION] = false },
             label = { Text(stringResource(R.string.report_location)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.AddLocationAlt, contentDescription = null
                 )
             },
-            isError = errors[ReportField.LOCATION] ?: false,
-            supportingText = { if (errors[ReportField.LOCATION] == true) Text(requiredErrorMessage) },
+            isError = uiState.errors[ReportField.LOCATION] ?: false,
+            supportingText = {
+                if (uiState.errors[ReportField.LOCATION] == true) Text(
+                    requiredErrorMessage
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(ReportField.LOCATION.testTag)
@@ -148,11 +146,15 @@ fun ReportForm(
                 )
             },
             readOnly = true,
-            isError = errors[ReportField.DATE] ?: false,
-            supportingText = { if (errors[ReportField.DATE] == true) Text(requiredErrorMessage) },
+            isError = uiState.errors[ReportField.DATE] ?: false,
+            supportingText = {
+                if (uiState.errors[ReportField.DATE] == true) Text(
+                    requiredErrorMessage
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { showDatePicker = true }
+                .clickable { uiState.showDatePicker = true }
                 .testTag(ReportField.DATE.testTag),
             enabled = false,
             colors = OutlinedTextFieldDefaults.colors(
@@ -162,16 +164,19 @@ fun ReportForm(
                 disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
             ))
 
-        if (showDatePicker) {
-            DatePickerDialog(onDismissRequest = { showDatePicker = false }, confirmButton = {
+        if (uiState.showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { uiState.showDatePicker = false },
+                confirmButton = {
                 TextButton(onClick = {
-                    showDatePicker = false
-                    errors[ReportField.DATE] = false
+                    uiState.selectedDateMillis = datePickerState.selectedDateMillis
+                    uiState.showDatePicker = false
+                    uiState.errors[ReportField.DATE] = false
                 }) {
                     Text("OK")
                 }
             }, dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
+                    TextButton(onClick = { uiState.showDatePicker = false }) {
                     Text("Cancel")
                 }
             }) {
@@ -181,21 +186,25 @@ fun ReportForm(
 
         // Type Input (Exposed Dropdown)
         ExposedDropdownMenuBox(
-            expanded = expandedDropdown,
-            onExpandedChange = { expandedDropdown = !expandedDropdown },
+            expanded = uiState.expandedDropdown,
+            onExpandedChange = { uiState.expandedDropdown = !uiState.expandedDropdown },
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = selectedType?.let { stringResource(it.nameResId) } ?: "",
+                value = uiState.selectedType?.let { stringResource(it.nameResId) } ?: "",
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(stringResource(R.string.report_type)) },
                 leadingIcon = {
                     Icon(imageVector = Icons.Outlined.Traffic, contentDescription = null)
                 },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
-                isError = errors[ReportField.TYPE] ?: false,
-                supportingText = { if (errors[ReportField.TYPE] == true) Text(requiredErrorMessage) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.expandedDropdown) },
+                isError = uiState.errors[ReportField.TYPE] ?: false,
+                supportingText = {
+                    if (uiState.errors[ReportField.TYPE] == true) Text(
+                        requiredErrorMessage
+                    )
+                },
                 modifier = Modifier
                     .menuAnchor(
                         ExposedDropdownMenuAnchorType.PrimaryNotEditable, true
@@ -204,25 +213,28 @@ fun ReportForm(
                     .testTag(ReportField.TYPE.testTag)
             )
             ExposedDropdownMenu(
-                expanded = expandedDropdown, onDismissRequest = { expandedDropdown = false }) {
+                expanded = uiState.expandedDropdown,
+                onDismissRequest = { uiState.expandedDropdown = false }) {
                 Type.entries.forEach { type ->
                     DropdownMenuItem(text = { Text(stringResource(type.nameResId)) }, onClick = {
-                        selectedType = type
-                        expandedDropdown = false
-                        errors[ReportField.TYPE] = false
+                        uiState.selectedType = type
+                        uiState.expandedDropdown = false
+                        uiState.errors[ReportField.TYPE] = false
                     })
                 }
             }
         }
 
-        // Description Input
+        // uiState.description Input
         OutlinedTextField(
-            value = description,
-            onValueChange = { description = it; errors[ReportField.DESCRIPTION] = false },
+            value = uiState.description,
+            onValueChange = {
+                uiState.description = it; uiState.errors[ReportField.DESCRIPTION] = false
+            },
             label = { Text(stringResource(R.string.report_description)) },
-            isError = errors[ReportField.DESCRIPTION] ?: false,
+            isError = uiState.errors[ReportField.DESCRIPTION] ?: false,
             supportingText = {
-                if (errors[ReportField.DESCRIPTION] == true) Text(
+                if (uiState.errors[ReportField.DESCRIPTION] == true) Text(
                     requiredErrorMessage
                 )
             },
@@ -250,14 +262,14 @@ fun ReportForm(
                 Row(
                     verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                         .selectable(
-                            selected = (severity == selectedSeverity),
-                            onClick = { selectedSeverity = severity },
+                            selected = (severity == uiState.selectedSeverity),
+                            onClick = { uiState.selectedSeverity = severity },
                             role = Role.RadioButton
                         )
                         .padding(8.dp)
                 ) {
                     RadioButton(
-                        selected = (severity == selectedSeverity), onClick = null
+                        selected = (severity == uiState.selectedSeverity), onClick = null
                     )
                     Text(text = stringResource(labelResId), modifier = Modifier.padding(8.dp))
                 }
@@ -270,33 +282,34 @@ fun ReportForm(
         // Submit Button
         Button(
             onClick = {
-                errors[ReportField.TITLE] = title.isBlank()
-                errors[ReportField.LOCATION] = location.isBlank()
-                errors[ReportField.DATE] = (selectedDate == null)
-                errors[ReportField.TYPE] = (selectedType == null)
-                errors[ReportField.DESCRIPTION] = description.isBlank()
+                uiState.errors[ReportField.TITLE] = uiState.title.isBlank()
+                uiState.errors[ReportField.LOCATION] = uiState.location.isBlank()
+                uiState.errors[ReportField.DATE] = (selectedDate == null)
+                uiState.errors[ReportField.TYPE] = (uiState.selectedType == null)
+                uiState.errors[ReportField.DESCRIPTION] = uiState.description.isBlank()
 
-                val hasErrors = errors.values.any { it } // check if any value is true (it == true)
+                val hasErrors =
+                    uiState.errors.values.any { it } // check if any value is true (it == true)
 
                 if (!hasErrors) {
                     val isNewReport = report == null
                     val report =
                         if (isNewReport)
                             Report(
-                                title = title,
-                                location = location,
-                                timestamp = selectedDate ?: Date().time,
-                                type = selectedType ?: Type.OTHER,
-                                description = description,
-                                severity = selectedSeverity
+                                title = uiState.title,
+                                location = uiState.location,
+                                timestamp = uiState.selectedDateMillis ?: Date().time,
+                                type = uiState.selectedType ?: Type.OTHER,
+                                description = uiState.description,
+                                severity = uiState.selectedSeverity
                             )
                         else report.copy(
-                            title = title,
-                            location = location,
-                            timestamp = selectedDate ?: Date().time,
-                            type = selectedType ?: Type.OTHER,
-                            description = description,
-                            severity = selectedSeverity
+                            title = uiState.title,
+                            location = uiState.location,
+                            timestamp = uiState.selectedDateMillis ?: Date().time,
+                            type = uiState.selectedType ?: Type.OTHER,
+                            description = uiState.description,
+                            severity = uiState.selectedSeverity
                         )
                     onSubmit(report)
                 }

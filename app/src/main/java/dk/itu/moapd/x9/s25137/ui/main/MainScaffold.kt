@@ -95,7 +95,7 @@ fun MainScaffold(
         onLogout = onLogout,
         onInsertReport = { viewModel.insertReport(it) },
         onEditReport = { viewModel.updateReport(it) },
-        onDeleteReport = { viewModel.deleteReport(it) }
+        onDeleteReport = { viewModel.deleteReport(it) },
     )
 }
 
