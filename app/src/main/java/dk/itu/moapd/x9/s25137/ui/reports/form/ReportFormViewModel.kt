@@ -1,4 +1,4 @@
-package dk.itu.moapd.x9.s25137.ui.reports
+package dk.itu.moapd.x9.s25137.ui.reports.form
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

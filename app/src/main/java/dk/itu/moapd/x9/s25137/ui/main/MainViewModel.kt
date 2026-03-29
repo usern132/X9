@@ -39,7 +39,6 @@ import javax.inject.Inject
  */
 
 private const val TAG = "MainViewModel"
-private const val ADD_FAKE_REPORTS = false
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -48,19 +47,13 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState(userId = authRepository.currentUser?.uid))
     val uiState: StateFlow<MainUiState> = _uiState
-    private var _reports = MutableStateFlow<List<Report>>(emptyList())
     val currentUser: User?
         get() = authRepository.currentUser
 
     private var reportsListener: ValueEventListener? = null
 
     init {
-        if (ADD_FAKE_REPORTS) addFakeReports()
         observeReports()
-    }
-
-    fun addFakeReports(n: Int = 100) {
-        _reports.value = Report.generateRandomReports(n)
     }
 
     private fun observeReports() {
@@ -77,7 +70,7 @@ class MainViewModel @Inject constructor(
                     // Assign Firebase's generated key to the Report object
                     report.copy(key = key)
                 }.sortedByDescending { it.timestamp }
-                
+
                 _uiState.update { it.copy(reports = items) }
             }
 

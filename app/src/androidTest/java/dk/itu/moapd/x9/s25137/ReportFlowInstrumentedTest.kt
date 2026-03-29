@@ -17,8 +17,8 @@ import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.main.MainUiState
-import dk.itu.moapd.x9.s25137.ui.reports.ReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
+import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals

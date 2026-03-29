@@ -37,8 +37,8 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
-import dk.itu.moapd.x9.s25137.ui.reports.ReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
+import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
 import kotlinx.coroutines.flow.MutableStateFlow
