@@ -1,11 +1,13 @@
 package dk.itu.moapd.x9.s25137
 
-import androidx.activity.ComponentActivity
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -15,6 +17,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
+import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.main.MainUiState
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
@@ -36,7 +40,7 @@ class ReportFlowInstrumentedTest {
     }
 
     @get:Rule
-    val composeRule = createAndroidComposeRule<ComponentActivity>()
+    val composeRule = createAndroidComposeRule<ComposeHiltTestActivity>()
 
     @Test
     fun dashboardCallbacksAreTriggeredFromFabAndReportClick() {
@@ -67,7 +71,8 @@ class ReportFlowInstrumentedTest {
                 DashboardPage(
                     uiState = state,
                     onCreateReportClick = { createClicks += 1 },
-                    onReportClick = { clickedIndex = it }
+                    onReportClick = { clickedIndex = it },
+                    onDeleteReport = {}
                 )
             }
         }
@@ -150,7 +155,11 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                ReportDetailsPage(report = report)
+                ReportDetailsPage(
+                    report = report,
+                    isEditable = false,
+                    onEditButtonClick = {}
+                )
             }
         }
         composeRule.waitForIdle()
@@ -161,6 +170,36 @@ class ReportFlowInstrumentedTest {
         composeRule.onNodeWithText(context.getString(Type.ROAD_INCIDENTS.nameResId))
             .assertIsDisplayed()
         composeRule.onNodeWithText(context.getString(Severity.MAJOR.nameResId)).assertIsDisplayed()
+        composeRule.onAllNodesWithContentDescription("Edit report").assertCountEquals(0)
+    }
+
+    @Test
+    fun reportDetailsEditableShowsEditFabAndCallbackIsTriggered() {
+        val report = Report(
+            key = "editable-1",
+            title = "Editable",
+            location = "Main St",
+            timestamp = 1_710_000_000_000L,
+            type = Type.OTHER,
+            description = "desc",
+            severity = Severity.MINOR
+        )
+        var editClicks = 0
+
+        composeRule.setContent {
+            AppTheme {
+                ReportDetailsPage(
+                    report = report,
+                    isEditable = true,
+                    onEditButtonClick = { editClicks += 1 }
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithContentDescription("Edit report").assertIsDisplayed().performClick()
+
+        assertEquals(1, editClicks)
     }
 
     @Test
@@ -241,5 +280,48 @@ class ReportFlowInstrumentedTest {
 
         assertNotNull(submittedReport.value)
         assertEquals(Severity.MAJOR, submittedReport.value?.severity)
+    }
+
+    @Test
+    fun accountScreenShowsProfileDataAndHandlesLogout() {
+        var logoutClicks = 0
+
+        composeRule.setContent {
+            AppTheme {
+                AccountScreen(
+                    name = "Jane Doe",
+                    email = "jane@example.com",
+                    profilePictureUrl = null,
+                    onLogout = { logoutClicks += 1 }
+                )
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Jane Doe").assertIsDisplayed()
+        composeRule.onNodeWithText("jane@example.com").assertIsDisplayed()
+        composeRule.onNodeWithText("Log out").assertIsDisplayed().performClick()
+
+        assertEquals(1, logoutClicks)
+    }
+
+    @Test
+    fun loggedOutAccountScreenShowsMessageAndNavigatesToLogin() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        var passedContext: Context? = null
+
+        composeRule.setContent {
+            AppTheme {
+                LoggedOutAccountScreen(navigateToLoginScreen = { passedContext = it })
+            }
+        }
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText(context.getString(R.string.log_in_message)).assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(R.string.log_in)).assertIsDisplayed()
+            .performClick()
+
+        assertNotNull(passedContext)
+        assertEquals(context.packageName, passedContext?.packageName)
     }
 }
