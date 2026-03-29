@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Traffic
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -87,210 +88,254 @@ fun ReportForm(
             .padding(16.dp)
             .verticalScroll(scrollState),
     ) {
+        TitleInput(uiState, requiredErrorMessage)
+        LocationInput(uiState, requiredErrorMessage)
+        DateInput(formattedDate, uiState, requiredErrorMessage, datePickerState)
+        TypeInput(uiState, requiredErrorMessage)
+        DescriptionInput(uiState, requiredErrorMessage)
+        SeverityInput(uiState)
 
-        // Title Input
-        OutlinedTextField(
-            value = uiState.title,
-            onValueChange = { uiState.title = it; uiState.errors[ReportField.TITLE] = false },
-            label = { Text(stringResource(R.string.report_title)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.DirectionsCar, contentDescription = null
-                )
-            },
-            isError = uiState.errors[ReportField.TITLE] ?: false,
-            supportingText = {
-                if (uiState.errors[ReportField.TITLE] == true) Text(
-                    requiredErrorMessage
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(ReportField.TITLE.testTag)
-        )
-
-        // Location Input
-        OutlinedTextField(
-            value = uiState.location,
-            onValueChange = { uiState.location = it; uiState.errors[ReportField.LOCATION] = false },
-            label = { Text(stringResource(R.string.report_location)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.AddLocationAlt, contentDescription = null
-                )
-            },
-            isError = uiState.errors[ReportField.LOCATION] ?: false,
-            supportingText = {
-                if (uiState.errors[ReportField.LOCATION] == true) Text(
-                    requiredErrorMessage
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(ReportField.LOCATION.testTag)
-        )
-
-        // Date Input
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = { },
-            label = { Text(stringResource(R.string.report_date)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.CalendarToday, contentDescription = null
-                )
-            },
-            readOnly = true,
-            isError = uiState.errors[ReportField.DATE] ?: false,
-            supportingText = {
-                if (uiState.errors[ReportField.DATE] == true) Text(
-                    requiredErrorMessage
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { uiState.showDatePicker = true }
-                .testTag(ReportField.DATE.testTag),
-            enabled = false,
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ))
-
-        if (uiState.showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { uiState.showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        uiState.selectedDate = datePickerState.selectedDateMillis?.let { Date(it) }
-                        uiState.showDatePicker = false
-                        uiState.errors[ReportField.DATE] = false
-                    }) {
-                        Text("OK")
-                    }
-                }, dismissButton = {
-                    TextButton(onClick = { uiState.showDatePicker = false }) {
-                        Text("Cancel")
-                    }
-                }) {
-                DatePicker(state = datePickerState)
-            }
-        }
-
-        // Type Input (Exposed Dropdown)
-        ExposedDropdownMenuBox(
-            expanded = uiState.expandedDropdown,
-            onExpandedChange = { uiState.expandedDropdown = !uiState.expandedDropdown },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            OutlinedTextField(
-                value = uiState.selectedType?.let { stringResource(it.nameResId) } ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.report_type)) },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Traffic, contentDescription = null)
-                },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.expandedDropdown) },
-                isError = uiState.errors[ReportField.TYPE] ?: false,
-                supportingText = {
-                    if (uiState.errors[ReportField.TYPE] == true) Text(
-                        requiredErrorMessage
-                    )
-                },
-                modifier = Modifier
-                    .menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable, true
-                    )
-                    .fillMaxWidth()
-                    .testTag(ReportField.TYPE.testTag)
-            )
-            ExposedDropdownMenu(
-                expanded = uiState.expandedDropdown,
-                onDismissRequest = { uiState.expandedDropdown = false }) {
-                Type.entries.forEach { type ->
-                    DropdownMenuItem(text = { Text(stringResource(type.nameResId)) }, onClick = {
-                        uiState.selectedType = type
-                        uiState.expandedDropdown = false
-                        uiState.errors[ReportField.TYPE] = false
-                    })
-                }
-            }
-        }
-
-        // uiState.description Input
-        OutlinedTextField(
-            value = uiState.description,
-            onValueChange = {
-                uiState.description = it; uiState.errors[ReportField.DESCRIPTION] = false
-            },
-            label = { Text(stringResource(R.string.report_description)) },
-            isError = uiState.errors[ReportField.DESCRIPTION] ?: false,
-            supportingText = {
-                if (uiState.errors[ReportField.DESCRIPTION] == true) Text(
-                    requiredErrorMessage
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .testTag(ReportField.DESCRIPTION.testTag),
-            maxLines = 5
-        )
-
-        // Severity Radio Group
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .selectableGroup(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            val severities = listOf(
-                Severity.MINOR to R.string.minor,
-                Severity.MODERATE to R.string.moderate,
-                Severity.MAJOR to R.string.major
-            )
-
-            severities.forEach { (severity, labelResId) ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .selectable(
-                            selected = (severity == uiState.selectedSeverity),
-                            onClick = { uiState.selectedSeverity = severity },
-                            role = Role.RadioButton
-                        )
-                        .padding(8.dp)
-                ) {
-                    RadioButton(
-                        selected = (severity == uiState.selectedSeverity), onClick = null
-                    )
-                    Text(text = stringResource(labelResId), modifier = Modifier.padding(8.dp))
-                }
-            }
-        }
-
-        // Push submit button to the bottom of the screen
+        // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
 
-        // Submit Button
-        Button(
-            onClick = {
-                val hasErrors = viewModel.validateFields()
-                if (!hasErrors) {
-                    val report = viewModel.getFormReport()
-                    onSubmit(report)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .testTag(ReportField.SUBMIT.testTag)
-        ) {
-            Text(text = submitButtonText, modifier = Modifier.padding(8.dp))
+        SubmitButton(viewModel, onSubmit, submitButtonText)
+    }
+}
+
+@Composable
+private fun SubmitButton(
+    viewModel: ReportFormViewModel,
+    onSubmit: (Report) -> Unit,
+    submitButtonText: String
+) {
+    Button(
+        onClick = {
+            val hasErrors = viewModel.validateFields()
+            if (!hasErrors) {
+                val report = viewModel.getFormReport()
+                onSubmit(report)
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .testTag(ReportField.SUBMIT.testTag)
+    ) {
+        Text(text = submitButtonText, modifier = Modifier.padding(8.dp))
+    }
+}
+
+@Composable
+private fun SeverityInput(uiState: ReportFormUiState) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        val severities = listOf(
+            Severity.MINOR to R.string.minor,
+            Severity.MODERATE to R.string.moderate,
+            Severity.MAJOR to R.string.major
+        )
+
+        severities.forEach { (severity, labelResId) ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                    .selectable(
+                        selected = (severity == uiState.selectedSeverity),
+                        onClick = { uiState.selectedSeverity = severity },
+                        role = Role.RadioButton
+                    )
+                    .padding(8.dp)
+            ) {
+                RadioButton(
+                    selected = (severity == uiState.selectedSeverity), onClick = null
+                )
+                Text(text = stringResource(labelResId), modifier = Modifier.padding(8.dp))
+            }
         }
     }
+}
+
+@Composable
+private fun DescriptionInput(
+    uiState: ReportFormUiState,
+    requiredErrorMessage: String
+) {
+    OutlinedTextField(
+        value = uiState.description,
+        onValueChange = {
+            uiState.description = it; uiState.errors[ReportField.DESCRIPTION] = false
+        },
+        label = { Text(stringResource(R.string.report_description)) },
+        isError = uiState.errors[ReportField.DESCRIPTION] ?: false,
+        supportingText = {
+            if (uiState.errors[ReportField.DESCRIPTION] == true) Text(
+                requiredErrorMessage
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(160.dp)
+            .testTag(ReportField.DESCRIPTION.testTag),
+        maxLines = 5
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TypeInput(
+    uiState: ReportFormUiState,
+    requiredErrorMessage: String
+) {
+    ExposedDropdownMenuBox(
+        expanded = uiState.expandedDropdown,
+        onExpandedChange = { uiState.expandedDropdown = !uiState.expandedDropdown },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = uiState.selectedType?.let { stringResource(it.nameResId) } ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.report_type)) },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Traffic, contentDescription = null)
+            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.expandedDropdown) },
+            isError = uiState.errors[ReportField.TYPE] ?: false,
+            supportingText = {
+                if (uiState.errors[ReportField.TYPE] == true) Text(
+                    requiredErrorMessage
+                )
+            },
+            modifier = Modifier
+                .menuAnchor(
+                    ExposedDropdownMenuAnchorType.PrimaryNotEditable, true
+                )
+                .fillMaxWidth()
+                .testTag(ReportField.TYPE.testTag)
+        )
+        ExposedDropdownMenu(
+            expanded = uiState.expandedDropdown,
+            onDismissRequest = { uiState.expandedDropdown = false }) {
+            Type.entries.forEach { type ->
+                DropdownMenuItem(text = { Text(stringResource(type.nameResId)) }, onClick = {
+                    uiState.selectedType = type
+                    uiState.expandedDropdown = false
+                    uiState.errors[ReportField.TYPE] = false
+                })
+            }
+        }
+    }
+}
+
+@Composable
+private fun DateInput(
+    formattedDate: String,
+    uiState: ReportFormUiState,
+    requiredErrorMessage: String,
+    datePickerState: DatePickerState
+) {
+    OutlinedTextField(
+        value = formattedDate,
+        onValueChange = { },
+        label = { Text(stringResource(R.string.report_date)) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.CalendarToday, contentDescription = null
+            )
+        },
+        readOnly = true,
+        isError = uiState.errors[ReportField.DATE] ?: false,
+        supportingText = {
+            if (uiState.errors[ReportField.DATE] == true) Text(
+                requiredErrorMessage
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { uiState.showDatePicker = true }
+            .testTag(ReportField.DATE.testTag),
+        enabled = false,
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledBorderColor = MaterialTheme.colorScheme.outline,
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ))
+
+    if (uiState.showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { uiState.showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    uiState.selectedDate = datePickerState.selectedDateMillis?.let { Date(it) }
+                    uiState.showDatePicker = false
+                    uiState.errors[ReportField.DATE] = false
+                }) {
+                    Text("OK")
+                }
+            }, dismissButton = {
+                TextButton(onClick = { uiState.showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }) {
+            DatePicker(state = datePickerState)
+        }
+    }
+}
+
+@Composable
+private fun LocationInput(
+    uiState: ReportFormUiState,
+    requiredErrorMessage: String
+) {
+    OutlinedTextField(
+        value = uiState.location,
+        onValueChange = { uiState.location = it; uiState.errors[ReportField.LOCATION] = false },
+        label = { Text(stringResource(R.string.report_location)) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.AddLocationAlt, contentDescription = null
+            )
+        },
+        isError = uiState.errors[ReportField.LOCATION] ?: false,
+        supportingText = {
+            if (uiState.errors[ReportField.LOCATION] == true) Text(
+                requiredErrorMessage
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(ReportField.LOCATION.testTag)
+    )
+}
+
+@Composable
+private fun TitleInput(
+    uiState: ReportFormUiState,
+    requiredErrorMessage: String
+) {
+    OutlinedTextField(
+        value = uiState.title,
+        onValueChange = { uiState.title = it; uiState.errors[ReportField.TITLE] = false },
+        label = { Text(stringResource(R.string.report_title)) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.DirectionsCar, contentDescription = null
+            )
+        },
+        isError = uiState.errors[ReportField.TITLE] ?: false,
+        supportingText = {
+            if (uiState.errors[ReportField.TITLE] == true) Text(
+                requiredErrorMessage
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(ReportField.TITLE.testTag)
+    )
 }
 
 @Preview(showBackground = true)
