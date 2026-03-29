@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
+import java.util.Date
 
 enum class ReportField(val testTag: String) {
     TITLE("createReport:title"),
@@ -17,10 +18,9 @@ enum class ReportField(val testTag: String) {
 }
 
 class ReportFormUiState(
-    private val report: Report? = null,
+    val report: Report? = null,
     private val testInitialSelectedDateMillis: Long? = null
 ) {
-
     var title by mutableStateOf(report?.title ?: "")
     var location by mutableStateOf(report?.location ?: "")
     var description by mutableStateOf(report?.description ?: "")
@@ -33,5 +33,6 @@ class ReportFormUiState(
 
     val errors = mutableStateMapOf<ReportField, Boolean>()
 
-    var selectedDateMillis by mutableStateOf(report?.timestamp ?: testInitialSelectedDateMillis)
+    var selectedDate by mutableStateOf(
+        report?.timestamp?.let { Date(it) } ?: testInitialSelectedDateMillis?.let { Date(it) })
 }

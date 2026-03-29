@@ -66,21 +66,16 @@ fun ReportForm(
     testInitialSelectedDateMillis: Long? = null
 ) {
     LaunchedEffect(report) {
-        viewModel.setReport(report, testInitialSelectedDateMillis)
+        viewModel.initialize(report, testInitialSelectedDateMillis)
     }
 
     val uiState by viewModel.uiState.collectAsState()
-
     val scrollState = rememberScrollState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = uiState.selectedDate?.time
+    )
 
-    val datePickerState =
-        rememberDatePickerState(
-            initialSelectedDateMillis = uiState.selectedDateMillis
-        )
-
-    val selectedDate = uiState.selectedDateMillis?.let { Date(it) }
-
-    val formattedDate = selectedDate?.let {
+    val formattedDate = uiState.selectedDate?.let {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
     } ?: ""
 
@@ -168,18 +163,18 @@ fun ReportForm(
             DatePickerDialog(
                 onDismissRequest = { uiState.showDatePicker = false },
                 confirmButton = {
-                TextButton(onClick = {
-                    uiState.selectedDateMillis = datePickerState.selectedDateMillis
-                    uiState.showDatePicker = false
-                    uiState.errors[ReportField.DATE] = false
-                }) {
-                    Text("OK")
-                }
-            }, dismissButton = {
+                    TextButton(onClick = {
+                        uiState.selectedDate = datePickerState.selectedDateMillis?.let { Date(it) }
+                        uiState.showDatePicker = false
+                        uiState.errors[ReportField.DATE] = false
+                    }) {
+                        Text("OK")
+                    }
+                }, dismissButton = {
                     TextButton(onClick = { uiState.showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }) {
+                        Text("Cancel")
+                    }
+                }) {
                 DatePicker(state = datePickerState)
             }
         }
@@ -282,35 +277,9 @@ fun ReportForm(
         // Submit Button
         Button(
             onClick = {
-                uiState.errors[ReportField.TITLE] = uiState.title.isBlank()
-                uiState.errors[ReportField.LOCATION] = uiState.location.isBlank()
-                uiState.errors[ReportField.DATE] = (selectedDate == null)
-                uiState.errors[ReportField.TYPE] = (uiState.selectedType == null)
-                uiState.errors[ReportField.DESCRIPTION] = uiState.description.isBlank()
-
-                val hasErrors =
-                    uiState.errors.values.any { it } // check if any value is true (it == true)
-
+                val hasErrors = viewModel.validateFields()
                 if (!hasErrors) {
-                    val isNewReport = report == null
-                    val report =
-                        if (isNewReport)
-                            Report(
-                                title = uiState.title,
-                                location = uiState.location,
-                                timestamp = uiState.selectedDateMillis ?: Date().time,
-                                type = uiState.selectedType ?: Type.OTHER,
-                                description = uiState.description,
-                                severity = uiState.selectedSeverity
-                            )
-                        else report.copy(
-                            title = uiState.title,
-                            location = uiState.location,
-                            timestamp = uiState.selectedDateMillis ?: Date().time,
-                            type = uiState.selectedType ?: Type.OTHER,
-                            description = uiState.description,
-                            severity = uiState.selectedSeverity
-                        )
+                    val report = viewModel.getFormReport()
                     onSubmit(report)
                 }
             },
