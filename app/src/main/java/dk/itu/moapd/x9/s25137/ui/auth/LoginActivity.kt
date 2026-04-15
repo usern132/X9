@@ -57,6 +57,7 @@ class LoginActivity : ComponentActivity() {
             .setAvailableProviders(providers)
             .setLogo(R.drawable.outline_directions_car_24)
             .setTheme(R.style.Theme_X9)
+            .setCredentialManagerEnabled(false)
             .apply {
                 setTosAndPrivacyPolicyUrls(
                     "https://firebase.google.com/terms/",
