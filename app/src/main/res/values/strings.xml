@@ -46,5 +46,6 @@
     <string name="restricted_feature_message">This feature is restricted to our users! Please log in or sign up in order to access this.</string>
     <string name="log_in">Log in</string>
     <string name="log_in_message">Logging in will grant you full access to all functionality. Become a member of the community!</string>
+    <string name="my_reports">My reports</string>
 
 </resources>

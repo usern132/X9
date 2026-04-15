@@ -34,7 +34,6 @@ import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.main.MainActivity
 
 class LoginActivity : ComponentActivity() {
-
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { result ->

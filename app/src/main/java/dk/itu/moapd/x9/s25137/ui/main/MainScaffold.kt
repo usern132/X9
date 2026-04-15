@@ -36,7 +36,7 @@ import androidx.navigation.navArgument
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
-import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
+import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
 import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
@@ -223,7 +223,7 @@ private fun MainScaffoldContent(
             }
             composable("account") {
                 if (currentUser != null)
-                    AccountScreen(
+                    LoggedInAccountScreen(
                         onLogout = onLogout,
                         name = currentUser.name ?: "",
                         email = currentUser.email ?: "",

@@ -1,12 +1,20 @@
 package dk.itu.moapd.x9.s25137.ui.account
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,12 +29,17 @@ import dk.itu.moapd.x9.s25137.ui.common.ProfilePicture
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 @Composable
-fun AccountScreen(
+fun LoggedInAccountScreen(
     name: String,
     email: String,
     profilePictureUrl: String?,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onMyReportsClick: () -> Unit
 ) {
+    val actionListActions = mapOf(
+        R.string.my_reports to onMyReportsClick,
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -34,6 +47,7 @@ fun AccountScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(
+            modifier = Modifier.padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfilePicture(profilePictureUrl, size = 120)
@@ -48,7 +62,7 @@ fun AccountScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            ActionList(modifier = Modifier.padding(vertical = 32.dp), actions = actionListActions)
             Button(onClick = onLogout) {
                 Text(stringResource(R.string.log_out))
             }
@@ -56,15 +70,44 @@ fun AccountScreen(
     }
 }
 
+@Composable
+private fun ActionList(modifier: Modifier = Modifier, actions: Map<Int, () -> Unit> = emptyMap()) {
+    Column(modifier = modifier) {
+        HorizontalDivider()
+        actions.forEach { action ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+                    .clickable(onClick = action.value),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    stringResource(action.key),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Icon(
+                    Icons.AutoMirrored.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            HorizontalDivider()
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun AccountScreenPreview() {
+fun LoggedInAccountScreenPreview() {
     AppTheme {
-        AccountScreen(
+        LoggedInAccountScreen(
             onLogout = {},
             name = "John Doe",
             email = "john.doe@example.com",
-            profilePictureUrl = null
+            profilePictureUrl = null,
+            onMyReportsClick = {}
         )
     }
 }

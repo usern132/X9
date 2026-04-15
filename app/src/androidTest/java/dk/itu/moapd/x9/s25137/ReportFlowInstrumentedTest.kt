@@ -17,7 +17,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
-import dk.itu.moapd.x9.s25137.ui.account.AccountScreen
+import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
 import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.main.MainUiState
@@ -288,7 +288,7 @@ class ReportFlowInstrumentedTest {
 
         composeRule.setContent {
             AppTheme {
-                AccountScreen(
+                LoggedInAccountScreen(
                     name = "Jane Doe",
                     email = "jane@example.com",
                     profilePictureUrl = null,
