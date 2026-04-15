@@ -7,34 +7,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import dk.itu.moapd.x9.s25137.domain.models.Report.Companion.generateRandomReports
-import dk.itu.moapd.x9.s25137.ui.main.MainUiState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import dk.itu.moapd.x9.s25137.domain.models.Report
 
 @Composable
 fun ReportList(
-    uiState: StateFlow<MainUiState>,
     modifier: Modifier = Modifier,
+    reports: List<Report>,
     onDeleteReport: (key: String) -> Unit = {},
+    isReportDeletable: (report: Report) -> Boolean = { false },
     onItemClick: (Int) -> Unit = {}
 ) {
-    val state by uiState.collectAsState()
-
     Surface(modifier = modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(items = state.reports, key = { it.key!! }) { report ->
+            items(items = reports, key = { it.key!! }) { report ->
                 ReportListItem(
                     report = report,
                     onDelete = onDeleteReport,
-                    isDeletable = report.userId == state.currentUser?.uid,
+                    isDeletable = isReportDeletable(report),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onItemClick(state.reports.indexOf(report)) }
+                        .clickable { onItemClick(reports.indexOf(report)) }
                 )
             }
         }
@@ -45,8 +39,6 @@ fun ReportList(
 @Composable
 fun ReportListPreview() {
     ReportList(
-        uiState = MutableStateFlow(
-            MainUiState(reports = generateRandomReports(20))
-        )
+        reports = Report.generateRandomReports(20)
     )
 }

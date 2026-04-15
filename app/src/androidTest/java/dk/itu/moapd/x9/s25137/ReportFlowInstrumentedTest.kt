@@ -69,7 +69,6 @@ class ReportFlowInstrumentedTest {
         composeRule.setContent {
             AppTheme {
                 DashboardPage(
-                    uiState = state,
                     onCreateReportClick = { createClicks += 1 },
                     onReportClick = { clickedIndex = it },
                     onDeleteReport = {}

@@ -44,7 +44,6 @@ import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -93,7 +92,7 @@ fun MainScaffold(
 ) {
     val state by uiState.collectAsState()
     MainScaffoldContent(
-        uiState = uiState,
+        uiState = state,
         currentUser = state.currentUser,
         onLogout = { viewModel.logOut() },
         onInsertReport = { viewModel.insertReport(it) },
@@ -106,7 +105,7 @@ fun MainScaffold(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScaffoldContent(
-    uiState: StateFlow<MainUiState>,
+    uiState: MainUiState,
     currentUser: User?,
     onLogout: () -> Unit,
     onInsertReport: (Report) -> Unit,
@@ -164,13 +163,14 @@ private fun MainScaffoldContent(
         ) {
             composable("home") {
                 DashboardPage(
-                    uiState = uiState,
+                    reports = uiState.reports,
                     onCreateReportClick = {
                         if (currentUser != null)
                             navController.navigate("create_report")
                         else showLoginAlertDialog()
                     },
                     onReportClick = { index -> navController.navigate("report_details/$index") },
+                    isReportDeletable = { report -> report.userId == uiState.currentUser?.uid },
                     onDeleteReport = { key -> onDeleteReport(key) },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -188,9 +188,8 @@ private fun MainScaffoldContent(
                 arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
             ) { backStackEntry ->
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
-                val state by uiState.collectAsState()
-                if (reportIndex in state.reports.indices) {
-                    val report = state.reports[reportIndex]
+                if (reportIndex in uiState.reports.indices) {
+                    val report = uiState.reports[reportIndex]
                     // A logged-in user can only edit their own reports
                     val isEditable = report.userId == currentUser?.uid
                     ReportDetailsPage(
@@ -206,9 +205,8 @@ private fun MainScaffoldContent(
                 arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
             ) { backStackEntry ->
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
-                val state by uiState.collectAsState()
-                if (reportIndex in state.reports.indices) {
-                    val report = state.reports[reportIndex]
+                if (reportIndex in uiState.reports.indices) {
+                    val report = uiState.reports[reportIndex]
                     ReportForm(
                         report = report,
                         onSubmit = { report ->
@@ -217,6 +215,9 @@ private fun MainScaffoldContent(
                         }
                     )
                 }
+            }
+            composable("my_reports") {
+                PlaceholderScreen(name = "my_reports")
             }
             composable("calendar") {
                 PlaceholderScreen(name = "calendar")
@@ -227,7 +228,8 @@ private fun MainScaffoldContent(
                         onLogout = onLogout,
                         name = currentUser.name ?: "",
                         email = currentUser.email ?: "",
-                        profilePictureUrl = currentUser.photoUri?.toString()
+                        profilePictureUrl = currentUser.photoUri?.toString(),
+                        onMyReportsClick = { navController.navigate("my_reports") }
                     )
                 else {
                     LoggedOutAccountScreen(
@@ -254,14 +256,9 @@ fun MainScaffoldPreview() {
         name = "John Doe",
         email = "john@example.com"
     )
-    val reports = Report.generateRandomReports(20).mapIndexed { index, report ->
-        if (index == 0) report.copy(userId = "user123") else report
-    }
-    val uiState = MutableStateFlow(MainUiState(currentUser = user, reports = reports))
-
     AppTheme {
         MainScaffoldContent(
-            uiState = uiState,
+            uiState = MainUiState(),
             currentUser = user,
             onLogout = {},
             onInsertReport = {},

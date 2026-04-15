@@ -78,8 +78,8 @@ private fun ActionList(modifier: Modifier = Modifier, actions: Map<Int, () -> Un
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp)
-                    .clickable(onClick = action.value),
+                    .clickable(onClick = action.value)
+                    .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

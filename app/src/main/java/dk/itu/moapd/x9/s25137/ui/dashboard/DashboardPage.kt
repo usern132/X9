@@ -14,11 +14,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.domain.models.Report
-import dk.itu.moapd.x9.s25137.ui.main.MainUiState
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 private enum class DashboardElements(val testTag: String) {
     CREATE_REPORT_BUTTON("dashboard:createReport")
@@ -26,11 +23,12 @@ private enum class DashboardElements(val testTag: String) {
 
 @Composable
 fun DashboardPage(
-    uiState: StateFlow<MainUiState>,
+    modifier: Modifier = Modifier,
+    reports: List<Report>,
     onCreateReportClick: () -> Unit,
     onDeleteReport: (key: String) -> Unit,
     onReportClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    isReportDeletable: (report: Report) -> Boolean = { false }
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -45,9 +43,10 @@ fun DashboardPage(
             }
         }) { innerPadding ->
         ReportList(
-            uiState = uiState,
+            reports = reports,
             onItemClick = onReportClick,
             onDeleteReport = onDeleteReport,
+            isReportDeletable = isReportDeletable,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -58,9 +57,7 @@ fun DashboardPage(
 fun DashboardPagePreview() {
     AppTheme {
         DashboardPage(
-            uiState = MutableStateFlow(
-                MainUiState(reports = Report.generateRandomReports(20))
-            ),
+            reports = Report.generateRandomReports(20),
             onCreateReportClick = {},
             onReportClick = {},
             onDeleteReport = {}
