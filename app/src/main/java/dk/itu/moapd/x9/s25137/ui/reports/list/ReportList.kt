@@ -15,9 +15,9 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 fun ReportList(
     modifier: Modifier = Modifier,
     reports: List<Report>,
-    onDeleteReport: (key: String) -> Unit = {},
-    isReportDeletable: (report: Report) -> Boolean = { false },
-    onItemClick: (Int) -> Unit = {}
+    onDeleteReport: (key: String) -> Unit,
+    isReportDeletable: (report: Report) -> Boolean,
+    onItemClick: (Int) -> Unit
 ) {
     Surface(modifier = modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -39,6 +39,9 @@ fun ReportList(
 @Composable
 fun ReportListPreview() {
     ReportList(
-        reports = Report.generateRandomReports(20)
+        reports = Report.generateRandomReports(20),
+        onDeleteReport = {},
+        isReportDeletable = { false },
+        onItemClick = {}
     )
 }

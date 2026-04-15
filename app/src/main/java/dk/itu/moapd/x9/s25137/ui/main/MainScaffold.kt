@@ -42,6 +42,7 @@ import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
+import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
 import kotlinx.coroutines.flow.StateFlow
@@ -98,6 +99,8 @@ fun MainScaffold(
         onInsertReport = { viewModel.insertReport(it) },
         onEditReport = { viewModel.updateReport(it) },
         onDeleteReport = { viewModel.deleteReport(it) },
+        isReportEditable = { viewModel.isReportEditable(it) },
+        isReportDeletable = { viewModel.isReportDeletable(it) },
         showLoginAlertDialog = { viewModel.showLoginAlertDialog() }
     )
 }
@@ -111,12 +114,17 @@ private fun MainScaffoldContent(
     onInsertReport: (Report) -> Unit,
     onEditReport: (Report) -> Unit,
     onDeleteReport: (String) -> Unit,
+    isReportEditable: (Report) -> Boolean,
+    isReportDeletable: (Report) -> Boolean,
     modifier: Modifier = Modifier,
     showLoginAlertDialog: () -> Unit
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
+
+    fun onReportClick(): (Int) -> Unit =
+        { index -> navController.navigate("report_details/$index") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -169,8 +177,8 @@ private fun MainScaffoldContent(
                             navController.navigate("create_report")
                         else showLoginAlertDialog()
                     },
-                    onReportClick = { index -> navController.navigate("report_details/$index") },
-                    isReportDeletable = { report -> report.userId == uiState.currentUser?.uid },
+                    onReportClick = onReportClick(),
+                    isReportDeletable = isReportDeletable,
                     onDeleteReport = { key -> onDeleteReport(key) },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -190,11 +198,9 @@ private fun MainScaffoldContent(
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
                 if (reportIndex in uiState.reports.indices) {
                     val report = uiState.reports[reportIndex]
-                    // A logged-in user can only edit their own reports
-                    val isEditable = report.userId == currentUser?.uid
                     ReportDetailsPage(
                         report = report,
-                        isEditable = isEditable,
+                        isEditable = isReportEditable(report),
                         onEditButtonClick = { navController.navigate("edit_report/$reportIndex") },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -217,7 +223,12 @@ private fun MainScaffoldContent(
                 }
             }
             composable("my_reports") {
-                PlaceholderScreen(name = "my_reports")
+                ReportList(
+                    reports = uiState.reports.filter { it.userId == currentUser?.uid!! },
+                    isReportDeletable = isReportDeletable,
+                    onDeleteReport = onDeleteReport,
+                    onItemClick = onReportClick()
+                )
             }
             composable("calendar") {
                 PlaceholderScreen(name = "calendar")
@@ -263,7 +274,9 @@ fun MainScaffoldPreview() {
             onLogout = {},
             onInsertReport = {},
             onEditReport = {},
-            onDeleteReport = {}
+            onDeleteReport = {},
+            isReportEditable = { false },
+            isReportDeletable = { false }
         ) {}
     }
 }

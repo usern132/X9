@@ -115,9 +115,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun errorConsumed() {
+    fun isReportEditable(report: Report): Boolean =
+        report.userId == currentUser?.uid
+
+    fun isReportDeletable(report: Report): Boolean =
+        // Same criterion applied to both editing and deleting
+        isReportEditable(report)
+
+    fun errorConsumed() =
         _uiState.update { it.copy(errorMessage = null) }
-    }
 
     fun getAllReportsQuery() =
         reportRepository.getAllQuery()
@@ -135,11 +141,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun showLoginAlertDialog() {
+    fun showLoginAlertDialog() =
         _uiState.update { it.copy(showLoginAlertDialog = true) }
-    }
 
-    fun hideLoginAlertDialog() {
+    fun hideLoginAlertDialog() =
         _uiState.update { it.copy(showLoginAlertDialog = false) }
-    }
 }
