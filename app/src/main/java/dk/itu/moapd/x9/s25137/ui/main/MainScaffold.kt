@@ -84,6 +84,30 @@ private val destinations = listOf(
     TopLevelDestination("account", R.string.account, Icons.Filled.AccountCircle),
 )
 
+private data class Actions(
+    val onLogout: () -> Unit,
+    val onInsertReport: (Report) -> Unit,
+    val onEditReport: (Report) -> Unit,
+    val onDeleteReport: (String) -> Unit,
+    val isReportEditable: (Report) -> Boolean,
+    val isReportDeletable: (Report) -> Boolean,
+    val modifier: Modifier = Modifier,
+    val showLoginAlertDialog: () -> Unit,
+    val showLocationRequiredAlertDialog: () -> Unit
+) {
+    // Dummy constructor used for the Compose preview
+    constructor() : this(
+        onLogout = {},
+        onInsertReport = {},
+        onEditReport = {},
+        onDeleteReport = {},
+        isReportEditable = { false },
+        isReportDeletable = { false },
+        showLoginAlertDialog = {},
+        showLocationRequiredAlertDialog = {}
+    )
+}
+
 
 private const val ANIM_DURATION = 150
 
@@ -94,9 +118,7 @@ fun MainScaffold(
     viewModel: MainViewModel = viewModel(),
 ) {
     val state by uiState.collectAsState()
-    MainScaffoldContent(
-        uiState = state,
-        currentUser = state.currentUser,
+    val actions = Actions(
         onLogout = { viewModel.logOut() },
         onInsertReport = { viewModel.insertReport(it) },
         onEditReport = { viewModel.updateReport(it) },
@@ -106,22 +128,20 @@ fun MainScaffold(
         showLoginAlertDialog = { viewModel.showLoginAlertDialog() },
         showLocationRequiredAlertDialog = { viewModel.showLocationRequiredAlertDialog() }
     )
+    MainScaffoldContent(
+        uiState = state,
+        currentUser = state.currentUser,
+        actions = actions
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScaffoldContent(
+    modifier: Modifier = Modifier,
     uiState: MainUiState,
     currentUser: User?,
-    onLogout: () -> Unit,
-    onInsertReport: (Report) -> Unit,
-    onEditReport: (Report) -> Unit,
-    onDeleteReport: (String) -> Unit,
-    isReportEditable: (Report) -> Boolean,
-    isReportDeletable: (Report) -> Boolean,
-    modifier: Modifier = Modifier,
-    showLoginAlertDialog: () -> Unit,
-    showLocationRequiredAlertDialog: () -> Unit
+    actions: Actions
 ) {
     val navController = rememberNavController()
 
@@ -129,18 +149,18 @@ private fun MainScaffoldContent(
 
     fun navigateOrShowLoginAlertDialog(route: String) =
         if (isLoggedIn()) navController.navigate(route)
-        else showLoginAlertDialog()
+        else actions.showLoginAlertDialog()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) navController.navigate("create_report")
-        else showLocationRequiredAlertDialog()
+        else actions.showLocationRequiredAlertDialog()
     }
 
     fun onCreateReportClick() {
         // First, check if the user is logged in
-        if (!isLoggedIn()) showLoginAlertDialog()
+        if (!isLoggedIn()) actions.showLoginAlertDialog()
         else {
             // Second, check if location permission is granted
             permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -180,15 +200,15 @@ private fun MainScaffoldContent(
                     isFABEnabled = isLoggedIn(),
                     onCreateReportClick = { onCreateReportClick() },
                     onReportClick = onReportClick(),
-                    isReportDeletable = isReportDeletable,
-                    onDeleteReport = { key -> onDeleteReport(key) },
+                    isReportDeletable = actions.isReportDeletable,
+                    onDeleteReport = { key -> actions.onDeleteReport(key) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
             composable("create_report") {
                 ReportForm(
                     onSubmit = { report ->
-                        onInsertReport(report)
+                        actions.onInsertReport(report)
                         navController.popBackStack()
                     })
             }
@@ -201,7 +221,7 @@ private fun MainScaffoldContent(
                     val report = uiState.reports[reportIndex]
                     ReportDetailsPage(
                         report = report,
-                        isEditable = isReportEditable(report),
+                        isEditable = actions.isReportEditable(report),
                         onEditButtonClick = { navController.navigate("edit_report/$reportIndex") },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -216,7 +236,7 @@ private fun MainScaffoldContent(
                     val report = uiState.reports[reportIndex]
                     ReportForm(
                         report = report, onSubmit = { report ->
-                            onEditReport(report)
+                            actions.onEditReport(report)
                             navController.popBackStack()
                         })
                 }
@@ -224,8 +244,8 @@ private fun MainScaffoldContent(
             composable("my_reports") {
                 ReportList(
                     reports = uiState.reports.filter { it.userId == currentUser?.uid!! },
-                    isReportDeletable = isReportDeletable,
-                    onDeleteReport = onDeleteReport,
+                    isReportDeletable = actions.isReportDeletable,
+                    onDeleteReport = actions.onDeleteReport,
                     onItemClick = onReportClick()
                 )
             }
@@ -234,7 +254,7 @@ private fun MainScaffoldContent(
             }
             composable("account") {
                 if (isLoggedIn()) LoggedInAccountScreen(
-                    onLogout = onLogout,
+                    onLogout = actions.onLogout,
                     name = currentUser!!.name ?: "",
                     email = currentUser.email ?: "",
                     profilePictureUrl = currentUser.photoUri?.toString(),
@@ -289,14 +309,7 @@ fun MainScaffoldPreview() {
         MainScaffoldContent(
             uiState = MainUiState(reports = Report.generateRandomReports()),
             currentUser = user,
-            onLogout = {},
-            onInsertReport = {},
-            onEditReport = {},
-            onDeleteReport = {},
-            isReportEditable = { false },
-            isReportDeletable = { false },
-            showLoginAlertDialog = {},
-            showLocationRequiredAlertDialog = {}
+            actions = Actions()
         )
     }
 }
