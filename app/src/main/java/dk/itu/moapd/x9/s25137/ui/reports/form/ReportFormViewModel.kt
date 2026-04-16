@@ -14,14 +14,13 @@ class ReportFormViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(ReportFormUiState())
     val uiState: StateFlow<ReportFormUiState> = _uiState
 
-    fun initialize(report: Report?, testInitialSelectedDateMillis: Long? = null) {
-        _uiState.value = ReportFormUiState(report, testInitialSelectedDateMillis)
+    fun initialize(report: Report?) {
+        _uiState.value = ReportFormUiState(report)
     }
 
     fun validateFields(): Boolean {
         _uiState.value.errors[ReportField.TITLE] = _uiState.value.title.isBlank()
         _uiState.value.errors[ReportField.LOCATION] = _uiState.value.location.isBlank()
-        _uiState.value.errors[ReportField.DATE] = (_uiState.value.selectedDate == null)
         _uiState.value.errors[ReportField.TYPE] = (_uiState.value.selectedType == null)
         _uiState.value.errors[ReportField.DESCRIPTION] = _uiState.value.description.isBlank()
 
@@ -37,7 +36,7 @@ class ReportFormViewModel @Inject constructor() : ViewModel() {
                 Report(
                     title = _uiState.value.title,
                     location = _uiState.value.location,
-                    timestamp = _uiState.value.selectedDate?.time ?: Date().time,
+                    timestamp = Date().time, // assign current time upon submission
                     type = _uiState.value.selectedType ?: Type.OTHER,
                     description = _uiState.value.description,
                     severity = _uiState.value.selectedSeverity
@@ -45,7 +44,7 @@ class ReportFormViewModel @Inject constructor() : ViewModel() {
             else _uiState.value.report!!.copy(
                 title = _uiState.value.title,
                 location = _uiState.value.location,
-                timestamp = _uiState.value.selectedDate?.time ?: Date().time,
+                timestamp = Date().time,
                 type = _uiState.value.selectedType ?: Type.OTHER,
                 description = _uiState.value.description,
                 severity = _uiState.value.selectedSeverity

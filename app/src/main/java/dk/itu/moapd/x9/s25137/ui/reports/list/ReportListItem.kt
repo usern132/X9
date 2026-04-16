@@ -125,7 +125,7 @@ private fun ReportListItemContent(
             style = MaterialTheme.typography.titleMedium
         )
         Text(
-            text = "${Date(report.timestamp).toFormattedString()} · ${report.location}",
+            text = "${Date(report.timestamp).toFormattedString(includeTime = true)} · ${report.location}",
             style = MaterialTheme.typography.bodyMedium
         )
     }

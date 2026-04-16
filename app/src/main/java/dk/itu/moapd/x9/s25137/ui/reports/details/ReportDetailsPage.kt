@@ -87,7 +87,7 @@ fun ReportDetailsPage(
                 )
                 ReportDetailsItem(
                     label = stringResource(R.string.report_date),
-                    value = Date(report.timestamp).toFormattedString()
+                    value = Date(report.timestamp).toFormattedString(includeTime = true)
                 )
                 ReportDetailsItem(
                     label = stringResource(R.string.report_type),

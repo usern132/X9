@@ -110,7 +110,6 @@ class ReportFlowInstrumentedTest {
         composeRule.setContent {
             AppTheme {
                 ReportForm(
-                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport.value = it }
                 )
             }
@@ -210,7 +209,6 @@ class ReportFlowInstrumentedTest {
         composeRule.setContent {
             AppTheme {
                 ReportForm(
-                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport = it }
                 )
             }
@@ -236,7 +234,6 @@ class ReportFlowInstrumentedTest {
         composeRule.setContent {
             AppTheme {
                 ReportForm(
-                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport = it }
                 )
             }
@@ -261,7 +258,6 @@ class ReportFlowInstrumentedTest {
         composeRule.setContent {
             AppTheme {
                 ReportForm(
-                    testInitialSelectedDateMillis = selectedDate,
                     onSubmit = { submittedReport.value = it }
                 )
             }

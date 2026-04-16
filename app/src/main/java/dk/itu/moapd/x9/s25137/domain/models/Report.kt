@@ -7,9 +7,9 @@ import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
 
-fun Date.toFormattedString(includeTime: Boolean = false): String {
+fun Date.toFormattedString(includeTime: Boolean = false, timeSeparator: String = "·"): String {
     var result: String = DateFormat.format("dd/MM/yyyy", this).toString()
-    if (includeTime) result += " - ${DateFormat.format("HH:mm", this)}"
+    if (includeTime) result += " $timeSeparator ${DateFormat.format("HH:mm", this)}"
     return result
 }
 
@@ -32,7 +32,7 @@ data class Report(
     override fun toString() =
         "Title: $title\n" +
                 "Location: $location\n" +
-                "Date: ${Date(timestamp).toFormattedString()}\n" +
+                "Date: ${Date(timestamp).toFormattedString(includeTime = true)}\n" +
                 "Type: ${type.name}\n" +
                 "Description: $description\n" +
                 "Severity: ${severity.name}" +

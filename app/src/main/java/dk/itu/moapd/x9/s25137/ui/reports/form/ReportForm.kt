@@ -1,6 +1,5 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,26 +14,18 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddLocationAlt
-import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.Traffic
 import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,9 +43,6 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,22 +51,14 @@ fun ReportForm(
     report: Report? = null,
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
-    submitButtonText: String = stringResource(R.string.submit),
-    testInitialSelectedDateMillis: Long? = null
+    submitButtonText: String = stringResource(R.string.submit)
 ) {
     LaunchedEffect(report) {
-        viewModel.initialize(report, testInitialSelectedDateMillis)
+        viewModel.initialize(report)
     }
 
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = uiState.selectedDate?.time
-    )
-
-    val formattedDate = uiState.selectedDate?.let {
-        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
-    } ?: ""
 
     val requiredErrorMessage = stringResource(R.string.field_is_required)
 
@@ -90,7 +70,6 @@ fun ReportForm(
     ) {
         TitleInput(uiState, requiredErrorMessage)
         LocationInput(uiState, requiredErrorMessage)
-        DateInput(formattedDate, uiState, requiredErrorMessage, datePickerState)
         TypeInput(uiState, requiredErrorMessage)
         DescriptionInput(uiState, requiredErrorMessage)
         SeverityInput(uiState)
@@ -226,62 +205,6 @@ private fun TypeInput(
                     uiState.errors[ReportField.TYPE] = false
                 })
             }
-        }
-    }
-}
-
-@Composable
-private fun DateInput(
-    formattedDate: String,
-    uiState: ReportFormUiState,
-    requiredErrorMessage: String,
-    datePickerState: DatePickerState
-) {
-    OutlinedTextField(
-        value = formattedDate,
-        onValueChange = { },
-        label = { Text(stringResource(R.string.report_date)) },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.CalendarToday, contentDescription = null
-            )
-        },
-        readOnly = true,
-        isError = uiState.errors[ReportField.DATE] ?: false,
-        supportingText = {
-            if (uiState.errors[ReportField.DATE] == true) Text(
-                requiredErrorMessage
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { uiState.showDatePicker = true }
-            .testTag(ReportField.DATE.testTag),
-        enabled = false,
-        colors = OutlinedTextFieldDefaults.colors(
-            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-            disabledBorderColor = MaterialTheme.colorScheme.outline,
-            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ))
-
-    if (uiState.showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { uiState.showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    uiState.selectedDate = datePickerState.selectedDateMillis?.let { Date(it) }
-                    uiState.showDatePicker = false
-                    uiState.errors[ReportField.DATE] = false
-                }) {
-                    Text("OK")
-                }
-            }, dismissButton = {
-                TextButton(onClick = { uiState.showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }) {
-            DatePicker(state = datePickerState)
         }
     }
 }
