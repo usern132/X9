@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,7 +18,7 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
-private enum class DashboardElements(val testTag: String) {
+private enum class DashboardElement(val testTag: String) {
     CREATE_REPORT_BUTTON("dashboard:createReport")
 }
 
@@ -25,6 +26,7 @@ private enum class DashboardElements(val testTag: String) {
 fun DashboardPage(
     modifier: Modifier = Modifier,
     reports: List<Report>,
+    isFABEnabled: Boolean,
     onCreateReportClick: () -> Unit,
     onDeleteReport: (key: String) -> Unit,
     onReportClick: (Int) -> Unit,
@@ -36,8 +38,11 @@ fun DashboardPage(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateReportClick,
-                modifier = Modifier
-                    .testTag(DashboardElements.CREATE_REPORT_BUTTON.testTag),
+                containerColor = if (isFABEnabled) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = if (isFABEnabled) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.testTag(DashboardElement.CREATE_REPORT_BUTTON.testTag),
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Report")
             }
@@ -52,15 +57,24 @@ fun DashboardPage(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun DashboardPagePreview() {
+private fun DashboardPagePreviewBase(isFABEnabled: Boolean) {
     AppTheme {
         DashboardPage(
             reports = Report.generateRandomReports(20),
+            isFABEnabled = isFABEnabled,
             onCreateReportClick = {},
             onReportClick = {},
-            onDeleteReport = {}
-        )
+            onDeleteReport = {})
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardPagePreviewFABEnabled() =
+    DashboardPagePreviewBase(isFABEnabled = true)
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardPagePreviewFABDisabled() =
+    DashboardPagePreviewBase(isFABEnabled = false)

@@ -26,7 +26,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -71,9 +73,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 
 private data class TopLevelDestination(
-    val route: String,
-    val labelRes: Int,
-    val icon: ImageVector
+    val route: String, val labelRes: Int, val icon: ImageVector
 )
 
 private val destinations = listOf(
@@ -101,8 +101,7 @@ fun MainScaffold(
         onDeleteReport = { viewModel.deleteReport(it) },
         isReportEditable = { viewModel.isReportEditable(it) },
         isReportDeletable = { viewModel.isReportDeletable(it) },
-        showLoginAlertDialog = { viewModel.showLoginAlertDialog() }
-    )
+        showLoginAlertDialog = { viewModel.showLoginAlertDialog() })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,6 +119,11 @@ private fun MainScaffoldContent(
     showLoginAlertDialog: () -> Unit
 ) {
     val navController = rememberNavController()
+
+    fun navigateOrShowLoginAlertDialog(route: String) =
+        if (currentUser != null) navController.navigate(route)
+        else showLoginAlertDialog()
+
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
 
@@ -133,28 +137,7 @@ private fun MainScaffoldContent(
                 title = { Text(stringResource(R.string.app_name)) },
             )
         },
-        bottomBar = {
-            NavigationBar {
-                destinations.forEach { destination ->
-                    val selected =
-                        currentDestination?.hierarchy?.any { it.route == destination.route } == true
-                    NavigationBarItem(
-                        selected = selected,
-                        icon = { Icon(imageVector = destination.icon, contentDescription = null) },
-                        onClick = {
-                            navController.navigate(destination.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        label = { Text(text = stringResource(destination.labelRes)) }
-                    )
-                }
-            }
-        },
+        bottomBar = { BottomNavigationBar(currentDestination, navController) },
     ) { innerPadding ->
         val enterTransition: EnterTransition = fadeIn(animationSpec = tween(ANIM_DURATION))
         val exitTransition = fadeOut(animationSpec = tween(ANIM_DURATION))
@@ -167,16 +150,12 @@ private fun MainScaffoldContent(
             enterTransition = { enterTransition },
             exitTransition = { exitTransition },
             popEnterTransition = { enterTransition },
-            popExitTransition = { exitTransition }
-        ) {
+            popExitTransition = { exitTransition }) {
             composable("home") {
                 DashboardPage(
                     reports = uiState.reports,
-                    onCreateReportClick = {
-                        if (currentUser != null)
-                            navController.navigate("create_report")
-                        else showLoginAlertDialog()
-                    },
+                    isFABEnabled = currentUser != null,
+                    onCreateReportClick = { navigateOrShowLoginAlertDialog("create_report") },
                     onReportClick = onReportClick(),
                     isReportDeletable = isReportDeletable,
                     onDeleteReport = { key -> onDeleteReport(key) },
@@ -188,8 +167,7 @@ private fun MainScaffoldContent(
                     onSubmit = { report ->
                         onInsertReport(report)
                         navController.popBackStack()
-                    }
-                )
+                    })
             }
             composable(
                 "report_details/{reportIndex}",
@@ -214,12 +192,10 @@ private fun MainScaffoldContent(
                 if (reportIndex in uiState.reports.indices) {
                     val report = uiState.reports[reportIndex]
                     ReportForm(
-                        report = report,
-                        onSubmit = { report ->
+                        report = report, onSubmit = { report ->
                             onEditReport(report)
                             navController.popBackStack()
-                        }
-                    )
+                        })
                 }
             }
             composable("my_reports") {
@@ -234,14 +210,12 @@ private fun MainScaffoldContent(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                if (currentUser != null)
-                    LoggedInAccountScreen(
-                        onLogout = onLogout,
-                        name = currentUser.name ?: "",
-                        email = currentUser.email ?: "",
-                        profilePictureUrl = currentUser.photoUri?.toString(),
-                        onMyReportsClick = { navController.navigate("my_reports") }
-                    )
+                if (currentUser != null) LoggedInAccountScreen(
+                    onLogout = onLogout,
+                    name = currentUser.name ?: "",
+                    email = currentUser.email ?: "",
+                    profilePictureUrl = currentUser.photoUri?.toString(),
+                    onMyReportsClick = { navController.navigate("my_reports") })
                 else {
                     LoggedOutAccountScreen(
                         navigateToLoginScreen = { context ->
@@ -249,12 +223,35 @@ private fun MainScaffoldContent(
                                 Intent(context, LoginActivity::class.java).apply {
                                     flags =
                                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                }
-                            )
-                        }
-                    )
+                                })
+                        })
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BottomNavigationBar(
+    currentDestination: NavDestination?, navController: NavHostController
+) {
+    NavigationBar {
+        destinations.forEach { destination ->
+            val selected =
+                currentDestination?.hierarchy?.any { it.route == destination.route } == true
+            NavigationBarItem(
+                selected = selected,
+                icon = { Icon(imageVector = destination.icon, contentDescription = null) },
+                onClick = {
+                    navController.navigate(destination.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                label = { Text(text = stringResource(destination.labelRes)) })
         }
     }
 }
@@ -263,9 +260,7 @@ private fun MainScaffoldContent(
 @Composable
 fun MainScaffoldPreview() {
     val user = User(
-        uid = "user123",
-        name = "John Doe",
-        email = "john@example.com"
+        uid = "user123", name = "John Doe", email = "john@example.com"
     )
     AppTheme {
         MainScaffoldContent(
@@ -276,7 +271,7 @@ fun MainScaffoldPreview() {
             onEditReport = {},
             onDeleteReport = {},
             isReportEditable = { false },
-            isReportDeletable = { false }
-        ) {}
+            isReportDeletable = { false },
+            showLoginAlertDialog = {})
     }
 }
