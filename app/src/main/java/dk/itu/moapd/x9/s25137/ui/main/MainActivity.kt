@@ -1,6 +1,9 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -63,7 +66,17 @@ class MainActivity : ComponentActivity() {
                     LoginAlertDialog(dismiss = { viewModel.hideLoginAlertDialog() })
 
                 if (uiState.showLocationRequiredAlertDialog)
-                    LocationAlertDialog(dismiss = { viewModel.hideLocationRequiredAlertDialog() })
+                    LocationAlertDialog(
+                        onConfirm = {
+                            // Navigate to the app's system settings, where the user can adjust the permissions
+                            Intent(
+                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.fromParts("package", packageName, null)
+                            ).also { startActivity(it) }
+                            viewModel.hideLocationRequiredAlertDialog()
+                        },
+                        dismiss = { viewModel.hideLocationRequiredAlertDialog() }
+                    )
             }
         }
     }

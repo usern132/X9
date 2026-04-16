@@ -49,5 +49,6 @@
     <string name="my_reports">My reports</string>
     <string name="location_permission_required_title">Location permission required</string>
     <string name="location_permission_required_message">Location permission is required to create a new report, given that your location will be associated to it. This allows other users to know where the incident took place.</string>
+    <string name="settings">Settings</string>
 
 </resources>

@@ -9,13 +9,19 @@ import dk.itu.moapd.x9.s25137.R
 
 @Composable
 fun BaseAlertDialog(
-    icon: @Composable () -> Unit, title: String, text: String, dismiss: () -> Unit
+    icon: @Composable () -> Unit,
+    title: String,
+    text: String,
+    dismiss: () -> Unit,
+    confirmButton: (@Composable () -> Unit)? = null
 ) = AlertDialog(
     icon = icon,
     title = { Text(text = title) },
     text = { Text(text = text) },
     onDismissRequest = dismiss,
-    confirmButton = {},
+    confirmButton = {
+        confirmButton?.invoke()
+    },
     dismissButton = {
         TextButton(onClick = dismiss) {
             Text(
