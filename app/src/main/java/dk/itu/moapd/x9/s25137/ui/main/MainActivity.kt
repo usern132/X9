@@ -1,27 +1,16 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
-import dk.itu.moapd.x9.s25137.R
-import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
+import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
+import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
+import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 private const val TAG = "MainActivity"
@@ -72,61 +61,10 @@ class MainActivity : ComponentActivity() {
 
                 if (uiState.showLoginAlertDialog)
                     LoginAlertDialog(dismiss = { viewModel.hideLoginAlertDialog() })
+
+                if (uiState.showLocationRequiredAlertDialog)
+                    LocationAlertDialog(dismiss = { viewModel.hideLocationRequiredAlertDialog() })
             }
         }
-    }
-
-    @Composable
-    private fun ErrorAlertDialog(errorMessage: String, dismiss: () -> Unit) {
-        AlertDialog(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = null,
-                    tint = Color(red = 200, green = 100, blue = 100)
-                )
-            },
-            title = { Text(text = stringResource(R.string.error_occurred)) },
-            text = { Text(text = errorMessage) },
-            onDismissRequest = dismiss,
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = dismiss) {
-                    Text(
-                        text = stringResource(R.string.dismiss)
-                    )
-                }
-            }
-        )
-    }
-
-    @Composable
-    private fun LoginAlertDialog(dismiss: () -> Unit) {
-        AlertDialog(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            title = { Text(text = stringResource(R.string.restricted_feature_title)) },
-            text = { Text(text = stringResource(R.string.restricted_feature_message)) },
-            onDismissRequest = dismiss,
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = dismiss) {
-                    Text(
-                        text = stringResource(R.string.dismiss)
-                    )
-                }
-            }
-        )
-    }
-
-    private fun startLoginActivity() {
-        Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }.let(::startActivity)
     }
 }

@@ -30,5 +30,6 @@ data class MainUiState(
     val currentUser: User? = null,
     val reports: List<Report> = emptyList(),
     val errorMessage: String? = null,
-    val showLoginAlertDialog: Boolean = false
+    val showLoginAlertDialog: Boolean = false,
+    val showLocationRequiredAlertDialog: Boolean = false
 )

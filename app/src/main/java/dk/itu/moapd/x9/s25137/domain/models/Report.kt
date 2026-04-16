@@ -41,7 +41,7 @@ data class Report(
                 "User Image Uri: $userImageUri"
 
     companion object {
-        fun generateRandomReports(n: Int = 100): List<Report> {
+        fun generateRandomReports(n: Int = 20): List<Report> {
             val faker = Faker()
             val reports = mutableListOf<Report>()
 

@@ -47,5 +47,7 @@
     <string name="log_in">Log in</string>
     <string name="log_in_message">Logging in will grant you full access to all functionality. Become a member of the community!</string>
     <string name="my_reports">My reports</string>
+    <string name="location_permission_required_title">Location permission required</string>
+    <string name="location_permission_required_message">Location permission is required to create a new report, given that your location will be associated to it. This allows other users to know where the incident took place.</string>
 
 </resources>

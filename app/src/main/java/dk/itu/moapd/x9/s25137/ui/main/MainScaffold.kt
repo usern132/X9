@@ -1,6 +1,8 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -101,7 +103,9 @@ fun MainScaffold(
         onDeleteReport = { viewModel.deleteReport(it) },
         isReportEditable = { viewModel.isReportEditable(it) },
         isReportDeletable = { viewModel.isReportDeletable(it) },
-        showLoginAlertDialog = { viewModel.showLoginAlertDialog() })
+        showLoginAlertDialog = { viewModel.showLoginAlertDialog() },
+        showLocationRequiredAlertDialog = { viewModel.showLocationRequiredAlertDialog() }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,13 +120,32 @@ private fun MainScaffoldContent(
     isReportEditable: (Report) -> Boolean,
     isReportDeletable: (Report) -> Boolean,
     modifier: Modifier = Modifier,
-    showLoginAlertDialog: () -> Unit
+    showLoginAlertDialog: () -> Unit,
+    showLocationRequiredAlertDialog: () -> Unit
 ) {
     val navController = rememberNavController()
 
+    fun isLoggedIn(): Boolean = currentUser != null
+
     fun navigateOrShowLoginAlertDialog(route: String) =
-        if (currentUser != null) navController.navigate(route)
+        if (isLoggedIn()) navController.navigate(route)
         else showLoginAlertDialog()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) navController.navigate("create_report")
+        else showLocationRequiredAlertDialog()
+    }
+
+    fun onCreateReportClick() {
+        // First, check if the user is logged in
+        if (!isLoggedIn()) showLoginAlertDialog()
+        else {
+            // Second, check if location permission is granted
+            permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
@@ -154,8 +177,8 @@ private fun MainScaffoldContent(
             composable("home") {
                 DashboardPage(
                     reports = uiState.reports,
-                    isFABEnabled = currentUser != null,
-                    onCreateReportClick = { navigateOrShowLoginAlertDialog("create_report") },
+                    isFABEnabled = isLoggedIn(),
+                    onCreateReportClick = { onCreateReportClick() },
                     onReportClick = onReportClick(),
                     isReportDeletable = isReportDeletable,
                     onDeleteReport = { key -> onDeleteReport(key) },
@@ -210,9 +233,9 @@ private fun MainScaffoldContent(
                 PlaceholderScreen(name = "calendar")
             }
             composable("account") {
-                if (currentUser != null) LoggedInAccountScreen(
+                if (isLoggedIn()) LoggedInAccountScreen(
                     onLogout = onLogout,
-                    name = currentUser.name ?: "",
+                    name = currentUser!!.name ?: "",
                     email = currentUser.email ?: "",
                     profilePictureUrl = currentUser.photoUri?.toString(),
                     onMyReportsClick = { navController.navigate("my_reports") })
@@ -264,7 +287,7 @@ fun MainScaffoldPreview() {
     )
     AppTheme {
         MainScaffoldContent(
-            uiState = MainUiState(),
+            uiState = MainUiState(reports = Report.generateRandomReports()),
             currentUser = user,
             onLogout = {},
             onInsertReport = {},
@@ -272,6 +295,8 @@ fun MainScaffoldPreview() {
             onDeleteReport = {},
             isReportEditable = { false },
             isReportDeletable = { false },
-            showLoginAlertDialog = {})
+            showLoginAlertDialog = {},
+            showLocationRequiredAlertDialog = {}
+        )
     }
 }

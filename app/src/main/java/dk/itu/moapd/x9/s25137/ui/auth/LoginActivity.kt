@@ -54,7 +54,7 @@ class LoginActivity : ComponentActivity() {
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
-            .setLogo(R.drawable.outline_directions_car_24)
+            .setLogo(R.drawable.ic_launcher_foreground)
             .setTheme(R.style.Theme_X9)
             .setCredentialManagerEnabled(false)
             .apply {
