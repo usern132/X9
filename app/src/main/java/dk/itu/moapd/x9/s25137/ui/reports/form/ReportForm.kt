@@ -13,7 +13,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddLocationAlt
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.Traffic
 import androidx.compose.material3.Button
@@ -23,6 +22,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -39,15 +39,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 
+@Composable
+fun EditReportForm(
+    report: Report,
+    viewModel: ReportFormViewModel = hiltViewModel(),
+    onSubmit: (Report) -> Unit,
+    submitButtonText: String = stringResource(R.string.submit)
+) = ReportForm(
+    report = report,
+    location = Location(latitude = report.latitude, longitude = report.longitude),
+    viewModel = viewModel,
+    onSubmit = onSubmit,
+    submitButtonText = submitButtonText
+)
+
+@Composable
+fun CreateReportForm(
+    location: Location,
+    viewModel: ReportFormViewModel = hiltViewModel(),
+    onSubmit: (Report) -> Unit,
+    submitButtonText: String = stringResource(R.string.submit)
+) = ReportForm(
+    location = location,
+    viewModel = viewModel,
+    onSubmit = onSubmit,
+    submitButtonText = submitButtonText
+)
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportForm(
+private fun ReportForm(
+    location: Location,
     report: Report? = null,
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
@@ -58,6 +88,9 @@ fun ReportForm(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    uiState.latitude = location.latitude
+    uiState.longitude = location.longitude
+
     val scrollState = rememberScrollState()
 
     val requiredErrorMessage = stringResource(R.string.field_is_required)
@@ -69,10 +102,11 @@ fun ReportForm(
             .verticalScroll(scrollState),
     ) {
         TitleInput(uiState, requiredErrorMessage)
-        LocationInput(uiState, requiredErrorMessage)
         TypeInput(uiState, requiredErrorMessage)
         DescriptionInput(uiState, requiredErrorMessage)
         SeverityInput(uiState)
+        Spacer(modifier = Modifier.height(16.dp))
+        LocationDisclaimer()
 
         // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -80,6 +114,12 @@ fun ReportForm(
         SubmitButton(viewModel, onSubmit, submitButtonText)
     }
 }
+
+@Composable
+private fun LocationDisclaimer() = Text(
+    stringResource(R.string.report_location_disclaimer),
+    style = MaterialTheme.typography.bodySmall
+)
 
 @Composable
 private fun SubmitButton(
@@ -91,7 +131,7 @@ private fun SubmitButton(
         onClick = {
             val hasErrors = viewModel.validateFields()
             if (!hasErrors) {
-                val report = viewModel.getFormReport()
+                val report = viewModel.formReport
                 onSubmit(report)
             }
         },
@@ -210,32 +250,6 @@ private fun TypeInput(
 }
 
 @Composable
-private fun LocationInput(
-    uiState: ReportFormUiState,
-    requiredErrorMessage: String
-) {
-    OutlinedTextField(
-        value = uiState.location,
-        onValueChange = { uiState.location = it; uiState.errors[ReportField.LOCATION] = false },
-        label = { Text(stringResource(R.string.report_location)) },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Outlined.AddLocationAlt, contentDescription = null
-            )
-        },
-        isError = uiState.errors[ReportField.LOCATION] ?: false,
-        supportingText = {
-            if (uiState.errors[ReportField.LOCATION] == true) Text(
-                requiredErrorMessage
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(ReportField.LOCATION.testTag)
-    )
-}
-
-@Composable
 private fun TitleInput(
     uiState: ReportFormUiState,
     requiredErrorMessage: String
@@ -263,8 +277,31 @@ private fun TitleInput(
 
 @Preview(showBackground = true)
 @Composable
-fun ReportFormPreview() {
+fun CreateReportFormPreview() {
     AppTheme {
-        ReportForm(onSubmit = {})
+        CreateReportForm(
+            location = Location(latitude = 0.0, longitude = 0.0),
+            onSubmit = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditReportFormPreview() {
+    AppTheme {
+        EditReportForm(
+            report = Report(
+                title = "Important speed camera on highway",
+                latitude = 0.0,
+                longitude = 0.0,
+                address = "Address",
+                timestamp = 0L,
+                type = Type.SPEED_CAMERA,
+                description = "There is a speed camera on the highway.",
+                severity = Severity.MODERATE
+            ),
+            onSubmit = {}
+        )
     }
 }

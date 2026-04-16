@@ -50,5 +50,7 @@
     <string name="location_permission_required_title">Location permission required</string>
     <string name="location_permission_required_message">Location permission is required to create a new report, given that your location will be associated to it. This allows other users to know where the incident took place.</string>
     <string name="settings">Settings</string>
+    <string name="report_location_disclaimer">Your current location will be added to this report in order to inform other users of where this incident was reported.</string>
+    <string name="location_error_message">There was an issue obtaining your device\'s location. Your GPS signal may be too weak. Please try again later.</string>
 
 </resources>

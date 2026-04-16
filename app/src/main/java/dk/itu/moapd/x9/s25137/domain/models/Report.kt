@@ -6,6 +6,7 @@ import com.google.firebase.database.Exclude
 import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
 import java.util.Date
+import kotlin.random.Random
 
 fun Date.toFormattedString(includeTime: Boolean = false, timeSeparator: String = "·"): String {
     var result: String = DateFormat.format("dd/MM/yyyy", this).toString()
@@ -20,7 +21,9 @@ data class Report(
      */
     @get:Exclude val key: String? = null,
     val title: String = "",
-    val location: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val address: String = "",
     val timestamp: Long = 0L,
     val type: Type = Type.OTHER,
     val description: String = "",
@@ -29,17 +32,6 @@ data class Report(
     val userName: String = "",
     val userImageUri: String? = null
 ) {
-    override fun toString() =
-        "Title: $title\n" +
-                "Location: $location\n" +
-                "Date: ${Date(timestamp).toFormattedString(includeTime = true)}\n" +
-                "Type: ${type.name}\n" +
-                "Description: $description\n" +
-                "Severity: ${severity.name}" +
-                "User: $userId" +
-                "User Name: $userName" +
-                "User Image Uri: $userImageUri"
-
     companion object {
         fun generateRandomReports(n: Int = 20): List<Report> {
             val faker = Faker()
@@ -49,7 +41,9 @@ data class Report(
                 val report = Report(
                     key = faker.number.hexadecimal(digits = 8),
                     title = faker.lorem.sentence(wordCount = 3),
-                    location = faker.address.streetAddress(),
+                    latitude = Random.nextDouble(0.0, 50.0),
+                    longitude = Random.nextDouble(0.0, 50.0),
+                    address = faker.address.streetAddress(),
                     timestamp = faker.date.backward().time,
                     type = Type.entries.random(),
                     description = faker.lorem.paragraphs(1).toString(),

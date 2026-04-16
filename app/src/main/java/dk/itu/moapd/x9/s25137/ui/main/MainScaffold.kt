@@ -38,6 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
@@ -45,7 +46,8 @@ import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
-import dk.itu.moapd.x9.s25137.ui.reports.form.ReportForm
+import dk.itu.moapd.x9.s25137.ui.reports.form.CreateReportForm
+import dk.itu.moapd.x9.s25137.ui.reports.form.EditReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
@@ -93,7 +95,9 @@ private data class Actions(
     val isReportDeletable: (Report) -> Boolean,
     val modifier: Modifier = Modifier,
     val showLoginAlertDialog: () -> Unit,
-    val showLocationRequiredAlertDialog: () -> Unit
+    val showLocationRequiredAlertDialog: () -> Unit,
+    val showLocationErrorAlertDialog: () -> Unit,
+    val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit
 ) {
     // Dummy constructor used for the Compose preview
     constructor() : this(
@@ -104,10 +108,11 @@ private data class Actions(
         isReportEditable = { false },
         isReportDeletable = { false },
         showLoginAlertDialog = {},
-        showLocationRequiredAlertDialog = {}
+        showLocationRequiredAlertDialog = {},
+        showLocationErrorAlertDialog = {},
+        fetchCurrentLocation = { _, _ -> }
     )
 }
-
 
 private const val ANIM_DURATION = 150
 
@@ -126,7 +131,11 @@ fun MainScaffold(
         isReportEditable = { viewModel.isReportEditable(it) },
         isReportDeletable = { viewModel.isReportDeletable(it) },
         showLoginAlertDialog = { viewModel.showLoginAlertDialog() },
-        showLocationRequiredAlertDialog = { viewModel.showLocationRequiredAlertDialog() }
+        showLocationRequiredAlertDialog = { viewModel.showLocationRequiredAlertDialog() },
+        showLocationErrorAlertDialog = { viewModel.showLocationErrorAlertDialog() },
+        fetchCurrentLocation = { onSuccess, onError ->
+            viewModel.getCurrentLocation(onSuccess, onError)
+        }
     )
     MainScaffoldContent(
         uiState = state,
@@ -154,15 +163,27 @@ private fun MainScaffoldContent(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        if (granted) navController.navigate("create_report")
-        else actions.showLocationRequiredAlertDialog()
+        if (granted) {
+            actions.fetchCurrentLocation({ location ->
+                navController.currentBackStackEntry?.savedStateHandle?.set(
+                    "report_latitude", location.latitude
+                )
+                navController.currentBackStackEntry?.savedStateHandle?.set(
+                    "report_longitude", location.longitude
+                )
+                navController.navigate("create_report")
+            }, { actions.showLocationErrorAlertDialog() })
+        } else {
+            actions.showLocationRequiredAlertDialog()
+        }
     }
 
     fun onCreateReportClick() {
         // First, check if the user is logged in
         if (!isLoggedIn()) actions.showLoginAlertDialog()
         else {
-            // Second, check if location permission is granted
+            // Second, check if location permission is granted.
+            // permissionLauncher will handle the conditional action for whether permission was granted
             permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
@@ -206,11 +227,19 @@ private fun MainScaffoldContent(
                 )
             }
             composable("create_report") {
-                ReportForm(
-                    onSubmit = { report ->
-                        actions.onInsertReport(report)
-                        navController.popBackStack()
-                    })
+                val reportLatitude =
+                    navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_latitude")
+                val reportLongitude =
+                    navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_longitude")
+
+                if (reportLatitude != null && reportLongitude != null) {
+                    val reportLocation = Location(reportLatitude, reportLongitude)
+                    CreateReportForm(
+                        location = reportLocation, onSubmit = { report ->
+                            actions.onInsertReport(report)
+                            navController.popBackStack()
+                        })
+                }
             }
             composable(
                 "report_details/{reportIndex}",
@@ -234,7 +263,7 @@ private fun MainScaffoldContent(
                 val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
                 if (reportIndex in uiState.reports.indices) {
                     val report = uiState.reports[reportIndex]
-                    ReportForm(
+                    EditReportForm(
                         report = report, onSubmit = { report ->
                             actions.onEditReport(report)
                             navController.popBackStack()

@@ -10,13 +10,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
+import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-
-private const val TAG = "MainActivity"
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
@@ -40,6 +40,8 @@ private const val TAG = "MainActivity"
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -76,6 +78,11 @@ class MainActivity : ComponentActivity() {
                             viewModel.hideLocationRequiredAlertDialog()
                         },
                         dismiss = { viewModel.hideLocationRequiredAlertDialog() }
+                    )
+                if (uiState.showLocationErrorAlertDialog)
+                    ErrorAlertDialog(
+                        errorMessage = stringResource(R.string.location_error_message),
+                        dismiss = { viewModel.hideLocationErrorAlertDialog() },
                     )
             }
         }
