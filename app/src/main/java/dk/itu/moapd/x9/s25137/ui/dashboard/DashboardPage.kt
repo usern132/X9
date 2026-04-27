@@ -57,7 +57,8 @@ fun DashboardPage(
     onDeleteReport: (key: String) -> Unit,
     onReportClick: (String) -> Unit,
     isReportDeletable: (report: Report) -> Boolean = { false },
-    locationTrace: List<LatLng>
+    locationTrace: List<LatLng>,
+    hasLocationPermission: Boolean
 ) {
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
@@ -110,6 +111,7 @@ fun DashboardPage(
                     reports = reports,
                     locationTrace = locationTrace,
                     onReportInfoWindowClick = onReportClick,
+                    hasLocationPermission = hasLocationPermission
                 )
             }
         }
@@ -129,7 +131,8 @@ private fun DashboardPagePreviewBase(
             onCreateReportClick = {},
             onReportClick = {},
             locationTrace = emptyList(),
-            onDeleteReport = {}
+            onDeleteReport = {},
+            hasLocationPermission = true
         )
     }
 }

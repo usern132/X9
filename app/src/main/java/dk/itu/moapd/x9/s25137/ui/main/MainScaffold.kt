@@ -1,6 +1,8 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.EnterTransition
@@ -21,12 +23,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -96,7 +104,8 @@ private data class Actions(
     val showLoginAlertDialog: () -> Unit,
     val showLocationRequiredAlertDialog: () -> Unit,
     val showLocationErrorAlertDialog: () -> Unit,
-    val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit
+    val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
+    val onStartLocationTracking: () -> Unit
 ) {
     // Dummy constructor used for the Compose preview
     constructor() : this(
@@ -109,7 +118,8 @@ private data class Actions(
         showLoginAlertDialog = {},
         showLocationRequiredAlertDialog = {},
         showLocationErrorAlertDialog = {},
-        fetchCurrentLocation = { _, _ -> }
+        fetchCurrentLocation = { _, _ -> },
+        onStartLocationTracking = {}
     )
 }
 
@@ -120,6 +130,7 @@ private const val ANIM_DURATION = 150
 fun MainScaffold(
     uiState: StateFlow<MainUiState>,
     viewModel: MainViewModel = viewModel(),
+    onStartLocationTracking: () -> Unit
 ) {
     val state by uiState.collectAsState()
     val locationTrace by viewModel.locationTrace.collectAsState()
@@ -135,7 +146,8 @@ fun MainScaffold(
         showLocationErrorAlertDialog = { viewModel.showLocationErrorAlertDialog() },
         fetchCurrentLocation = { onSuccess, onError ->
             viewModel.getCurrentLocation(onSuccess, onError)
-        }
+        },
+        onStartLocationTracking = onStartLocationTracking
     )
     MainScaffoldContent(
         uiState = state,
@@ -155,6 +167,34 @@ private fun MainScaffoldContent(
     actions: Actions
 ) {
     val navController = rememberNavController()
+
+    var hasLocationPermission by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val globalLocationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasLocationPermission = granted
+        if (granted) {
+            actions.onStartLocationTracking()
+        } else {
+            actions.showLocationRequiredAlertDialog()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        hasLocationPermission = granted
+
+        if (granted) {
+            actions.onStartLocationTracking()
+        } else {
+            globalLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
 
     fun isLoggedIn(): Boolean = currentUser != null
 
@@ -224,6 +264,7 @@ private fun MainScaffoldContent(
                     isReportDeletable = actions.isReportDeletable,
                     onDeleteReport = { key -> actions.onDeleteReport(key) },
                     locationTrace = locationTrace,
+                    hasLocationPermission = hasLocationPermission,
                     modifier = Modifier.fillMaxSize()
                 )
             }

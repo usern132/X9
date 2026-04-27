@@ -86,7 +86,8 @@ class MainActivity : ComponentActivity() {
 
                 MainScaffold(
                     uiState = viewModel.uiState,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onStartLocationTracking = { startLocationService() }
                 )
 
                 uiState.errorMessage?.let { errorMessage ->
@@ -119,13 +120,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        pendingStartTracking = true
         bindService(
             Intent(this, LocationService::class.java),
             serviceConnection,
             BIND_AUTO_CREATE
         )
-        startLocationService()
     }
 
     private fun startLocationService() {
