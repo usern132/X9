@@ -76,15 +76,13 @@ import kotlinx.coroutines.flow.StateFlow
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-private data class TopLevelDestination(
+private enum class TopLevelDestinations(
     val route: String, val labelRes: Int, val icon: ImageVector
-)
-
-private val destinations = listOf(
-    TopLevelDestination("home", R.string.home, Icons.Filled.Home),
-    TopLevelDestination("calendar", R.string.calendar, Icons.Filled.CalendarMonth),
-    TopLevelDestination("account", R.string.account, Icons.Filled.AccountCircle),
-)
+) {
+    HOME("home", R.string.home, Icons.Filled.Home),
+    CALENDAR("calendar", R.string.calendar, Icons.Filled.CalendarMonth),
+    ACCOUNT("account", R.string.account, Icons.Filled.AccountCircle),
+}
 
 private data class Actions(
     val onLogout: () -> Unit,
@@ -205,7 +203,7 @@ private fun MainScaffoldContent(
         val exitTransition = fadeOut(animationSpec = tween(ANIM_DURATION))
         NavHost(
             navController = navController,
-            startDestination = destinations.first().route,
+            startDestination = TopLevelDestinations.entries.first().route,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
@@ -313,7 +311,7 @@ private fun BottomNavigationBar(
     currentDestination: NavDestination?, navController: NavHostController
 ) {
     NavigationBar {
-        destinations.forEach { destination ->
+        TopLevelDestinations.entries.forEach { destination ->
             val selected =
                 currentDestination?.hierarchy?.any { it.route == destination.route } == true
             NavigationBarItem(
