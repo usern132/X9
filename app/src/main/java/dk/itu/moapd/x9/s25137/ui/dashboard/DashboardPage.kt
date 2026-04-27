@@ -109,7 +109,10 @@ fun DashboardPage(
                     modifier = Modifier.padding(innerPadding)
                 )
 
-                Destinations.MAP.ordinal -> ReportMap()
+                Destinations.MAP.ordinal -> ReportMap(
+                    reports = reports,
+                    onReportInfoWindowClick = onReportClick,
+                )
             }
         }
     }

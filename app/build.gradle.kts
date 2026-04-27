@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
@@ -101,7 +102,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.dotenv.kotlin)
-
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -124,6 +124,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(libs.google.play.services.location)
+    implementation(libs.maps.compose)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

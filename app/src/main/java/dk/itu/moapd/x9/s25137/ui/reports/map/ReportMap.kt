@@ -2,8 +2,11 @@ package dk.itu.moapd.x9.s25137.ui.reports.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,10 +19,19 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import dk.itu.moapd.x9.s25137.domain.models.Report
+
+private const val MARKER_DESCRIPTION_LENGTH = 50
 
 @Composable
-fun ReportMap() {
+fun ReportMap(
+    modifier: Modifier = Modifier,
+    onReportInfoWindowClick: (String) -> Unit = {},
+    reports: List<Report>
+) {
     val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(
@@ -30,12 +42,25 @@ fun ReportMap() {
         )
     }
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasPermission = granted
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasPermission) {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    val itu = remember { LatLng(55.6596, 12.5910) }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(52.52, 13.40), 10f)
+        position = CameraPosition.fromLatLngZoom(itu, 14f)
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
@@ -45,5 +70,17 @@ fun ReportMap() {
             isTrafficEnabled = true,
             isMyLocationEnabled = hasPermission
         )
-    )
+    ) {
+        reports.forEach { report ->
+            val markerState =
+                remember { MarkerState(position = LatLng(report.latitude, report.longitude)) }
+            Marker(
+                state = markerState,
+                title = report.title,
+                snippet = if (report.description.length < MARKER_DESCRIPTION_LENGTH) report.description
+                else report.description.take(MARKER_DESCRIPTION_LENGTH) + "...",
+                onInfoWindowClick = { onReportInfoWindowClick(report.key!!) }
+            )
+        }
+    }
 }
