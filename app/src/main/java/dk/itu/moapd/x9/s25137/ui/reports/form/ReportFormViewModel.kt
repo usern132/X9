@@ -16,16 +16,20 @@ class ReportFormViewModel @Inject constructor() : ViewModel() {
 
     val formReport: Report
         get() {
-            val isNewReport = _uiState.value.report == null
+            val originalReport = _uiState.value.report
             return Report(
+                key = originalReport?.key,
                 title = _uiState.value.title,
                 latitude = _uiState.value.latitude,
                 longitude = _uiState.value.longitude,
                 address = _uiState.value.address,
-                timestamp = Date().time, // assign current time upon submission
+                timestamp = originalReport?.timestamp ?: Date().time,
                 type = _uiState.value.selectedType ?: Type.OTHER,
                 description = _uiState.value.description,
-                severity = _uiState.value.selectedSeverity
+                severity = _uiState.value.selectedSeverity,
+                userId = originalReport?.userId ?: "",
+                userName = originalReport?.userName ?: "",
+                userImageUri = originalReport?.userImageUri
             )
         }
 
