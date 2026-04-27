@@ -336,7 +336,7 @@ fun MainScaffoldPreview() {
     )
     AppTheme {
         MainScaffoldContent(
-            uiState = MainUiState(reports = Report.generateRandomReports()),
+            uiState = MainUiState(reports = Report.previewReports),
             currentUser = user,
             actions = Actions()
         )

@@ -39,7 +39,7 @@ fun ReportList(
 @Composable
 fun ReportListPreview() {
     ReportList(
-        reports = Report.generateRandomReports(20),
+        reports = Report.previewReports,
         onDeleteReport = {},
         isReportDeletable = { false },
         onItemClick = {}

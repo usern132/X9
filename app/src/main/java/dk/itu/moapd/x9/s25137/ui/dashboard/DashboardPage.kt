@@ -61,7 +61,7 @@ fun DashboardPage(
 private fun DashboardPagePreviewBase(isFABEnabled: Boolean) {
     AppTheme {
         DashboardPage(
-            reports = Report.generateRandomReports(20),
+            reports = Report.previewReports,
             isFABEnabled = isFABEnabled,
             onCreateReportClick = {},
             onReportClick = {},
