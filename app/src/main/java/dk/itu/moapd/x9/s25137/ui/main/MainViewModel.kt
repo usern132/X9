@@ -4,8 +4,10 @@ import android.Manifest
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -16,9 +18,12 @@ import dk.itu.moapd.x9.s25137.data.repositories.ReportRepository
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
+import dk.itu.moapd.x9.s25137.services.LocationService
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -50,7 +55,7 @@ private const val TAG = "MainViewModel"
 class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val reportRepository: ReportRepository,
-    private val fusedLocationProviderClient: FusedLocationProviderClient
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState(currentUser = authRepository.currentUser))
     val uiState: StateFlow<MainUiState> = _uiState
@@ -63,6 +68,24 @@ class MainViewModel @Inject constructor(
         get() = authRepository.currentUser
 
     private var reportsListener: ValueEventListener? = null
+
+    private var locationCollectJob: Job? = null
+
+    private val _locationTrace = MutableStateFlow<List<LatLng>>(emptyList())
+    val locationTrace: StateFlow<List<LatLng>> = _locationTrace
+
+    fun observeLocationUpdates(locationService: LocationService) {
+        locationCollectJob?.cancel()
+        locationCollectJob = viewModelScope.launch {
+            locationService.locationUpdates.collect { location ->
+                addLocationTracePoint(location)
+            }
+        }
+    }
+
+    fun addLocationTracePoint(location: android.location.Location) {
+        _locationTrace.update { it + LatLng(location.latitude, location.longitude) }
+    }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun getCurrentLocation(onSuccess: (Location) -> Unit, onError: () -> Unit) {

@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
@@ -55,7 +56,8 @@ fun DashboardPage(
     onCreateReportClick: () -> Unit,
     onDeleteReport: (key: String) -> Unit,
     onReportClick: (String) -> Unit,
-    isReportDeletable: (report: Report) -> Boolean = { false }
+    isReportDeletable: (report: Report) -> Boolean = { false },
+    locationTrace: List<LatLng>
 ) {
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
@@ -106,6 +108,7 @@ fun DashboardPage(
 
                 DashboardTabDestination.MAP.ordinal -> ReportMap(
                     reports = reports,
+                    locationTrace = locationTrace,
                     onReportInfoWindowClick = onReportClick,
                 )
             }
@@ -125,6 +128,7 @@ private fun DashboardPagePreviewBase(
             startDestination = startDestination,
             onCreateReportClick = {},
             onReportClick = {},
+            locationTrace = emptyList(),
             onDeleteReport = {}
         )
     }

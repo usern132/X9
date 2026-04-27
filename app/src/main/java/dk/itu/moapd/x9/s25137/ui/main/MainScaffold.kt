@@ -37,6 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
@@ -121,6 +122,7 @@ fun MainScaffold(
     viewModel: MainViewModel = viewModel(),
 ) {
     val state by uiState.collectAsState()
+    val locationTrace by viewModel.locationTrace.collectAsState()
     val actions = Actions(
         onLogout = { viewModel.logOut() },
         onInsertReport = { viewModel.insertReport(it) },
@@ -138,6 +140,7 @@ fun MainScaffold(
     MainScaffoldContent(
         uiState = state,
         currentUser = state.currentUser,
+        locationTrace = locationTrace,
         actions = actions
     )
 }
@@ -148,6 +151,7 @@ private fun MainScaffoldContent(
     modifier: Modifier = Modifier,
     uiState: MainUiState,
     currentUser: User?,
+    locationTrace: List<LatLng>,
     actions: Actions
 ) {
     val navController = rememberNavController()
@@ -219,6 +223,7 @@ private fun MainScaffoldContent(
                     onReportClick = onReportClick(),
                     isReportDeletable = actions.isReportDeletable,
                     onDeleteReport = { key -> actions.onDeleteReport(key) },
+                    locationTrace = locationTrace,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -341,7 +346,8 @@ fun MainScaffoldPreview() {
         MainScaffoldContent(
             uiState = MainUiState(reports = Report.previewReports),
             currentUser = user,
-            actions = Actions()
+            locationTrace = emptyList(),
+            actions = Actions(),
         )
     }
 }

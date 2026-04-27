@@ -1,8 +1,11 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,8 +14,10 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.services.LocationService
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
@@ -46,6 +51,30 @@ private const val TAG = "MainActivity"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+
+    private var locationService: LocationService? = null
+    private var locationServiceBound: Boolean = false
+    private var pendingStartTracking: Boolean = false
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val binder = service as LocationService.LocalBinder
+            val service = binder.service
+            locationService = service
+            locationServiceBound = true
+
+            if (pendingStartTracking) {
+                service.subscribeToLocationUpdates()
+                pendingStartTracking = false
+            }
+            locationService?.let { viewModel.observeLocationUpdates(it) }
+
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            locationService = null
+            locationServiceBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,5 +115,29 @@ class MainActivity : ComponentActivity() {
                     )
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        pendingStartTracking = true
+        bindService(
+            Intent(this, LocationService::class.java),
+            serviceConnection,
+            BIND_AUTO_CREATE
+        )
+        startLocationService()
+    }
+
+    private fun startLocationService() {
+        val serviceIntent = Intent(this, LocationService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)
+    }
+
+    override fun onStop() {
+        if (locationServiceBound) {
+            unbindService(serviceConnection)
+            locationServiceBound = false
+        }
+        super.onStop()
     }
 }

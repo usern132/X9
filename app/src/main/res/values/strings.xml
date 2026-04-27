@@ -54,5 +54,9 @@
     <string name="location_error_message">There was an issue obtaining your device\'s location. Your GPS signal may be too weak. Please try again later.</string>
     <string name="map">Map</string>
     <string name="list">List</string>
+    <string name="location_notification_channel_name">Route tracing location service</string>
+    <string name="location_notification_channel_description">Notification to keep the location tracing service active in foreground</string>
+    <string name="location_notification_title">Tracing route</string>
+    <string name="location_notification_text">Location tracing is active</string>
 
 </resources>

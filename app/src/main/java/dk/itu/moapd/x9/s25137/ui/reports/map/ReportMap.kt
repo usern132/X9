@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.maps.model.CameraPosition
@@ -21,6 +22,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import dk.itu.moapd.x9.s25137.domain.models.Report
 
@@ -52,8 +54,9 @@ private const val MARKER_DESCRIPTION_LENGTH = 50
 @Composable
 fun ReportMap(
     modifier: Modifier = Modifier,
-    onReportInfoWindowClick: (String) -> Unit = {},
-    reports: List<Report>
+    reports: List<Report>,
+    locationTrace: List<LatLng>,
+    onReportInfoWindowClick: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     var hasPermission by remember {
@@ -96,7 +99,14 @@ fun ReportMap(
     ) {
         reports.forEach { report ->
             val markerState =
-                remember { MarkerState(position = LatLng(report.latitude, report.longitude)) }
+                remember(report.key) {
+                    MarkerState(
+                        position = LatLng(
+                            report.latitude,
+                            report.longitude
+                        )
+                    )
+                }
             Marker(
                 state = markerState,
                 title = report.title,
@@ -105,5 +115,6 @@ fun ReportMap(
                 onInfoWindowClick = { onReportInfoWindowClick(report.key!!) }
             )
         }
+        Polyline(points = locationTrace, color = Color.Red)
     }
 }
