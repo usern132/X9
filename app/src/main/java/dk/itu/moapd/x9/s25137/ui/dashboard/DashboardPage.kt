@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
@@ -40,7 +39,7 @@ private enum class DashboardElement(val testTag: String) {
     CREATE_REPORT_BUTTON("dashboard:createReport")
 }
 
-private enum class Destinations(
+enum class DashboardTabDestination(
     val route: String, val labelRes: Int, val icon: ImageVector
 ) {
     LIST("list", R.string.list, Icons.AutoMirrored.Filled.List),
@@ -52,13 +51,12 @@ fun DashboardPage(
     modifier: Modifier = Modifier,
     reports: List<Report>,
     isFABEnabled: Boolean,
+    startDestination: DashboardTabDestination = DashboardTabDestination.LIST,
     onCreateReportClick: () -> Unit,
     onDeleteReport: (key: String) -> Unit,
     onReportClick: (String) -> Unit,
     isReportDeletable: (report: Report) -> Boolean = { false }
 ) {
-    val navController = rememberNavController()
-    val startDestination = Destinations.LIST
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
     Scaffold(
@@ -81,13 +79,10 @@ fun DashboardPage(
                 selectedTabIndex = selectedDestination,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                Destinations.entries.forEachIndexed { index, destination ->
+                DashboardTabDestination.entries.forEachIndexed { index, destination ->
                     Tab(
                         selected = index == selectedDestination,
-                        onClick = {
-//                            navController.navigate(route = destination.route)
-                            selectedDestination = index
-                        },
+                        onClick = { selectedDestination = index },
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(imageVector = destination.icon, contentDescription = null)
@@ -101,7 +96,7 @@ fun DashboardPage(
                 }
             }
             when (selectedDestination) {
-                Destinations.LIST.ordinal -> ReportList(
+                DashboardTabDestination.LIST.ordinal -> ReportList(
                     reports = reports,
                     onItemClick = onReportClick,
                     onDeleteReport = onDeleteReport,
@@ -109,7 +104,7 @@ fun DashboardPage(
                     modifier = Modifier.padding(innerPadding)
                 )
 
-                Destinations.MAP.ordinal -> ReportMap(
+                DashboardTabDestination.MAP.ordinal -> ReportMap(
                     reports = reports,
                     onReportInfoWindowClick = onReportClick,
                 )
@@ -119,23 +114,50 @@ fun DashboardPage(
 }
 
 @Composable
-private fun DashboardPagePreviewBase(isFABEnabled: Boolean) {
+private fun DashboardPagePreviewBase(
+    isFABEnabled: Boolean,
+    startDestination: DashboardTabDestination
+) {
     AppTheme {
         DashboardPage(
             reports = Report.previewReports,
             isFABEnabled = isFABEnabled,
+            startDestination = startDestination,
             onCreateReportClick = {},
             onReportClick = {},
-            onDeleteReport = {})
+            onDeleteReport = {}
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DashboardPagePreviewFABEnabled() =
-    DashboardPagePreviewBase(isFABEnabled = true)
+fun DashboardPagePreviewListFABEnabled() =
+    DashboardPagePreviewBase(
+        isFABEnabled = true,
+        startDestination = DashboardTabDestination.LIST
+    )
 
 @Preview(showBackground = true)
 @Composable
-fun DashboardPagePreviewFABDisabled() =
-    DashboardPagePreviewBase(isFABEnabled = false)
+fun DashboardPagePreviewListFABDisabled() =
+    DashboardPagePreviewBase(
+        isFABEnabled = false,
+        startDestination = DashboardTabDestination.LIST
+    )
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardPagePreviewMapFABEnabled() =
+    DashboardPagePreviewBase(
+        isFABEnabled = true,
+        startDestination = DashboardTabDestination.MAP
+    )
+
+@Preview(showBackground = true)
+@Composable
+fun DashboardPagePreviewMapFABDisabled() =
+    DashboardPagePreviewBase(
+        isFABEnabled = false,
+        startDestination = DashboardTabDestination.MAP
+    )
