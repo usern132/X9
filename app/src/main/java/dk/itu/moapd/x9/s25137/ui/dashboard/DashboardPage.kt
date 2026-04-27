@@ -29,7 +29,7 @@ fun DashboardPage(
     isFABEnabled: Boolean,
     onCreateReportClick: () -> Unit,
     onDeleteReport: (key: String) -> Unit,
-    onReportClick: (Int) -> Unit,
+    onReportClick: (String) -> Unit,
     isReportDeletable: (report: Report) -> Boolean = { false }
 ) {
     Scaffold(

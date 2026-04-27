@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui.reports.details
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ fun ReportDetailsPage(
     report: Report,
     isEditable: Boolean,
     onEditButtonClick: () -> Unit,
+    onAuthorClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -76,7 +78,7 @@ fun ReportDetailsPage(
                     fontWeight = FontWeight.Bold
                 )
 
-                AuthorDetails(report)
+                AuthorDetails(report, modifier = Modifier.clickable(onClick = onAuthorClick))
 
                 // This empty box adds VERTICAL_SPACING dp of spacing
                 Box {}
@@ -107,10 +109,11 @@ fun ReportDetailsPage(
 }
 
 @Composable
-private fun AuthorDetails(report: Report) {
+private fun AuthorDetails(report: Report, modifier: Modifier = Modifier) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
     ) {
         ProfilePicture(
             profilePictureUri = report.userImageUri,
@@ -141,6 +144,7 @@ private fun ReportDetailsPagePreview(isEditable: Boolean) {
         ReportDetailsPage(
             report = sampleReport,
             isEditable = isEditable,
+            onAuthorClick = {},
             onEditButtonClick = {}
         )
     }

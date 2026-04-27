@@ -173,9 +173,7 @@ private fun MainScaffoldContent(
                 )
                 navController.navigate("create_report")
             }, { actions.showLocationErrorAlertDialog() })
-        } else {
-            actions.showLocationRequiredAlertDialog()
-        }
+        } else actions.showLocationRequiredAlertDialog()
     }
 
     fun onCreateReportClick() {
@@ -191,8 +189,8 @@ private fun MainScaffoldContent(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
 
-    fun onReportClick(): (Int) -> Unit =
-        { index -> navController.navigate("report_details/$index") }
+    fun onReportClick(): (String) -> Unit =
+        { key -> navController.navigate("report_details/$key") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -242,41 +240,48 @@ private fun MainScaffoldContent(
                 }
             }
             composable(
-                "report_details/{reportIndex}",
-                arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
+                "report_details/{reportKey}",
+                arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
             ) { backStackEntry ->
-                val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
-                if (reportIndex in uiState.reports.indices) {
-                    val report = uiState.reports[reportIndex]
+                val reportKey = backStackEntry.arguments?.getString("reportKey")
+                val report = uiState.reports.find { it.key == reportKey }
+                report?.let { report ->
                     ReportDetailsPage(
                         report = report,
                         isEditable = actions.isReportEditable(report),
-                        onEditButtonClick = { navController.navigate("edit_report/$reportIndex") },
+                        onEditButtonClick = { navController.navigate("edit_report/$reportKey") },
+                        onAuthorClick = { navController.navigate("reports/${report.userId}") },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
             composable(
-                "edit_report/{reportIndex}",
-                arguments = listOf(navArgument("reportIndex") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val reportIndex = backStackEntry.arguments?.getInt("reportIndex") ?: 0
-                if (reportIndex in uiState.reports.indices) {
-                    val report = uiState.reports[reportIndex]
-                    EditReportForm(
-                        report = report, onSubmit = { report ->
-                            actions.onEditReport(report)
-                            navController.popBackStack()
-                        })
-                }
-            }
-            composable("my_reports") {
+                "reports/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) {
+                val userIdArg = it.arguments?.getString("userId")
                 ReportList(
-                    reports = uiState.reports.filter { it.userId == currentUser?.uid!! },
+                    reports = uiState.reports.filter { report -> report.userId == userIdArg },
                     isReportDeletable = actions.isReportDeletable,
                     onDeleteReport = actions.onDeleteReport,
                     onItemClick = onReportClick()
                 )
+            }
+            composable(
+                "edit_report/{reportKey}",
+                arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val reportKey = backStackEntry.arguments?.getString("reportKey")
+                val report = uiState.reports.find { it.key == reportKey }
+                report?.let { report ->
+                    EditReportForm(
+                        report = report,
+                        onSubmit = { report ->
+                            actions.onEditReport(report)
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
             composable("calendar") {
                 PlaceholderScreen(name = "calendar")
@@ -287,7 +292,7 @@ private fun MainScaffoldContent(
                     name = currentUser!!.name ?: "",
                     email = currentUser.email ?: "",
                     profilePictureUrl = currentUser.photoUri?.toString(),
-                    onMyReportsClick = { navController.navigate("my_reports") })
+                    onMyReportsClick = { navController.navigate("reports/${currentUser.uid}") })
                 else {
                     LoggedOutAccountScreen(
                         navigateToLoginScreen = { context ->

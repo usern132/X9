@@ -17,7 +17,7 @@ fun ReportList(
     reports: List<Report>,
     onDeleteReport: (key: String) -> Unit,
     isReportDeletable: (report: Report) -> Boolean,
-    onItemClick: (Int) -> Unit
+    onItemClick: (String) -> Unit
 ) {
     Surface(modifier = modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -28,7 +28,7 @@ fun ReportList(
                     isDeletable = isReportDeletable(report),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onItemClick(reports.indexOf(report)) }
+                        .clickable { onItemClick(report.key!!) }
                 )
             }
         }
