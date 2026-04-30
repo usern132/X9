@@ -126,6 +126,7 @@ dependencies {
     implementation(libs.google.play.services.location)
     implementation(libs.maps.compose)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.composecalendar)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

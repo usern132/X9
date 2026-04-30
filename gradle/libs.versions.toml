@@ -5,6 +5,7 @@ agp = "8.13.2"
 androidxNavigationFragmentKtx = "2.9.7"
 coilCompose = "3.4.0"
 coilNetworkOkhttp = "3.4.0"
+composecalendar = "1.4.0"
 datastorePreferences = "1.2.1"
 faker = "2.0.4"
 firebaseAuthKtx = "23.2.1"
@@ -57,6 +58,7 @@ androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx",
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+composecalendar = { module = "io.github.boguszpawlowski.composecalendar:composecalendar", version.ref = "composecalendar" }
 dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 faker = { module = "io.bloco:faker", version.ref = "faker" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }

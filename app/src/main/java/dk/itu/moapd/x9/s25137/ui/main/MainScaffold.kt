@@ -56,6 +56,7 @@ import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
 import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
+import dk.itu.moapd.x9.s25137.ui.calendar.CalendarPage
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
 import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesPage
 import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesViewModel
@@ -64,7 +65,6 @@ import dk.itu.moapd.x9.s25137.ui.reports.form.CreateReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.form.EditReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
-import dk.itu.moapd.x9.s25137.ui.utils.PlaceholderScreen
 import kotlinx.coroutines.flow.StateFlow
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -357,7 +357,12 @@ private fun MainScaffoldContent(
                 }
             }
             composable("calendar") {
-                PlaceholderScreen(name = "calendar")
+                CalendarPage(
+                    reports = uiState.reports,
+                    onDeleteReport = actions.onDeleteReport,
+                    isReportDeletable = actions.isReportDeletable,
+                    onItemClick = onReportClick()
+                )
             }
             composable("account") {
                 if (isLoggedIn()) LoggedInAccountScreen(

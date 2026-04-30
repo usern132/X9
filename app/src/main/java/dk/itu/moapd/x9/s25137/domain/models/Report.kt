@@ -40,7 +40,7 @@ data class Report(
                 latitude = 55.6761,
                 longitude = 12.5683,
                 address = "E20, Copenhagen",
-                timestamp = 1715856000000L,
+                timestamp = 1777636800000L, // May 1, 2026, 12:00 PM UTC
                 type = Type.HEAVY_TRAFFIC,
                 description = "Major congestion due to an accident.",
                 severity = Severity.MAJOR,
@@ -53,7 +53,7 @@ data class Report(
                 latitude = 55.6600,
                 longitude = 12.5900,
                 address = "Amagerbrogade 12",
-                timestamp = 1715852400000L,
+                timestamp = 1777896000000L, // May 4, 2026
                 type = Type.BROKEN_VEHICLES,
                 description = "Vehicle broken down blocking one lane.",
                 severity = Severity.MODERATE,
@@ -66,7 +66,7 @@ data class Report(
                 latitude = 55.7000,
                 longitude = 12.5000,
                 address = "Lyngbyvej",
-                timestamp = 1715848800000L,
+                timestamp = 1778155200000L, // May 7, 2026
                 type = Type.SPEED_CAMERA,
                 description = "Mobile speed camera spotted.",
                 severity = Severity.MINOR,
@@ -79,7 +79,7 @@ data class Report(
                 latitude = 55.6800,
                 longitude = 12.5800,
                 address = "Nørrebrogade",
-                timestamp = 1715845200000L,
+                timestamp = 1778414400000L, // May 10, 2026
                 type = Type.ROAD_INCIDENTS,
                 description = "Road works causing delays.",
                 severity = Severity.MODERATE,
@@ -92,7 +92,7 @@ data class Report(
                 latitude = 55.7200,
                 longitude = 12.4500,
                 address = "Hillerødmotorvejen",
-                timestamp = 1715841600000L,
+                timestamp = 1778673600000L, // May 13, 2026
                 type = Type.OTHER,
                 description = "Very slippery surface reported.",
                 severity = Severity.MAJOR,
@@ -105,7 +105,7 @@ data class Report(
                 latitude = 55.6500,
                 longitude = 12.6000,
                 address = "Kastrupvej",
-                timestamp = 1715838000000L,
+                timestamp = 1778932800000L, // May 16, 2026
                 type = Type.ROAD_INCIDENTS,
                 description = "Two cars collided, no injuries.",
                 severity = Severity.MINOR,
@@ -118,7 +118,7 @@ data class Report(
                 latitude = 55.6900,
                 longitude = 12.5500,
                 address = "Jagtvej",
-                timestamp = 1715834400000L,
+                timestamp = 1779192000000L, // May 19, 2026
                 type = Type.BROKEN_VEHICLES,
                 description = "Large truck stalled in the middle of the intersection.",
                 severity = Severity.MAJOR,
@@ -131,7 +131,7 @@ data class Report(
                 latitude = 55.6700,
                 longitude = 12.5700,
                 address = "Vesterbrogade",
-                timestamp = 1715830800000L,
+                timestamp = 1779451200000L, // May 22, 2026
                 type = Type.OTHER,
                 description = "Routine police checks.",
                 severity = Severity.MINOR,
@@ -144,7 +144,7 @@ data class Report(
                 latitude = 55.7100,
                 longitude = 12.4800,
                 address = "Ring 2",
-                timestamp = 1715827200000L,
+                timestamp = 1779710400000L, // May 25, 2026
                 type = Type.OTHER,
                 description = "Tractor moving very slowly.",
                 severity = Severity.MINOR,
@@ -157,7 +157,7 @@ data class Report(
                 latitude = 55.6400,
                 longitude = 12.6200,
                 address = "Øresundsmotorvejen",
-                timestamp = 1715823600000L,
+                timestamp = 1779969600000L, // May 28, 2026
                 type = Type.OTHER,
                 description = "Visibility is very low due to downpour.",
                 severity = Severity.MODERATE,
