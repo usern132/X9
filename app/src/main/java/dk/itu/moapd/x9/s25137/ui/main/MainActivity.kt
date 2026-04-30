@@ -87,7 +87,8 @@ class MainActivity : ComponentActivity() {
                 MainScaffold(
                     uiState = viewModel.uiState,
                     mainViewModel = viewModel,
-                    onStartLocationTracking = { startLocationService() }
+                    onStartLocationTracking = { startLocationService() },
+                    onStopLocationTracking = { stopLocationService() },
                 )
 
                 uiState.errorMessage?.let { errorMessage ->
@@ -130,6 +131,18 @@ class MainActivity : ComponentActivity() {
     private fun startLocationService() {
         val serviceIntent = Intent(this, LocationService::class.java)
         ContextCompat.startForegroundService(this, serviceIntent)
+        if (locationServiceBound)
+            locationService?.subscribeToLocationUpdates()
+        else
+            pendingStartTracking = true
+    }
+
+    private fun stopLocationService() {
+        locationService?.unsubscribeFromLocationUpdates()
+        viewModel.clearLocationTrace()
+        pendingStartTracking = false
+        val serviceIntent = Intent(this, LocationService::class.java)
+        stopService(serviceIntent)
     }
 
     override fun onStop() {

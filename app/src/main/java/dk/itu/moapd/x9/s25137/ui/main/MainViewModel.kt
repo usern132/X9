@@ -74,6 +74,8 @@ class MainViewModel @Inject constructor(
     private val _locationTrace = MutableStateFlow<List<LatLng>>(emptyList())
     val locationTrace: StateFlow<List<LatLng>> = _locationTrace
 
+    fun clearLocationTrace() = _locationTrace.update { emptyList() }
+
     fun observeLocationUpdates(locationService: LocationService) {
         locationCollectJob?.cancel()
         locationCollectJob = viewModelScope.launch {

@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.os.Binder
 import android.os.Build
@@ -88,7 +89,15 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, createNotification())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                createNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification())
+        }
         return START_NOT_STICKY
     }
 
@@ -134,8 +143,6 @@ class LocationService : Service() {
     }
 
     fun subscribeToLocationUpdates() {
-//        LocationTrackingPreferences.setTrackingEnabled(this, true)
-
         val locationRequest = LocationRequest
             .Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_UPDATE_INTERVAL_MS)
             .setMinUpdateIntervalMillis(MIN_UPDATE_INTERVAL_MS)
@@ -148,17 +155,14 @@ class LocationService : Service() {
                 locationCallback,
                 Looper.getMainLooper(),
             )
-        } catch (unlikely: SecurityException) {
-//            LocationTrackingPreferences.setTrackingEnabled(this, false)
+        } catch (_: SecurityException) {
         }
     }
 
     fun unsubscribeFromLocationUpdates() {
         try {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-//            LocationTrackingPreferences.setTrackingEnabled(this, false)
         } catch (_: SecurityException) {
-//            LocationTrackingPreferences.setTrackingEnabled(this, true)
         }
     }
 

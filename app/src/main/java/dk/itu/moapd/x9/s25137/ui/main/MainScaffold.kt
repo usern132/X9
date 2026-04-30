@@ -35,6 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -109,6 +111,7 @@ private data class Actions(
     val showLocationErrorAlertDialog: () -> Unit,
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
     val onStartLocationTracking: () -> Unit,
+    val onStopLocationTracking: () -> Unit,
     val setLocationTraceEnabled: (Boolean) -> Unit
 ) {
     // Dummy constructor used for the Compose preview
@@ -124,6 +127,7 @@ private data class Actions(
         showLocationErrorAlertDialog = {},
         fetchCurrentLocation = { _, _ -> },
         onStartLocationTracking = {},
+        onStopLocationTracking = {},
         setLocationTraceEnabled = {}
     )
 }
@@ -136,7 +140,8 @@ fun MainScaffold(
     uiState: StateFlow<MainUiState>,
     mainViewModel: MainViewModel = viewModel(),
     preferencesViewModel: PreferencesViewModel = viewModel(),
-    onStartLocationTracking: () -> Unit
+    onStartLocationTracking: () -> Unit,
+    onStopLocationTracking: () -> Unit
 ) {
     val state by uiState.collectAsState()
     val locationTrace by mainViewModel.locationTrace.collectAsState()
@@ -155,7 +160,8 @@ fun MainScaffold(
             mainViewModel.getCurrentLocation(onSuccess, onError)
         },
         onStartLocationTracking = onStartLocationTracking,
-        setLocationTraceEnabled = { preferencesViewModel.setLocationTraceEnabled(it) }
+        onStopLocationTracking = onStopLocationTracking,
+        setLocationTraceEnabled = { preferencesViewModel.setLocationTraceEnabled(it) },
     )
     MainScaffoldContent(
         uiState = state,
@@ -176,11 +182,14 @@ private fun MainScaffoldContent(
     preferences: UserPreferences,
     actions: Actions
 ) {
+    val context = LocalContext.current
     val navController = rememberNavController()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
 
     var hasLocationPermission by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
     val globalLocationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -189,20 +198,30 @@ private fun MainScaffoldContent(
             actions.onStartLocationTracking()
         } else {
             actions.showLocationRequiredAlertDialog()
+            actions.setLocationTraceEnabled(false)
         }
     }
 
-    LaunchedEffect(Unit) {
+    // Using the showLocationTrace shared preference as a key, we can observe
+    // any changes in the toggle and recompose accordingly.
+    // The lifecycle key is required to re-check the permission when the user resumes the activity
+    // after returning from the app's settings page where they may have enabled the location permission
+    LaunchedEffect(preferences.showLocationTrace, lifecycleState) {
         val granted = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         hasLocationPermission = granted
 
-        if (granted) {
-            actions.onStartLocationTracking()
+        if (preferences.showLocationTrace) {
+            if (granted)
+                actions.onStartLocationTracking()
+            else {
+                // Request location permission to the user
+                globalLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         } else {
-            globalLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            actions.onStopLocationTracking()
         }
     }
 
@@ -268,7 +287,7 @@ private fun MainScaffoldContent(
             composable("home") {
                 DashboardPage(
                     reports = uiState.reports,
-                    isFABEnabled = isLoggedIn(),
+                    isFABEnabled = isLoggedIn() && hasLocationPermission,
                     onCreateReportClick = { onCreateReportClick() },
                     onReportClick = onReportClick(),
                     isReportDeletable = actions.isReportDeletable,
@@ -364,7 +383,11 @@ private fun MainScaffoldContent(
             composable("preferences") {
                 PreferencesPage(
                     uiState = preferences,
-                    onShowLocationTraceChanged = { actions.setLocationTraceEnabled(it) }
+                    onShowLocationTraceChanged = { enabled ->
+                        actions.setLocationTraceEnabled(
+                            enabled
+                        )
+                    }
                 )
             }
         }
