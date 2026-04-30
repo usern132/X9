@@ -1,8 +1,11 @@
 package dk.itu.moapd.x9.s25137.ui.calendar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,18 +34,21 @@ fun CalendarPage(
                 timestampToLocalDate(report.timestamp)
             )
         }
-        SelectableCalendar(
-            calendarState = calendarState,
-            dayContent = { dayState ->
-                MyDay(
-                    dayState,
-                    hasReports = reports.any { report ->
-                        dayState.date ==
-                                timestampToLocalDate(report.timestamp)
-                    }
-                )
-            }
-        )
+        MaterialTheme(colorScheme = lightColorScheme()) {
+            SelectableCalendar(
+                modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
+                calendarState = calendarState,
+                dayContent = { dayState ->
+                    MyDay(
+                        dayState,
+                        hasReports = reports.any { report ->
+                            dayState.date ==
+                                    timestampToLocalDate(report.timestamp)
+                        }
+                    )
+                }
+            )
+        }
         ReportList(
             reports = selectedDayReports,
             onDeleteReport = onDeleteReport,
@@ -58,8 +64,8 @@ private fun MyDay(dayState: DayState<DynamicSelectionState>, hasReports: Boolean
         state = dayState,
         modifier = if (hasReports) Modifier.border(
             width = 1.dp,
-            color = Color.Red.copy(alpha = 0.5f),
-            shape = RoundedCornerShape(4.dp)
+            color = Color.Red.copy(alpha = 0.4f),
+            shape = RoundedCornerShape(3.dp)
         ) else Modifier,
     )
 }
