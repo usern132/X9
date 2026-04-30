@@ -15,15 +15,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.ui.common.Action
 import dk.itu.moapd.x9.s25137.ui.common.ActionList
 
 @Composable
 fun BaseAccountScreen(
     modifier: Modifier = Modifier,
-    actionListActions: Map<Int, () -> Unit> = emptyMap(),
+    actionListActions: Set<Action> = emptySet(),
+    navigateToSettingsPage: () -> Unit = {},
     logInOrLogOutButton: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val actionListActionsWithSharedActions = actionListActions + Action(
+        label = stringResource(R.string.settings),
+        onClick = navigateToSettingsPage
+    )
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -35,7 +41,10 @@ fun BaseAccountScreen(
         Box(modifier = Modifier.padding(16.dp)) {
             logInOrLogOutButton()
         }
-        ActionList(modifier = Modifier.padding(vertical = 16.dp), actions = actionListActions)
+        ActionList(
+            modifier = Modifier.padding(vertical = 16.dp),
+            actions = actionListActionsWithSharedActions
+        )
     }
 }
 
@@ -43,8 +52,11 @@ fun BaseAccountScreen(
 @Preview(showBackground = true)
 fun BaseAccountScreenPreview() {
     BaseAccountScreen(
-        actionListActions = mapOf(
-            R.string.settings to {},
+        actionListActions = setOf(
+            Action(
+                label = "Example",
+                onClick = {},
+            )
         ),
         logInOrLogOutButton = {
             Button(onClick = {}) { Text(stringResource(R.string.log_in)) }

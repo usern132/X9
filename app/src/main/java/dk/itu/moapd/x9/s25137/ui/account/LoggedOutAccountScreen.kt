@@ -10,13 +10,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.ui.common.Action
 
 @Composable
 fun LoggedOutAccountScreen(navigateToLoginScreen: (Context) -> Unit) {
     val context = LocalContext.current
-    val actionListActions = mapOf(
-        R.string.settings to { Unit }
-    )
+    val actionListActions = emptySet<Action>()
     BaseAccountScreen(
         actionListActions = actionListActions,
         logInOrLogOutButton = {

@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.ui.common.Action
 import dk.itu.moapd.x9.s25137.ui.common.ProfilePicture
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
@@ -23,8 +24,11 @@ fun LoggedInAccountScreen(
     onLogout: () -> Unit,
     onMyReportsClick: () -> Unit
 ) {
-    val actionListActions = mapOf(
-        R.string.my_reports to onMyReportsClick,
+    val actionListActions = setOf(
+        Action(
+            label = stringResource(R.string.my_reports),
+            onClick = onMyReportsClick
+        )
     )
 
     BaseAccountScreen(
