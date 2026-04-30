@@ -1,16 +1,10 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -41,29 +35,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
-import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
-import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
-import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
-import dk.itu.moapd.x9.s25137.ui.calendar.CalendarPage
-import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
-import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesPage
 import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesViewModel
-import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
-import dk.itu.moapd.x9.s25137.ui.reports.form.CreateReportForm
-import dk.itu.moapd.x9.s25137.ui.reports.form.EditReportForm
-import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import kotlinx.coroutines.flow.StateFlow
 
@@ -90,7 +70,7 @@ import kotlinx.coroutines.flow.StateFlow
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-private enum class TopLevelDestinations(
+enum class TopLevelDestinations(
     val route: String, val labelRes: Int, val icon: ImageVector
 ) {
     HOME("home", R.string.home, Icons.Filled.Home),
@@ -98,7 +78,7 @@ private enum class TopLevelDestinations(
     ACCOUNT("account", R.string.account, Icons.Filled.AccountCircle),
 }
 
-private data class Actions(
+data class MainActions(
     val onLogout: () -> Unit,
     val onInsertReport: (Report) -> Unit,
     val onEditReport: (Report) -> Unit,
@@ -132,8 +112,6 @@ private data class Actions(
     )
 }
 
-private const val ANIM_DURATION = 150
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
@@ -146,7 +124,7 @@ fun MainScaffold(
     val state by uiState.collectAsState()
     val locationTrace by mainViewModel.locationTrace.collectAsState()
     val preferences by preferencesViewModel.uiState.collectAsState()
-    val actions = Actions(
+    val actions = MainActions(
         onLogout = { mainViewModel.logOut() },
         onInsertReport = { mainViewModel.insertReport(it) },
         onEditReport = { mainViewModel.updateReport(it) },
@@ -180,7 +158,7 @@ private fun MainScaffoldContent(
     currentUser: User?,
     locationTrace: List<LatLng>,
     preferences: UserPreferences,
-    actions: Actions
+    actions: MainActions
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
@@ -231,37 +209,8 @@ private fun MainScaffoldContent(
         if (isLoggedIn()) navController.navigate(route)
         else actions.showLoginAlertDialog()
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        if (granted) {
-            actions.fetchCurrentLocation({ location ->
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "report_latitude", location.latitude
-                )
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "report_longitude", location.longitude
-                )
-                navController.navigate("create_report")
-            }, { actions.showLocationErrorAlertDialog() })
-        } else actions.showLocationRequiredAlertDialog()
-    }
-
-    fun onCreateReportClick() {
-        // First, check if the user is logged in
-        if (!isLoggedIn()) actions.showLoginAlertDialog()
-        else {
-            // Second, check if location permission is granted.
-            // permissionLauncher will handle the conditional action for whether permission was granted
-            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
-
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
-
-    fun onReportClick(): (String) -> Unit =
-        { key -> navController.navigate("report_details/$key") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -272,130 +221,17 @@ private fun MainScaffoldContent(
         },
         bottomBar = { BottomNavigationBar(currentDestination, navController) },
     ) { innerPadding ->
-        val enterTransition: EnterTransition = fadeIn(animationSpec = tween(ANIM_DURATION))
-        val exitTransition = fadeOut(animationSpec = tween(ANIM_DURATION))
-        NavHost(
+        MainNavHost(
             navController = navController,
-            startDestination = TopLevelDestinations.entries.first().route,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            enterTransition = { enterTransition },
-            exitTransition = { exitTransition },
-            popEnterTransition = { enterTransition },
-            popExitTransition = { exitTransition }) {
-            composable("home") {
-                DashboardPage(
-                    reports = uiState.reports,
-                    isFABEnabled = isLoggedIn() && hasLocationPermission,
-                    onCreateReportClick = { onCreateReportClick() },
-                    onReportClick = onReportClick(),
-                    isReportDeletable = actions.isReportDeletable,
-                    onDeleteReport = { key -> actions.onDeleteReport(key) },
-                    locationTrace = locationTrace,
-                    hasLocationPermission = hasLocationPermission,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            composable("create_report") {
-                val reportLatitude =
-                    navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_latitude")
-                val reportLongitude =
-                    navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_longitude")
-
-                if (reportLatitude != null && reportLongitude != null) {
-                    val reportLocation = Location(reportLatitude, reportLongitude)
-                    CreateReportForm(
-                        location = reportLocation, onSubmit = { report ->
-                            actions.onInsertReport(report)
-                            navController.popBackStack()
-                        })
-                }
-            }
-            composable(
-                "report_details/{reportKey}",
-                arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val reportKey = backStackEntry.arguments?.getString("reportKey")
-                val report = uiState.reports.find { it.key == reportKey }
-                report?.let { report ->
-                    ReportDetailsPage(
-                        report = report,
-                        isEditable = actions.isReportEditable(report),
-                        onEditButtonClick = { navController.navigate("edit_report/$reportKey") },
-                        onAuthorClick = { navController.navigate("reports/${report.userId}") },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-            composable(
-                "reports/{userId}",
-                arguments = listOf(navArgument("userId") { type = NavType.StringType })
-            ) {
-                val userIdArg = it.arguments?.getString("userId")
-                ReportList(
-                    reports = uiState.reports.filter { report -> report.userId == userIdArg },
-                    isReportDeletable = actions.isReportDeletable,
-                    onDeleteReport = actions.onDeleteReport,
-                    onItemClick = onReportClick()
-                )
-            }
-            composable(
-                "edit_report/{reportKey}",
-                arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val reportKey = backStackEntry.arguments?.getString("reportKey")
-                val report = uiState.reports.find { it.key == reportKey }
-                report?.let { report ->
-                    EditReportForm(
-                        report = report,
-                        onSubmit = { report ->
-                            actions.onEditReport(report)
-                            navController.popBackStack()
-                        }
-                    )
-                }
-            }
-            composable("calendar") {
-                CalendarPage(
-                    reports = uiState.reports,
-                    onDeleteReport = actions.onDeleteReport,
-                    isReportDeletable = actions.isReportDeletable,
-                    onItemClick = onReportClick()
-                )
-            }
-            composable("account") {
-                if (isLoggedIn()) LoggedInAccountScreen(
-                    onLogout = actions.onLogout,
-                    name = currentUser!!.name ?: "",
-                    email = currentUser.email ?: "",
-                    profilePictureUrl = currentUser.photoUri?.toString(),
-                    onMyReportsClick = { navController.navigate("reports/${currentUser.uid}") },
-                    onPreferencesClick = { navController.navigate("preferences") })
-                else {
-                    LoggedOutAccountScreen(
-                        navigateToLoginScreen = { context ->
-                            context.startActivity(
-                                Intent(context, LoginActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                })
-                        },
-                        onPreferencesClick = { navController.navigate("preferences") }
-                    )
-                }
-            }
-            composable("preferences") {
-                PreferencesPage(
-                    uiState = preferences,
-                    onShowLocationTraceChanged = { enabled ->
-                        actions.setLocationTraceEnabled(
-                            enabled
-                        )
-                    }
-                )
-            }
-        }
+            uiState = uiState,
+            currentUser = currentUser,
+            locationTrace = locationTrace,
+            preferences = preferences,
+            innerPadding = innerPadding,
+            isLoggedIn = { isLoggedIn() },
+            hasLocationPermission = hasLocationPermission,
+            actions = actions
+        )
     }
 }
 
@@ -438,7 +274,7 @@ fun MainScaffoldPreview() {
             preferences = UserPreferences(
                 showLocationTrace = false
             ),
-            actions = Actions(),
+            actions = MainActions(),
         )
     }
 }
