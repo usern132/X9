@@ -22,13 +22,13 @@ import dk.itu.moapd.x9.s25137.ui.common.ActionList
 fun BaseAccountScreen(
     modifier: Modifier = Modifier,
     actionListActions: Set<Action> = emptySet(),
-    navigateToSettingsPage: () -> Unit = {},
+    onPreferencesClick: () -> Unit = {},
     logInOrLogOutButton: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val actionListActionsWithSharedActions = actionListActions + Action(
-        label = stringResource(R.string.settings),
-        onClick = navigateToSettingsPage
+        label = stringResource(R.string.preferences),
+        onClick = onPreferencesClick
     )
     Column(
         modifier = modifier

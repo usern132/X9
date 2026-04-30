@@ -22,7 +22,8 @@ fun LoggedInAccountScreen(
     email: String,
     profilePictureUrl: String?,
     onLogout: () -> Unit,
-    onMyReportsClick: () -> Unit
+    onMyReportsClick: () -> Unit,
+    onPreferencesClick: () -> Unit,
 ) {
     val actionListActions = setOf(
         Action(
@@ -37,7 +38,8 @@ fun LoggedInAccountScreen(
             Button(onClick = onLogout) {
                 Text(stringResource(R.string.log_out))
             }
-        }
+        },
+        onPreferencesClick = onPreferencesClick
     ) {
         ProfilePicture(profilePictureUrl, size = 120)
         Spacer(modifier = Modifier.height(24.dp))
@@ -63,7 +65,8 @@ fun LoggedInAccountScreenPreview() {
             name = "John Doe",
             email = "john.doe@example.com",
             profilePictureUrl = null,
-            onMyReportsClick = {}
+            onMyReportsClick = {},
+            onPreferencesClick = {}
         )
     }
 }

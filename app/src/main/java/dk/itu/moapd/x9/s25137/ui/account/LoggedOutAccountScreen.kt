@@ -13,7 +13,10 @@ import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.ui.common.Action
 
 @Composable
-fun LoggedOutAccountScreen(navigateToLoginScreen: (Context) -> Unit) {
+fun LoggedOutAccountScreen(
+    navigateToLoginScreen: (Context) -> Unit,
+    onPreferencesClick: () -> Unit
+) {
     val context = LocalContext.current
     val actionListActions = emptySet<Action>()
     BaseAccountScreen(
@@ -22,7 +25,8 @@ fun LoggedOutAccountScreen(navigateToLoginScreen: (Context) -> Unit) {
             Button(onClick = { navigateToLoginScreen(context) }) {
                 Text(stringResource(R.string.log_in))
             }
-        }
+        },
+        onPreferencesClick = onPreferencesClick
     ) {
         Text(
             text = stringResource(R.string.log_in_message),
@@ -35,5 +39,5 @@ fun LoggedOutAccountScreen(navigateToLoginScreen: (Context) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun LoggedOutAccountScreenPreview() {
-    LoggedOutAccountScreen(navigateToLoginScreen = {})
+    LoggedOutAccountScreen(navigateToLoginScreen = {}, onPreferencesClick = {})
 }

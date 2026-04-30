@@ -47,6 +47,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
@@ -54,6 +55,8 @@ import dk.itu.moapd.x9.s25137.ui.account.LoggedInAccountScreen
 import dk.itu.moapd.x9.s25137.ui.account.LoggedOutAccountScreen
 import dk.itu.moapd.x9.s25137.ui.auth.LoginActivity
 import dk.itu.moapd.x9.s25137.ui.dashboard.DashboardPage
+import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesPage
+import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesViewModel
 import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.reports.form.CreateReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.form.EditReportForm
@@ -105,7 +108,8 @@ private data class Actions(
     val showLocationRequiredAlertDialog: () -> Unit,
     val showLocationErrorAlertDialog: () -> Unit,
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
-    val onStartLocationTracking: () -> Unit
+    val onStartLocationTracking: () -> Unit,
+    val setLocationTraceEnabled: (Boolean) -> Unit
 ) {
     // Dummy constructor used for the Compose preview
     constructor() : this(
@@ -119,7 +123,8 @@ private data class Actions(
         showLocationRequiredAlertDialog = {},
         showLocationErrorAlertDialog = {},
         fetchCurrentLocation = { _, _ -> },
-        onStartLocationTracking = {}
+        onStartLocationTracking = {},
+        setLocationTraceEnabled = {}
     )
 }
 
@@ -129,30 +134,34 @@ private const val ANIM_DURATION = 150
 @Composable
 fun MainScaffold(
     uiState: StateFlow<MainUiState>,
-    viewModel: MainViewModel = viewModel(),
+    mainViewModel: MainViewModel = viewModel(),
+    preferencesViewModel: PreferencesViewModel = viewModel(),
     onStartLocationTracking: () -> Unit
 ) {
     val state by uiState.collectAsState()
-    val locationTrace by viewModel.locationTrace.collectAsState()
+    val locationTrace by mainViewModel.locationTrace.collectAsState()
+    val preferences by preferencesViewModel.uiState.collectAsState()
     val actions = Actions(
-        onLogout = { viewModel.logOut() },
-        onInsertReport = { viewModel.insertReport(it) },
-        onEditReport = { viewModel.updateReport(it) },
-        onDeleteReport = { viewModel.deleteReport(it) },
-        isReportEditable = { viewModel.isReportEditable(it) },
-        isReportDeletable = { viewModel.isReportDeletable(it) },
-        showLoginAlertDialog = { viewModel.showLoginAlertDialog() },
-        showLocationRequiredAlertDialog = { viewModel.showLocationRequiredAlertDialog() },
-        showLocationErrorAlertDialog = { viewModel.showLocationErrorAlertDialog() },
+        onLogout = { mainViewModel.logOut() },
+        onInsertReport = { mainViewModel.insertReport(it) },
+        onEditReport = { mainViewModel.updateReport(it) },
+        onDeleteReport = { mainViewModel.deleteReport(it) },
+        isReportEditable = { mainViewModel.isReportEditable(it) },
+        isReportDeletable = { mainViewModel.isReportDeletable(it) },
+        showLoginAlertDialog = { mainViewModel.showLoginAlertDialog() },
+        showLocationRequiredAlertDialog = { mainViewModel.showLocationRequiredAlertDialog() },
+        showLocationErrorAlertDialog = { mainViewModel.showLocationErrorAlertDialog() },
         fetchCurrentLocation = { onSuccess, onError ->
-            viewModel.getCurrentLocation(onSuccess, onError)
+            mainViewModel.getCurrentLocation(onSuccess, onError)
         },
-        onStartLocationTracking = onStartLocationTracking
+        onStartLocationTracking = onStartLocationTracking,
+        setLocationTraceEnabled = { preferencesViewModel.setLocationTraceEnabled(it) }
     )
     MainScaffoldContent(
         uiState = state,
         currentUser = state.currentUser,
         locationTrace = locationTrace,
+        preferences = preferences,
         actions = actions
     )
 }
@@ -164,6 +173,7 @@ private fun MainScaffoldContent(
     uiState: MainUiState,
     currentUser: User?,
     locationTrace: List<LatLng>,
+    preferences: UserPreferences,
     actions: Actions
 ) {
     val navController = rememberNavController()
@@ -224,7 +234,7 @@ private fun MainScaffoldContent(
         else {
             // Second, check if location permission is granted.
             // permissionLauncher will handle the conditional action for whether permission was granted
-            permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
@@ -336,7 +346,8 @@ private fun MainScaffoldContent(
                     name = currentUser!!.name ?: "",
                     email = currentUser.email ?: "",
                     profilePictureUrl = currentUser.photoUri?.toString(),
-                    onMyReportsClick = { navController.navigate("reports/${currentUser.uid}") })
+                    onMyReportsClick = { navController.navigate("reports/${currentUser.uid}") },
+                    onPreferencesClick = { navController.navigate("preferences") })
                 else {
                     LoggedOutAccountScreen(
                         navigateToLoginScreen = { context ->
@@ -345,8 +356,16 @@ private fun MainScaffoldContent(
                                     flags =
                                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 })
-                        })
+                        },
+                        onPreferencesClick = { navController.navigate("preferences") }
+                    )
                 }
+            }
+            composable("preferences") {
+                PreferencesPage(
+                    uiState = preferences,
+                    onShowLocationTraceChanged = { actions.setLocationTraceEnabled(it) }
+                )
             }
         }
     }
@@ -388,6 +407,9 @@ fun MainScaffoldPreview() {
             uiState = MainUiState(reports = Report.previewReports),
             currentUser = user,
             locationTrace = emptyList(),
+            preferences = UserPreferences(
+                showLocationTrace = false
+            ),
             actions = Actions(),
         )
     }

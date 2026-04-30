@@ -125,6 +125,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(libs.google.play.services.location)
     implementation(libs.maps.compose)
+    implementation(libs.androidx.datastore.preferences)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

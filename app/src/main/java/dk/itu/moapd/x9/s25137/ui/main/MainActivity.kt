@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
 
                 MainScaffold(
                     uiState = viewModel.uiState,
-                    viewModel = viewModel,
+                    mainViewModel = viewModel,
                     onStartLocationTracking = { startLocationService() }
                 )
 
