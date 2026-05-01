@@ -31,5 +31,6 @@ data class MainUiState(
     val errorMessage: String? = null,
     val showLoginAlertDialog: Boolean = false,
     val locationRequiredAlertDialog: String? = null,
-    val showLocationErrorAlertDialog: Boolean = false
+    val showLocationErrorAlertDialog: Boolean = false,
+    val notificationRequiredAlertDialog: String? = null,
 )

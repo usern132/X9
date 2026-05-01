@@ -21,6 +21,7 @@ import dk.itu.moapd.x9.s25137.services.LocationService
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
+import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.NotificationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -102,11 +103,7 @@ class MainActivity : ComponentActivity() {
                     LocationAlertDialog(
                         message = uiState.locationRequiredAlertDialog!!,
                         onConfirm = {
-                            // Navigate to the app's system settings, where the user can adjust the permissions
-                            Intent(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                Uri.fromParts("package", packageName, null)
-                            ).also { startActivity(it) }
+                            navigateToAppSystemSettings()
                             viewModel.hideLocationRequiredAlertDialog()
                         },
                         dismiss = { viewModel.hideLocationRequiredAlertDialog() }
@@ -115,6 +112,15 @@ class MainActivity : ComponentActivity() {
                     ErrorAlertDialog(
                         errorMessage = stringResource(R.string.location_error_message),
                         dismiss = { viewModel.hideLocationErrorAlertDialog() },
+                    )
+                if (uiState.notificationRequiredAlertDialog != null)
+                    NotificationAlertDialog(
+                        message = uiState.notificationRequiredAlertDialog!!,
+                        onConfirm = {
+                            navigateToAppSystemSettings()
+                            viewModel.hideNotificationRequiredAlertDialog()
+                        },
+                        dismiss = { viewModel.hideNotificationRequiredAlertDialog() },
                     )
             }
         }
@@ -153,4 +159,12 @@ class MainActivity : ComponentActivity() {
         }
         super.onStop()
     }
+}
+
+/** Navigate to the app's system settings, where the user can adjust the permissions. */
+private fun MainActivity.navigateToAppSystemSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also { startActivity(it) }
 }

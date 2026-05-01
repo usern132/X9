@@ -64,5 +64,7 @@
     <string name="location_permission_required_for_tracing_message">Location permission is required
     to trace your location. Your location history is only recorded locally and does not leave your
         device.</string>
+    <string name="notification_permission_required_message">Notification permission is required to keep location tracing running in the background. It can be stopped at any time by pressing the Stop button on the notification.</string>
+    <string name="notification_permission_required_title">Notification permission required</string>
 
 </resources>

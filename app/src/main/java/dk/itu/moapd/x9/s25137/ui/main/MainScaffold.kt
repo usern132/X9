@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.s25137.ui.main
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
@@ -90,6 +91,7 @@ data class MainActions(
     val showLoginAlertDialog: () -> Unit,
     val showLocationRequiredAlertDialog: (String) -> Unit,
     val showLocationErrorAlertDialog: () -> Unit,
+    val showNotificationRequiredAlertDialog: (String) -> Unit,
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
     val onStartLocationTracking: () -> Unit,
     val onStopLocationTracking: () -> Unit,
@@ -106,6 +108,7 @@ data class MainActions(
         showLoginAlertDialog = {},
         showLocationRequiredAlertDialog = {},
         showLocationErrorAlertDialog = {},
+        showNotificationRequiredAlertDialog = {},
         fetchCurrentLocation = { _, _ -> },
         onStartLocationTracking = {},
         onStopLocationTracking = {},
@@ -135,6 +138,7 @@ fun MainScaffold(
         showLoginAlertDialog = { mainViewModel.showLoginAlertDialog() },
         showLocationRequiredAlertDialog = { mainViewModel.showLocationRequiredAlertDialog(it) },
         showLocationErrorAlertDialog = { mainViewModel.showLocationErrorAlertDialog() },
+        showNotificationRequiredAlertDialog = { mainViewModel.showNotificationRequiredAlertDialog(it) },
         fetchCurrentLocation = { onSuccess, onError ->
             mainViewModel.getCurrentLocation(onSuccess, onError)
         },
@@ -171,7 +175,7 @@ private fun MainScaffoldContent(
 
     val locationPermissionRequiredForTracingMessage =
         stringResource(R.string.location_permission_required_for_tracing_message)
-    val globalLocationPermissionLauncher = rememberLauncherForActivityResult(
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         hasLocationPermission = granted
@@ -183,23 +187,51 @@ private fun MainScaffoldContent(
         }
     }
 
+    val notificationPermissionAlertDialogMessage =
+        stringResource(R.string.notification_permission_required_message)
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (!granted) {
+            actions.showNotificationRequiredAlertDialog(
+                notificationPermissionAlertDialogMessage
+            )
+            actions.setLocationTraceEnabled(false)
+        }
+    }
+
     // Using the showLocationTrace shared preference as a key, we can observe
     // any changes in the toggle and recompose accordingly.
     // The lifecycle key is required to re-check the permission when the user resumes the activity
     // after returning from the app's settings page where they may have enabled the location permission
     LaunchedEffect(preferences.showLocationTrace, lifecycleState) {
-        val granted = ContextCompat.checkSelfPermission(
+        val locationPermissionGranted = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        hasLocationPermission = granted
+        hasLocationPermission = locationPermissionGranted
 
         if (preferences.showLocationTrace) {
-            if (granted)
-                actions.onStartLocationTracking()
+            if (!locationPermissionGranted)
+            // Request location permission to the user
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val notificationPermissionGranted = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (!notificationPermissionGranted) {
+                    // Request notification permission to the user
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    actions.onStartLocationTracking()
+                }
+            }
+            // If user enables location tracing but permissions are not granted,
+            // the service won't be enabled
             else {
-                // Request location permission to the user
-                globalLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                actions.onStartLocationTracking()
             }
         } else {
             actions.onStopLocationTracking()

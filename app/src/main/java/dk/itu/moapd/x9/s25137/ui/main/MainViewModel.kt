@@ -203,4 +203,10 @@ class MainViewModel @Inject constructor(
 
     fun hideLocationErrorAlertDialog() =
         _uiState.update { it.copy(showLocationErrorAlertDialog = false) }
+
+    fun showNotificationRequiredAlertDialog(message: String) =
+        _uiState.update { it.copy(notificationRequiredAlertDialog = message) }
+
+    fun hideNotificationRequiredAlertDialog() =
+        _uiState.update { it.copy(notificationRequiredAlertDialog = null) }
 }
