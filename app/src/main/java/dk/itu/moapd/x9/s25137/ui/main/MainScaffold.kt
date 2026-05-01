@@ -88,7 +88,7 @@ data class MainActions(
     val isReportDeletable: (Report) -> Boolean,
     val modifier: Modifier = Modifier,
     val showLoginAlertDialog: () -> Unit,
-    val showLocationRequiredAlertDialog: () -> Unit,
+    val showLocationRequiredAlertDialog: (String) -> Unit,
     val showLocationErrorAlertDialog: () -> Unit,
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
     val onStartLocationTracking: () -> Unit,
@@ -124,7 +124,7 @@ fun MainScaffold(
 ) {
     val state by uiState.collectAsState()
     val locationTrace by mainViewModel.locationTrace.collectAsState()
-    val preferences by preferencesViewModel.uiState.collectAsState()
+    val preferences by preferencesViewModel.preferencesFlow.collectAsState()
     val actions = MainActions(
         onLogout = { mainViewModel.logOut() },
         onInsertReport = { mainViewModel.insertReport(it) },
@@ -133,7 +133,7 @@ fun MainScaffold(
         isReportEditable = { mainViewModel.isReportEditable(it) },
         isReportDeletable = { mainViewModel.isReportDeletable(it) },
         showLoginAlertDialog = { mainViewModel.showLoginAlertDialog() },
-        showLocationRequiredAlertDialog = { mainViewModel.showLocationRequiredAlertDialog() },
+        showLocationRequiredAlertDialog = { mainViewModel.showLocationRequiredAlertDialog(it) },
         showLocationErrorAlertDialog = { mainViewModel.showLocationErrorAlertDialog() },
         fetchCurrentLocation = { onSuccess, onError ->
             mainViewModel.getCurrentLocation(onSuccess, onError)
@@ -169,6 +169,8 @@ private fun MainScaffoldContent(
 
     var hasLocationPermission by remember { mutableStateOf(false) }
 
+    val locationPermissionRequiredForTracingMessage =
+        stringResource(R.string.location_permission_required_for_tracing_message)
     val globalLocationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -176,7 +178,7 @@ private fun MainScaffoldContent(
         if (granted) {
             actions.onStartLocationTracking()
         } else {
-            actions.showLocationRequiredAlertDialog()
+            actions.showLocationRequiredAlertDialog(locationPermissionRequiredForTracingMessage)
             actions.setLocationTraceEnabled(false)
         }
     }

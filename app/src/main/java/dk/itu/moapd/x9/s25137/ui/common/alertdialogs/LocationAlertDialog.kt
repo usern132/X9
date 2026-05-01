@@ -11,7 +11,8 @@ import androidx.compose.ui.res.stringResource
 import dk.itu.moapd.x9.s25137.R
 
 @Composable
-fun LocationAlertDialog(onConfirm: () -> Unit, dismiss: () -> Unit) = BaseAlertDialog(
+fun LocationAlertDialog(message: String, onConfirm: () -> Unit, dismiss: () -> Unit) =
+    BaseAlertDialog(
     icon = {
         Icon(
             imageVector = Icons.Default.LocationOff,
@@ -20,7 +21,7 @@ fun LocationAlertDialog(onConfirm: () -> Unit, dismiss: () -> Unit) = BaseAlertD
         )
     },
     title = stringResource(R.string.location_permission_required_title),
-    text = stringResource(R.string.location_permission_required_message),
+        text = message,
     confirmButton = {
         TextButton(onClick = onConfirm) {
             Text(text = stringResource(R.string.settings))

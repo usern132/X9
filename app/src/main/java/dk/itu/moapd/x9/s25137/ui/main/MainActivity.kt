@@ -98,8 +98,9 @@ class MainActivity : ComponentActivity() {
                 if (uiState.showLoginAlertDialog)
                     LoginAlertDialog(dismiss = { viewModel.hideLoginAlertDialog() })
 
-                if (uiState.showLocationRequiredAlertDialog)
+                if (uiState.locationRequiredAlertDialog != null)
                     LocationAlertDialog(
+                        message = uiState.locationRequiredAlertDialog!!,
                         onConfirm = {
                             // Navigate to the app's system settings, where the user can adjust the permissions
                             Intent(

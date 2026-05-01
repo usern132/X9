@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
+import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.User
@@ -77,6 +79,9 @@ fun MainNavHost(
     val enterTransition: EnterTransition = fadeIn(animationSpec = tween(ANIM_DURATION))
     val exitTransition = fadeOut(animationSpec = tween(ANIM_DURATION))
 
+    val locationRequiredAlertDialogMessage =
+        stringResource(R.string.location_permission_required_message)
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -84,7 +89,9 @@ fun MainNavHost(
             actions.fetchCurrentLocation({ location ->
                 navController.navigate(Route.CreateReport(location.latitude, location.longitude))
             }, { actions.showLocationErrorAlertDialog() })
-        } else actions.showLocationRequiredAlertDialog()
+        } else {
+            actions.showLocationRequiredAlertDialog(locationRequiredAlertDialogMessage)
+        }
     }
 
     return NavHost(

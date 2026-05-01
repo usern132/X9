@@ -16,7 +16,7 @@ class PreferencesViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<UserPreferences> = preferencesRepository.preferencesFlow
+    val preferencesFlow: StateFlow<UserPreferences> = preferencesRepository.preferencesFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

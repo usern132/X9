@@ -61,5 +61,8 @@
     <string name="preferences_show_location_trace">Show location trace on map</string>
     <string name="preferences">Preferences</string>
     <string name="stop">Stop</string>
+    <string name="location_permission_required_for_tracing_message">Location permission is required
+    to trace your location. Your location history is only recorded locally and does not leave your
+        device.</string>
 
 </resources>

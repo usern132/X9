@@ -25,12 +25,11 @@ import dk.itu.moapd.x9.s25137.domain.models.User
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 data class MainUiState(
     val currentUser: User? = null,
     val reports: List<Report> = emptyList(),
     val errorMessage: String? = null,
     val showLoginAlertDialog: Boolean = false,
-    val showLocationRequiredAlertDialog: Boolean = false,
+    val locationRequiredAlertDialog: String? = null,
     val showLocationErrorAlertDialog: Boolean = false
 )
