@@ -49,6 +49,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 class LocationService : Service() {
     companion object {
+        // Arbitrary name used to refer to the stop action
+        const val ACTION_STOP_SERVICE = "LocationService.STOP"
         private const val NOTIFICATION_CHANNEL_ID = "location_tracking_channel"
         private const val NOTIFICATION_ID = 1
         private const val LOCATION_UPDATE_INTERVAL_MS = 1000L
@@ -89,6 +91,11 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP_SERVICE) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
                 NOTIFICATION_ID,
@@ -102,6 +109,11 @@ class LocationService : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder = localBinder
+
+    override fun onDestroy() {
+        unsubscribeFromLocationUpdates()
+        super.onDestroy()
+    }
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -130,6 +142,16 @@ class LocationService : Service() {
             flags
         )
 
+        val stopIntent = Intent(this, LocationService::class.java).apply {
+            action = ACTION_STOP_SERVICE
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            stopIntent,
+            flags
+        )
+
         return NotificationCompat.Builder(
             this,
             NOTIFICATION_CHANNEL_ID
@@ -138,6 +160,11 @@ class LocationService : Service() {
             .setContentText(getString(R.string.location_notification_text))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
+            .addAction(
+                R.drawable.ic_launcher_foreground,
+                getString(R.string.stop),
+                stopPendingIntent
+            )
             .setOngoing(true)
             .build()
     }
@@ -165,5 +192,4 @@ class LocationService : Service() {
         } catch (_: SecurityException) {
         }
     }
-
 }

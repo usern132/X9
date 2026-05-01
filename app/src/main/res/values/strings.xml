@@ -60,5 +60,6 @@
     <string name="location_notification_text">Location tracing is active</string>
     <string name="preferences_show_location_trace">Show location trace on map</string>
     <string name="preferences">Preferences</string>
+    <string name="stop">Stop</string>
 
 </resources>
