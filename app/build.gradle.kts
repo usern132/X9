@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.secrets.gradle)
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -27,7 +28,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -127,6 +129,7 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.composecalendar)
+    implementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

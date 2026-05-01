@@ -15,10 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Location
@@ -33,6 +32,33 @@ import dk.itu.moapd.x9.s25137.ui.reports.details.ReportDetailsPage
 import dk.itu.moapd.x9.s25137.ui.reports.form.CreateReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.form.EditReportForm
 import dk.itu.moapd.x9.s25137.ui.reports.list.ReportList
+import kotlinx.serialization.Serializable
+
+sealed interface Route {
+    @Serializable
+    object Home : Route
+
+    @Serializable
+    object Calendar : Route
+
+    @Serializable
+    object Account : Route
+
+    @Serializable
+    data class CreateReport(val latitude: Double, val longitude: Double) : Route
+
+    @Serializable
+    data class ReportDetails(val reportKey: String) : Route
+
+    @Serializable
+    data class UserReports(val userId: String) : Route
+
+    @Serializable
+    data class EditReport(val reportKey: String) : Route
+
+    @Serializable
+    object Preferences : Route
+}
 
 private const val ANIM_DURATION = 150
 
@@ -56,20 +82,14 @@ fun MainNavHost(
     ) { granted ->
         if (granted) {
             actions.fetchCurrentLocation({ location ->
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "report_latitude", location.latitude
-                )
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "report_longitude", location.longitude
-                )
-                navController.navigate("create_report")
+                navController.navigate(Route.CreateReport(location.latitude, location.longitude))
             }, { actions.showLocationErrorAlertDialog() })
         } else actions.showLocationRequiredAlertDialog()
     }
 
     return NavHost(
         navController = navController,
-        startDestination = TopLevelDestinations.entries.first().route,
+        startDestination = Route.Home,
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding),
@@ -77,7 +97,7 @@ fun MainNavHost(
         exitTransition = { exitTransition },
         popEnterTransition = { enterTransition },
         popExitTransition = { exitTransition }) {
-        composable("home") {
+        composable<Route.Home> {
             DashboardPage(
                 reports = uiState.reports,
                 isFABEnabled = isLoggedIn() && hasLocationPermission,
@@ -96,55 +116,40 @@ fun MainNavHost(
                 modifier = Modifier.fillMaxSize()
             )
         }
-        composable("create_report") {
-            val reportLatitude =
-                navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_latitude")
-            val reportLongitude =
-                navController.previousBackStackEntry?.savedStateHandle?.get<Double>("report_longitude")
-
-            if (reportLatitude != null && reportLongitude != null) {
-                val reportLocation = Location(reportLatitude, reportLongitude)
-                CreateReportForm(
-                    location = reportLocation, onSubmit = { report ->
-                        actions.onInsertReport(report)
-                        navController.popBackStack()
-                    })
-            }
+        composable<Route.CreateReport> { backStackEntry ->
+            val route = backStackEntry.toRoute<Route.CreateReport>()
+            val reportLocation = Location(route.latitude, route.longitude)
+            CreateReportForm(
+                location = reportLocation, onSubmit = { report ->
+                    actions.onInsertReport(report)
+                    navController.popBackStack()
+                })
         }
-        composable(
-            "report_details/{reportKey}",
-            arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val reportKey = backStackEntry.arguments?.getString("reportKey")
+        composable<Route.ReportDetails> { backStackEntry ->
+            val reportKey = backStackEntry.toRoute<Route.ReportDetails>().reportKey
             val report = uiState.reports.find { it.key == reportKey }
             report?.let { report ->
                 ReportDetailsPage(
                     report = report,
                     isEditable = actions.isReportEditable(report),
-                    onEditButtonClick = { navController.navigate("edit_report/$reportKey") },
-                    onAuthorClick = { navController.navigate("reports/${report.userId}") },
+                    onEditButtonClick = { navController.navigate(Route.EditReport(reportKey)) },
+                    onAuthorClick = { navController.navigate(Route.UserReports(report.userId)) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
         }
-        composable(
-            "reports/{userId}",
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) {
-            val userIdArg = it.arguments?.getString("userId")
+        composable<Route.UserReports> { backStackEntry ->
+            val route = backStackEntry.toRoute<Route.UserReports>()
             ReportList(
-                reports = uiState.reports.filter { report -> report.userId == userIdArg },
+                reports = uiState.reports.filter { report -> report.userId == route.userId },
                 isReportDeletable = actions.isReportDeletable,
                 onDeleteReport = actions.onDeleteReport,
                 onItemClick = onReportClick(navController)
             )
         }
-        composable(
-            "edit_report/{reportKey}",
-            arguments = listOf(navArgument("reportKey") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val reportKey = backStackEntry.arguments?.getString("reportKey")
-            val report = uiState.reports.find { it.key == reportKey }
+        composable<Route.EditReport> { backStackEntry ->
+            val route = backStackEntry.toRoute<Route.EditReport>()
+            val report = uiState.reports.find { it.key == route.reportKey }
             report?.let { report ->
                 EditReportForm(
                     report = report,
@@ -155,7 +160,7 @@ fun MainNavHost(
                 )
             }
         }
-        composable("calendar") {
+        composable<Route.Calendar> {
             CalendarPage(
                 reports = uiState.reports,
                 onDeleteReport = actions.onDeleteReport,
@@ -163,14 +168,14 @@ fun MainNavHost(
                 onItemClick = onReportClick(navController)
             )
         }
-        composable("account") {
+        composable<Route.Account> {
             if (isLoggedIn()) LoggedInAccountScreen(
                 onLogout = actions.onLogout,
                 name = currentUser!!.name ?: "",
                 email = currentUser.email ?: "",
                 profilePictureUrl = currentUser.photoUri?.toString(),
-                onMyReportsClick = { navController.navigate("reports/${currentUser.uid}") },
-                onPreferencesClick = { navController.navigate("preferences") })
+                onMyReportsClick = { navController.navigate(Route.UserReports(currentUser.uid)) },
+                onPreferencesClick = { navController.navigate(Route.Preferences) })
             else {
                 LoggedOutAccountScreen(
                     navigateToLoginScreen = { context ->
@@ -180,11 +185,11 @@ fun MainNavHost(
                                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
                     },
-                    onPreferencesClick = { navController.navigate("preferences") }
+                    onPreferencesClick = { navController.navigate(Route.Preferences) }
                 )
             }
         }
-        composable("preferences") {
+        composable<Route.Preferences> {
             PreferencesPage(
                 uiState = preferences,
                 onShowLocationTraceChanged = { enabled ->
@@ -200,7 +205,7 @@ fun MainNavHost(
 private fun onReportClick(
     navController: NavHostController
 ): (String) -> Unit =
-    { key -> navController.navigate("report_details/$key") }
+    { key -> navController.navigate(Route.ReportDetails(key)) }
 
 private fun onCreateReportClick(
     permissionLauncher: ActivityResultLauncher<String>,

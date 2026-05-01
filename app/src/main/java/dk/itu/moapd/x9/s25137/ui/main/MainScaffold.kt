@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -71,11 +72,11 @@ import kotlinx.coroutines.flow.StateFlow
  */
 
 enum class TopLevelDestinations(
-    val route: String, val labelRes: Int, val icon: ImageVector
+    val route: Route, val labelRes: Int, val icon: ImageVector
 ) {
-    HOME("home", R.string.home, Icons.Filled.Home),
-    CALENDAR("calendar", R.string.calendar, Icons.Filled.CalendarMonth),
-    ACCOUNT("account", R.string.account, Icons.Filled.AccountCircle),
+    HOME(Route.Home, R.string.home, Icons.Filled.Home),
+    CALENDAR(Route.Calendar, R.string.calendar, Icons.Filled.CalendarMonth),
+    ACCOUNT(Route.Account, R.string.account, Icons.Filled.AccountCircle),
 }
 
 data class MainActions(
@@ -205,7 +206,7 @@ private fun MainScaffoldContent(
 
     fun isLoggedIn(): Boolean = currentUser != null
 
-    fun navigateOrShowLoginAlertDialog(route: String) =
+    fun navigateOrShowLoginAlertDialog(route: Any) =
         if (isLoggedIn()) navController.navigate(route)
         else actions.showLoginAlertDialog()
 
@@ -242,7 +243,7 @@ private fun BottomNavigationBar(
     NavigationBar {
         TopLevelDestinations.entries.forEach { destination ->
             val selected =
-                currentDestination?.hierarchy?.any { it.route == destination.route } == true
+                currentDestination?.hierarchy?.any { it.hasRoute(destination.route::class) } == true
             NavigationBarItem(
                 selected = selected,
                 icon = { Icon(imageVector = destination.icon, contentDescription = null) },
