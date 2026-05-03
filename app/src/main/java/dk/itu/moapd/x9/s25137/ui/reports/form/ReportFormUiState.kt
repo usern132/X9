@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 
@@ -27,7 +28,7 @@ class ReportFormUiState(
     var description by mutableStateOf(report?.description ?: "")
     var selectedType by mutableStateOf(report?.type)
     var selectedSeverity by mutableStateOf(report?.severity ?: Severity.MINOR)
-    var attachedImageUri: Uri? by mutableStateOf(null)
+    var attachedImageUri: Uri? by mutableStateOf(report?.remoteImageUri?.toUri())
 
 
     var expandedDropdown by mutableStateOf(false)

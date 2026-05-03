@@ -82,7 +82,6 @@ fun CreateReportForm(
     viewModel = viewModel,
     onSubmit = onSubmit,
     submitButtonText = submitButtonText,
-    showImageAttachmentButtonsRow = true,
     onCameraPermissionDenied = onCameraPermissionDenied
 )
 
@@ -94,7 +93,6 @@ private fun ReportForm(
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit),
-    showImageAttachmentButtonsRow: Boolean = false,
     onCameraPermissionDenied: () -> Unit = { }
 ) {
     LaunchedEffect(report) {
@@ -120,7 +118,7 @@ private fun ReportForm(
         DescriptionInput(uiState, requiredErrorMessage)
         SeverityInput(uiState)
         Spacer(modifier = Modifier.height(16.dp))
-        if (showImageAttachmentButtonsRow) ImageAttachmentButtonsRow(
+        ImageAttachmentButtonsRow(
             uiState = uiState,
             createTempUri = { viewModel.createTempImageUri() },
             onCameraPermissionDenied = onCameraPermissionDenied
@@ -181,7 +179,7 @@ private fun ImageAttachmentButtonsRow(
 
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            uiState.attachedImageUri = uri
+            uri?.let { uiState.attachedImageUri = uri }
         }
 
     var tempUri = createTempUri()

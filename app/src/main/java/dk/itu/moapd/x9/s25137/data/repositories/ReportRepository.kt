@@ -1,6 +1,8 @@
 package dk.itu.moapd.x9.s25137.data.repositories
 
+import android.net.Uri
 import androidx.core.net.toUri
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseError
 import dk.itu.moapd.x9.s25137.data.datasources.ImageDataSource
 import dk.itu.moapd.x9.s25137.data.datasources.ReportRemoteDataSource
@@ -21,10 +23,7 @@ class ReportRepository @Inject constructor(
         )
 
         var insertedReportKey: String? = null
-        imageDataSource.uploadFile(
-            localUri = report.localImageUri.toUri(),
-            remotePath = "images/reports/${report.key}.jpg"
-        ).addOnSuccessListener { downloadUri ->
+        uploadImageTask(report).addOnSuccessListener { downloadUri ->
             val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
             insertedReportKey = reportRemoteDataSource.insert(
                 report = reportWithImage,
@@ -34,8 +33,28 @@ class ReportRepository @Inject constructor(
         return insertedReportKey
     }
 
-    fun update(report: Report, onComplete: (DatabaseError?) -> Unit) =
+    fun update(report: Report, onComplete: (DatabaseError?) -> Unit) {
+        if (report.localImageUri == null) {
+            reportRemoteDataSource.update(report = report, onComplete = onComplete)
+            return
+        } else {
+            uploadImageTask(report).addOnSuccessListener { downloadUri ->
+                val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
+                reportRemoteDataSource.update(report = reportWithImage, onComplete = onComplete)
+            }
+        }
         reportRemoteDataSource.update(report = report, onComplete = onComplete)
+    }
+
+    private fun uploadImageTask(
+        report: Report
+    ): Task<Uri> {
+        requireNotNull(report.localImageUri) { "Report's local image URI is null." }
+        return imageDataSource.uploadFile(
+            localUri = report.localImageUri.toUri(),
+            remotePath = "images/reports/${report.key}.jpg"
+        )
+    }
 
     fun delete(key: String, onComplete: (DatabaseError?) -> Unit) =
         reportRemoteDataSource.delete(key = key, onComplete = onComplete)
