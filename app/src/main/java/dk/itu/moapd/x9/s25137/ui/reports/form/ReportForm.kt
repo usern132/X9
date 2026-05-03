@@ -1,5 +1,8 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Traffic
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -53,11 +59,11 @@ fun EditReportForm(
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit)
 ) = ReportForm(
-    report = report,
     location = Location(latitude = report.latitude, longitude = report.longitude),
+    report = report,
     viewModel = viewModel,
     onSubmit = onSubmit,
-    submitButtonText = submitButtonText
+    submitButtonText = submitButtonText,
 )
 
 @Composable
@@ -70,9 +76,9 @@ fun CreateReportForm(
     location = location,
     viewModel = viewModel,
     onSubmit = onSubmit,
-    submitButtonText = submitButtonText
+    submitButtonText = submitButtonText,
+    showImageAttachmentButtonsRow = true,
 )
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +87,8 @@ private fun ReportForm(
     report: Report? = null,
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
-    submitButtonText: String = stringResource(R.string.submit)
+    submitButtonText: String = stringResource(R.string.submit),
+    showImageAttachmentButtonsRow: Boolean = false
 ) {
     LaunchedEffect(report) {
         viewModel.initialize(report)
@@ -106,12 +113,51 @@ private fun ReportForm(
         DescriptionInput(uiState, requiredErrorMessage)
         SeverityInput(uiState)
         Spacer(modifier = Modifier.height(16.dp))
-        LocationDisclaimer()
+        if (showImageAttachmentButtonsRow) ImageAttachmentButtonsRow(uiState)
 
         // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
 
-        SubmitButton(viewModel, onSubmit, submitButtonText)
+        LocationDisclaimer()
+        SubmitButton(
+            modifier = Modifier.padding(top = 4.dp),
+            viewModel = viewModel,
+            onSubmit = onSubmit,
+            submitButtonText = submitButtonText
+        )
+    }
+}
+
+@Composable
+private fun ImageAttachmentButtonsRow(
+    uiState: ReportFormUiState
+) {
+    val imagePicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            uiState.attachedImageUri = uri
+        }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Button(
+            onClick = {
+                imagePicker.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
+        ) {
+            Icon(imageVector = Icons.Outlined.AttachFile, contentDescription = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(stringResource(R.string.attach_image))
+        }
+        Button(
+            onClick = { }
+        ) {
+            Icon(imageVector = Icons.Outlined.PhotoCamera, contentDescription = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(stringResource(R.string.capture_image))
+        }
     }
 }
 
@@ -123,6 +169,7 @@ private fun LocationDisclaimer() = Text(
 
 @Composable
 private fun SubmitButton(
+    modifier: Modifier = Modifier,
     viewModel: ReportFormViewModel,
     onSubmit: (Report) -> Unit,
     submitButtonText: String
@@ -135,7 +182,7 @@ private fun SubmitButton(
                 onSubmit(report)
             }
         },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
             .testTag(ReportField.SUBMIT.testTag)

@@ -1,5 +1,6 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,15 +20,14 @@ class ReportFormUiState(
 ) {
     var title by mutableStateOf(report?.title ?: "")
 
-    // TODO: revisar si això va aquí o a una altra classe
     var latitude: Double = report?.latitude ?: 0.0
     var longitude: Double = report?.longitude ?: 0.0
     var address: String = report?.address ?: ""
 
-    // TODO: -------
     var description by mutableStateOf(report?.description ?: "")
     var selectedType by mutableStateOf(report?.type)
     var selectedSeverity by mutableStateOf(report?.severity ?: Severity.MINOR)
+    var attachedImageUri: Uri? by mutableStateOf(null)
 
 
     var expandedDropdown by mutableStateOf(false)

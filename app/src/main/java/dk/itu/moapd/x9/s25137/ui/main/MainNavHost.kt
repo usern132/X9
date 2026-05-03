@@ -127,10 +127,12 @@ fun MainNavHost(
             val route = backStackEntry.toRoute<Route.CreateReport>()
             val reportLocation = Location(route.latitude, route.longitude)
             CreateReportForm(
-                location = reportLocation, onSubmit = { report ->
+                location = reportLocation,
+                onSubmit = { report ->
                     actions.onInsertReport(report)
                     navController.popBackStack()
-                })
+                }
+            )
         }
         composable<Route.ReportDetails> { backStackEntry ->
             val reportKey = backStackEntry.toRoute<Route.ReportDetails>().reportKey
