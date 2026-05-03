@@ -19,6 +19,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.PhotoCamera
@@ -46,6 +47,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
@@ -123,6 +125,7 @@ private fun ReportForm(
             createTempUri = { viewModel.createTempImageUri() },
             onCameraPermissionDenied = onCameraPermissionDenied
         )
+        if (uiState.attachedImageUri != null) AttachedImage(uiState.attachedImageUri, uiState)
 
         // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -138,6 +141,33 @@ private fun ReportForm(
 }
 
 @Composable
+private fun AttachedImage(
+    attachedImageUri: Uri?,
+    uiState: ReportFormUiState
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AsyncImage(
+            model = attachedImageUri,
+            contentDescription = stringResource(R.string.attached_image),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .padding(vertical = 16.dp)
+        )
+        Button(
+            onClick = { uiState.attachedImageUri = null },
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(stringResource(R.string.delete))
+        }
+    }
+}
+
+@Composable
 private fun ImageAttachmentButtonsRow(
     uiState: ReportFormUiState,
     createTempUri: () -> Uri,
@@ -149,7 +179,8 @@ private fun ImageAttachmentButtonsRow(
             uiState.attachedImageUri = uri
         }
 
-    val tempUri = createTempUri()
+    var tempUri = createTempUri()
+
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { wasSaved ->
             if (wasSaved)
@@ -159,6 +190,9 @@ private fun ImageAttachmentButtonsRow(
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
+                // Update the temporary URI every time the user captures a new image,
+                // to substitute the previous capture.
+                tempUri = createTempUri()
                 cameraLauncher.launch(tempUri)
             } else {
                 onCameraPermissionDenied()
