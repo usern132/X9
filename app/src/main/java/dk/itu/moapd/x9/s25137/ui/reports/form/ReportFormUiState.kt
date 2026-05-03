@@ -23,7 +23,6 @@ class ReportFormUiState(
 
     var latitude: Double = report?.latitude ?: 0.0
     var longitude: Double = report?.longitude ?: 0.0
-    var address: String = report?.address ?: ""
 
     var description by mutableStateOf(report?.description ?: "")
     var selectedType by mutableStateOf(report?.type)

@@ -29,7 +29,6 @@ class ReportFormViewModel @Inject constructor(
                 title = _uiState.value.title,
                 latitude = _uiState.value.latitude,
                 longitude = _uiState.value.longitude,
-                address = _uiState.value.address,
                 timestamp = originalReport?.timestamp ?: Date().time,
                 type = _uiState.value.selectedType ?: Type.OTHER,
                 description = _uiState.value.description,

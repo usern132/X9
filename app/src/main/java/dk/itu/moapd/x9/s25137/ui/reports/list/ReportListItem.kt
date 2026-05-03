@@ -123,7 +123,7 @@ private fun ReportListItemContent(
             style = MaterialTheme.typography.titleMedium
         )
         Text(
-            text = "${Date(report.timestamp).toFormattedString(includeTime = true)} · ${report.address}",
+            text = Date(report.timestamp).toFormattedString(includeTime = true),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -134,7 +134,6 @@ private fun ReportListItemContent(
 fun ReportListItemPreview() {
     val report = Report(
         title = "Broken car in road",
-        address = "One Road, 123",
         timestamp = Date().time,
         type = Type.BROKEN_VEHICLES,
         description = "A broken car is parked in the road",

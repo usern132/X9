@@ -405,7 +405,6 @@ fun EditReportFormPreview() {
                 title = "Important speed camera on highway",
                 latitude = 0.0,
                 longitude = 0.0,
-                address = "Address",
                 timestamp = 0L,
                 type = Type.SPEED_CAMERA,
                 description = "There is a speed camera on the highway.",

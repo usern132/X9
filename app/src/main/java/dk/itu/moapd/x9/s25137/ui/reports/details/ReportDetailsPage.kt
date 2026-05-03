@@ -87,7 +87,7 @@ fun ReportDetailsPage(
 
                 ReportDetailsItem(
                     label = stringResource(R.string.report_location),
-                    value = "(${report.latitude}, ${report.longitude})\n${report.address}"
+                    value = "(${report.latitude}, ${report.longitude})"
                 )
                 ReportDetailsItem(
                     label = stringResource(R.string.report_date),
@@ -138,7 +138,6 @@ private fun ReportDetailsPagePreview(isEditable: Boolean) {
             title = "Large pothole on Main St affecting cyclists",
             latitude = 53.3498,
             longitude = -6.2603,
-            address = "Main St, 123",
             timestamp = Date().time,
             type = Type.OTHER,
             description = "Large pothole in the middle of the road." +
