@@ -125,7 +125,11 @@ private fun ReportForm(
             createTempUri = { viewModel.createTempImageUri() },
             onCameraPermissionDenied = onCameraPermissionDenied
         )
-        if (uiState.attachedImageUri != null) AttachedImage(uiState.attachedImageUri, uiState)
+        if (uiState.attachedImageUri != null) AttachedImage(
+            modifier = Modifier.padding(vertical = 16.dp),
+            attachedImageUri = uiState.attachedImageUri,
+            uiState = uiState
+        )
 
         // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -142,19 +146,20 @@ private fun ReportForm(
 
 @Composable
 private fun AttachedImage(
+    modifier: Modifier = Modifier,
     attachedImageUri: Uri?,
     uiState: ReportFormUiState
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
             model = attachedImageUri,
-            contentDescription = stringResource(R.string.attached_image),
+            contentDescription = stringResource(R.string.report_attached_image_content_description),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
-                .padding(vertical = 16.dp)
         )
         Button(
             onClick = { uiState.attachedImageUri = null },

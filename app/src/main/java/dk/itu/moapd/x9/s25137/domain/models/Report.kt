@@ -19,7 +19,8 @@ data class Report(
      * After inserting the Report, we can obtain the key created by Firebase
      * and make a copy of the object with that key assigned to it. We do NOT have control over the key creation.
      */
-    @get:Exclude val key: String? = null,
+    @get:Exclude
+    val key: String? = null,
     val title: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
@@ -28,6 +29,14 @@ data class Report(
     val type: Type = Type.OTHER,
     val description: String = "",
     val severity: Severity = Severity.MINOR,
+
+    // The local image URI gets excluded because it is the location of an image that was
+    // just attached/captured in the local filesystem as a temporary file.
+    @get:Exclude
+    val localImageUri: String? = null,
+    // The remote image URI will be assigned once it is uploaded to the storage bucket.
+    val remoteImageUri: String? = null,
+
     val userId: String = "",
     val userName: String = "",
     val userImageUri: String? = null

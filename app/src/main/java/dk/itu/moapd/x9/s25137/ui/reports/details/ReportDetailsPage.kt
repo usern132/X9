@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
@@ -103,6 +105,17 @@ fun ReportDetailsPage(
                     label = stringResource(R.string.report_description),
                     value = report.description
                 )
+
+                Box {}
+
+                if (report.remoteImageUri != null)
+                    AsyncImage(
+                        model = report.remoteImageUri,
+                        contentDescription = stringResource(R.string.report_attached_image_content_description),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp)
+                    )
             }
         }
     }

@@ -71,6 +71,6 @@
     <string name="camera_permission_required_title">Camera permission required</string>
     <string name="camera_permission_required_message">Camera permission is required to capture
         an image and attach it to your report.</string>
-    <string name="attached_image">Report image attached by the report author</string>
+    <string name="report_attached_image_content_description">Report image attached by the report author</string>
 
 </resources>

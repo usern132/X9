@@ -34,6 +34,8 @@ class ReportFormViewModel @Inject constructor(
                 type = _uiState.value.selectedType ?: Type.OTHER,
                 description = _uiState.value.description,
                 severity = _uiState.value.selectedSeverity,
+                localImageUri = _uiState.value.attachedImageUri?.toString(),
+                remoteImageUri = originalReport?.remoteImageUri,
                 userId = originalReport?.userId ?: "",
                 userName = originalReport?.userName ?: "",
                 userImageUri = originalReport?.userImageUri
