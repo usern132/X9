@@ -126,12 +126,19 @@ fun MainNavHost(
         composable<Route.CreateReport> { backStackEntry ->
             val route = backStackEntry.toRoute<Route.CreateReport>()
             val reportLocation = Location(route.latitude, route.longitude)
+            val cameraPermissionRequiredAlertDialogMessage =
+                stringResource(R.string.camera_permission_required_message)
             CreateReportForm(
                 location = reportLocation,
                 onSubmit = { report ->
                     actions.onInsertReport(report)
                     navController.popBackStack()
-                }
+                },
+                onCameraPermissionDenied = {
+                    actions.showCameraRequiredAlertDialog(
+                        cameraPermissionRequiredAlertDialogMessage
+                    )
+                },
             )
         }
         composable<Route.ReportDetails> { backStackEntry ->

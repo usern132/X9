@@ -1,5 +1,7 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
+import android.Manifest
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -71,13 +73,15 @@ fun CreateReportForm(
     location: Location,
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
-    submitButtonText: String = stringResource(R.string.submit)
+    submitButtonText: String = stringResource(R.string.submit),
+    onCameraPermissionDenied: () -> Unit
 ) = ReportForm(
     location = location,
     viewModel = viewModel,
     onSubmit = onSubmit,
     submitButtonText = submitButtonText,
     showImageAttachmentButtonsRow = true,
+    onCameraPermissionDenied = onCameraPermissionDenied
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +92,8 @@ private fun ReportForm(
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit),
-    showImageAttachmentButtonsRow: Boolean = false
+    showImageAttachmentButtonsRow: Boolean = false,
+    onCameraPermissionDenied: () -> Unit = { }
 ) {
     LaunchedEffect(report) {
         viewModel.initialize(report)
@@ -113,7 +118,11 @@ private fun ReportForm(
         DescriptionInput(uiState, requiredErrorMessage)
         SeverityInput(uiState)
         Spacer(modifier = Modifier.height(16.dp))
-        if (showImageAttachmentButtonsRow) ImageAttachmentButtonsRow(uiState)
+        if (showImageAttachmentButtonsRow) ImageAttachmentButtonsRow(
+            uiState = uiState,
+            createTempUri = { viewModel.createTempImageUri() },
+            onCameraPermissionDenied = onCameraPermissionDenied
+        )
 
         // Spacer to push the submit button to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -130,19 +139,39 @@ private fun ReportForm(
 
 @Composable
 private fun ImageAttachmentButtonsRow(
-    uiState: ReportFormUiState
+    uiState: ReportFormUiState,
+    createTempUri: () -> Uri,
+    onCameraPermissionDenied: () -> Unit
 ) {
-    val imagePicker =
+
+    val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             uiState.attachedImageUri = uri
         }
+
+    val tempUri = createTempUri()
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { wasSaved ->
+            if (wasSaved)
+                uiState.attachedImageUri = tempUri
+        }
+
+    val cameraPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                cameraLauncher.launch(tempUri)
+            } else {
+                onCameraPermissionDenied()
+            }
+        }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(
             onClick = {
-                imagePicker.launch(
+                imagePickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             }
@@ -152,7 +181,9 @@ private fun ImageAttachmentButtonsRow(
             Text(stringResource(R.string.attach_image))
         }
         Button(
-            onClick = { }
+            onClick = {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
         ) {
             Icon(imageVector = Icons.Outlined.PhotoCamera, contentDescription = null)
             Spacer(modifier = Modifier.width(4.dp))
@@ -328,7 +359,8 @@ fun CreateReportFormPreview() {
     AppTheme {
         CreateReportForm(
             location = Location(latitude = 0.0, longitude = 0.0),
-            onSubmit = {}
+            onSubmit = {},
+            onCameraPermissionDenied = {}
         )
     }
 }

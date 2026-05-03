@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.services.LocationService
+import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.CameraPermissionAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
@@ -122,6 +123,16 @@ class MainActivity : ComponentActivity() {
                         },
                         dismiss = { viewModel.hideNotificationRequiredAlertDialog() },
                     )
+                if (uiState.cameraRequiredAlertDialog != null) {
+                    CameraPermissionAlertDialog(
+                        onConfirm = {
+                            navigateToAppSystemSettings()
+                            viewModel.hideCameraRequiredAlertDialog()
+                        },
+                        dismiss = { viewModel.hideCameraRequiredAlertDialog() },
+                        message = uiState.cameraRequiredAlertDialog!!
+                    )
+                }
             }
         }
     }

@@ -95,7 +95,8 @@ data class MainActions(
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
     val onStartLocationTracking: () -> Unit,
     val onStopLocationTracking: () -> Unit,
-    val setLocationTraceEnabled: (Boolean) -> Unit
+    val setLocationTraceEnabled: (Boolean) -> Unit,
+    val showCameraRequiredAlertDialog: (String) -> Unit,
 ) {
     // Dummy constructor used for the Compose preview
     constructor() : this(
@@ -112,7 +113,8 @@ data class MainActions(
         fetchCurrentLocation = { _, _ -> },
         onStartLocationTracking = {},
         onStopLocationTracking = {},
-        setLocationTraceEnabled = {}
+        setLocationTraceEnabled = {},
+        showCameraRequiredAlertDialog = {}
     )
 }
 
@@ -145,6 +147,7 @@ fun MainScaffold(
         onStartLocationTracking = onStartLocationTracking,
         onStopLocationTracking = onStopLocationTracking,
         setLocationTraceEnabled = { preferencesViewModel.setLocationTraceEnabled(it) },
+        showCameraRequiredAlertDialog = { mainViewModel.showCameraRequiredAlertDialog(it) }
     )
     MainScaffoldContent(
         uiState = state,

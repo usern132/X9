@@ -68,5 +68,8 @@
     <string name="notification_permission_required_title">Notification permission required</string>
     <string name="attach_image">Attach image</string>
     <string name="capture_image">Capture image</string>
+    <string name="camera_permission_required_title">Camera permission required</string>
+    <string name="camera_permission_required_message">Camera permission is required to capture
+        an image and attach it to your report.</string>
 
 </resources>

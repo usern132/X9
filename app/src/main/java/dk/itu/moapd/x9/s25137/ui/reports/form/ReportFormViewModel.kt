@@ -1,16 +1,23 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.File
 import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class ReportFormViewModel @Inject constructor() : ViewModel() {
+class ReportFormViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ReportFormUiState())
     val uiState: StateFlow<ReportFormUiState> = _uiState
 
@@ -45,5 +52,15 @@ class ReportFormViewModel @Inject constructor() : ViewModel() {
         val hasErrors =
             _uiState.value.errors.values.any { it } // check if any value is true (it == true)
         return hasErrors
+    }
+
+    fun createTempImageUri(): Uri {
+        val tempFile = File.createTempFile(
+            "report_image_",
+            "${System.currentTimeMillis()}.jpg",
+            context.cacheDir
+        )
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", tempFile)
+        return uri
     }
 }

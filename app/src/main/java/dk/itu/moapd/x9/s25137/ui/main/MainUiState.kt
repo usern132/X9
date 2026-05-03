@@ -33,4 +33,5 @@ data class MainUiState(
     val locationRequiredAlertDialog: String? = null,
     val showLocationErrorAlertDialog: Boolean = false,
     val notificationRequiredAlertDialog: String? = null,
+    val cameraRequiredAlertDialog: String? = null,
 )

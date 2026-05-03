@@ -209,4 +209,10 @@ class MainViewModel @Inject constructor(
 
     fun hideNotificationRequiredAlertDialog() =
         _uiState.update { it.copy(notificationRequiredAlertDialog = null) }
+
+    fun showCameraRequiredAlertDialog(message: String) =
+        _uiState.update { it.copy(cameraRequiredAlertDialog = message) }
+
+    fun hideCameraRequiredAlertDialog() =
+        _uiState.update { it.copy(cameraRequiredAlertDialog = null) }
 }
