@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,13 +26,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import androidx.core.net.toUri
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
 import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
 import dk.itu.moapd.x9.s25137.ui.common.ProfilePicture
+import dk.itu.moapd.x9.s25137.ui.reports.components.ReportFormImage
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 import java.util.Date
 
@@ -109,13 +109,7 @@ fun ReportDetailsPage(
                 Box {}
 
                 if (report.remoteImageUri != null)
-                    AsyncImage(
-                        model = report.remoteImageUri,
-                        contentDescription = stringResource(R.string.report_attached_image_content_description),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
-                    )
+                    ReportFormImage(attachedImageUri = report.remoteImageUri.toUri())
             }
         }
     }

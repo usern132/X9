@@ -56,6 +56,8 @@ class ReportRepository @Inject constructor(
         )
     }
 
-    fun delete(key: String, onComplete: (DatabaseError?) -> Unit) =
-        reportRemoteDataSource.delete(key = key, onComplete = onComplete)
+    fun delete(report: Report, onComplete: (DatabaseError?) -> Unit) {
+        report.remoteImageUri?.let { imageDataSource.delete(it) }
+        reportRemoteDataSource.delete(key = report.key!!, onComplete = onComplete)
+    }
 }

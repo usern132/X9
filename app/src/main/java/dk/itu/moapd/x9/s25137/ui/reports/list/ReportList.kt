@@ -15,7 +15,7 @@ import dk.itu.moapd.x9.s25137.domain.models.Report
 fun ReportList(
     modifier: Modifier = Modifier,
     reports: List<Report>,
-    onDeleteReport: (key: String) -> Unit,
+    onDeleteReport: (report: Report) -> Unit,
     isReportDeletable: (report: Report) -> Boolean,
     onItemClick: (String) -> Unit
 ) {

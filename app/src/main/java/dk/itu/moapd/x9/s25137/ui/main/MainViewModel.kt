@@ -151,9 +151,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun deleteReport(key: String) {
+    fun deleteReport(report: Report) {
         currentUser?.uid ?: return
-        reportRepository.delete(key = key) { error ->
+        reportRepository.delete(report = report) { error ->
             if (error != null) {
                 _uiState.update { it.copy(errorMessage = error.message) }
             }

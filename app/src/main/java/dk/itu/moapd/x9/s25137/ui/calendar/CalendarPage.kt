@@ -23,7 +23,7 @@ import io.github.boguszpawlowski.composecalendar.selection.DynamicSelectionState
 @Composable
 fun CalendarPage(
     reports: List<Report>,
-    onDeleteReport: (String) -> Unit = {},
+    onDeleteReport: (Report) -> Unit = {},
     isReportDeletable: (Report) -> Boolean = { false },
     onItemClick: (String) -> Unit = {}
 ) {

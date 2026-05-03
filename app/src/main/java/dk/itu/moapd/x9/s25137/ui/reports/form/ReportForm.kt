@@ -47,12 +47,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.AsyncImage
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
+import dk.itu.moapd.x9.s25137.ui.reports.components.ReportFormImage
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 
@@ -152,13 +152,7 @@ private fun AttachedImage(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-            model = attachedImageUri,
-            contentDescription = stringResource(R.string.report_attached_image_content_description),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-        )
+        ReportFormImage(attachedImageUri)
         Button(
             onClick = { uiState.attachedImageUri = null },
             modifier = Modifier.padding(top = 8.dp)

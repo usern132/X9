@@ -40,7 +40,7 @@ import java.util.Date
 fun ReportListItem(
     report: Report,
     isDeletable: Boolean,
-    onDelete: (key: String) -> Unit,
+    onDelete: (report: Report) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDeletionConfirmationDialog by remember { mutableStateOf(false) }
@@ -65,9 +65,7 @@ fun ReportListItem(
             confirmButton = {
                 TextButton(onClick = {
                     showDeletionConfirmationDialog = false
-                    report.key?.let { key ->
-                        onDelete(key)
-                    }
+                    onDelete(report)
                 }) {
                     Text(text = stringResource(R.string.delete))
                 }

@@ -54,7 +54,7 @@ fun DashboardPage(
     isFABEnabled: Boolean,
     startDestination: DashboardTabDestination = DashboardTabDestination.LIST,
     onCreateReportClick: () -> Unit,
-    onDeleteReport: (key: String) -> Unit,
+    onDeleteReport: (report: Report) -> Unit,
     onReportClick: (String) -> Unit,
     isReportDeletable: (report: Report) -> Boolean = { false },
     locationTrace: List<LatLng>,

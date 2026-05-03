@@ -117,7 +117,7 @@ fun MainNavHost(
                 },
                 onReportClick = onReportClick(navController),
                 isReportDeletable = actions.isReportDeletable,
-                onDeleteReport = { key -> actions.onDeleteReport(key) },
+                onDeleteReport = { report -> actions.onDeleteReport(report) },
                 locationTrace = locationTrace,
                 hasLocationPermission = hasLocationPermission,
                 modifier = Modifier.fillMaxSize()
@@ -159,7 +159,7 @@ fun MainNavHost(
             ReportList(
                 reports = uiState.reports.filter { report -> report.userId == route.userId },
                 isReportDeletable = actions.isReportDeletable,
-                onDeleteReport = actions.onDeleteReport,
+                onDeleteReport = { report -> actions.onDeleteReport(report) },
                 onItemClick = onReportClick(navController)
             )
         }
@@ -179,7 +179,7 @@ fun MainNavHost(
         composable<Route.Calendar> {
             CalendarPage(
                 reports = uiState.reports,
-                onDeleteReport = actions.onDeleteReport,
+                onDeleteReport = { report -> actions.onDeleteReport(report) },
                 isReportDeletable = actions.isReportDeletable,
                 onItemClick = onReportClick(navController)
             )

@@ -84,7 +84,7 @@ data class MainActions(
     val onLogout: () -> Unit,
     val onInsertReport: (Report) -> Unit,
     val onEditReport: (Report) -> Unit,
-    val onDeleteReport: (String) -> Unit,
+    val onDeleteReport: (Report) -> Unit,
     val isReportEditable: (Report) -> Boolean,
     val isReportDeletable: (Report) -> Boolean,
     val modifier: Modifier = Modifier,
