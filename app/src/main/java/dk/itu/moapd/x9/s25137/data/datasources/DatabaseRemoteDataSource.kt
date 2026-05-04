@@ -3,6 +3,7 @@ package dk.itu.moapd.x9.s25137.data.datasources
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import dk.itu.moapd.x9.s25137.data.repositories.NotificationTopic
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import javax.inject.Inject
 
@@ -29,11 +30,12 @@ import javax.inject.Inject
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class ReportRemoteDataSource @Inject constructor(
+class DatabaseRemoteDataSource @Inject constructor(
     database: FirebaseDatabase
 ) {
     companion object {
         private const val PATH_REPORTS = "reports"
+        private const val PATH_FCM_TOKENS = "fcm_tokens"
     }
 
     private val root: DatabaseReference = database.reference
@@ -44,11 +46,19 @@ class ReportRemoteDataSource @Inject constructor(
     private fun reportReference(key: String): DatabaseReference = reportsReference()
         .child(key)
 
-    fun getAllQuery() =
+    private fun fcmTokensReference(): DatabaseReference = root
+        .child(PATH_FCM_TOKENS)
+
+    private fun fcmTopicTokenReference(topic: NotificationTopic, token: String): DatabaseReference =
+        fcmTokensReference()
+            .child(topic.name)
+            .child(token)
+
+    fun getAllReportsQuery() =
         reportsReference()
             .orderByChild("timestamp")
 
-    fun insert(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
+    fun insertReport(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
         val newChild = reportsReference().push()
         newChild.setValue(report) { error, _ ->
             onComplete(error)
@@ -56,16 +66,40 @@ class ReportRemoteDataSource @Inject constructor(
         return newChild.key
     }
 
-    fun update(report: Report, onComplete: (DatabaseError?) -> Unit) {
+    fun updateReport(report: Report, onComplete: (DatabaseError?) -> Unit) {
         val key = report.key ?: return
         reportReference(key).setValue(report) { error, _ ->
             onComplete(error)
         }
     }
 
-    fun delete(key: String, onComplete: (DatabaseError?) -> Unit) {
+    fun deleteReport(key: String, onComplete: (DatabaseError?) -> Unit) {
         reportReference(key).removeValue { error, _ ->
             onComplete(error)
         }
+    }
+
+    fun addTokenToTopic(
+        token: String,
+        topic: NotificationTopic
+    ) {
+        fcmTopicTokenReference(topic, token).setValue(true)
+    }
+
+    fun removeTokenFromTopic(
+        token: String,
+        topic: NotificationTopic
+    ) {
+        fcmTopicTokenReference(topic, token).removeValue()
+    }
+
+    fun removeTokenFromAllTopics(
+        token: String
+    ) {
+        // Set the value of the token in all topics to null in order to delete it
+        val updates = NotificationTopic.entries.associate { topic ->
+            "${topic.name}/$token" to null
+        }
+        fcmTokensReference().updateChildren(updates)
     }
 }

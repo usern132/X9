@@ -6,7 +6,10 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.StringRes
 import com.google.firebase.messaging.FirebaseMessagingService
+import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.data.repositories.NotificationsRepository
+import javax.inject.Inject
 
 private val TAG = MyFirebaseMessagingService::class.simpleName
 
@@ -32,7 +35,10 @@ private enum class FirebaseNotificationChannel(
 
 }
 
-class MyFirebaseMessagingService : FirebaseMessagingService() {
+@AndroidEntryPoint
+class MyFirebaseMessagingService @Inject constructor(
+    val notificationsRepository: NotificationsRepository
+) : FirebaseMessagingService() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
@@ -40,6 +46,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed FCM token: $token")
+        notificationsRepository.updateFcmToken(token)
     }
 
     private fun createNotificationChannels() {

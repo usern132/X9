@@ -4,20 +4,20 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseError
+import dk.itu.moapd.x9.s25137.data.datasources.DatabaseRemoteDataSource
 import dk.itu.moapd.x9.s25137.data.datasources.ImageRemoteDataSource
-import dk.itu.moapd.x9.s25137.data.datasources.ReportRemoteDataSource
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import javax.inject.Inject
 
 class ReportRepository @Inject constructor(
-    private val reportRemoteDataSource: ReportRemoteDataSource,
+    private val databaseRemoteDataSource: DatabaseRemoteDataSource,
     private val imageRemoteDataSource: ImageRemoteDataSource
 ) {
     fun getAllQuery() =
-        reportRemoteDataSource.getAllQuery()
+        databaseRemoteDataSource.getAllReportsQuery()
 
     fun insert(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
-        if (report.localImageUri == null) return reportRemoteDataSource.insert(
+        if (report.localImageUri == null) return databaseRemoteDataSource.insertReport(
             report = report,
             onComplete = onComplete
         )
@@ -25,7 +25,7 @@ class ReportRepository @Inject constructor(
         var insertedReportKey: String? = null
         uploadImageTask(report).addOnSuccessListener { downloadUri ->
             val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
-            insertedReportKey = reportRemoteDataSource.insert(
+            insertedReportKey = databaseRemoteDataSource.insertReport(
                 report = reportWithImage,
                 onComplete = onComplete
             )
@@ -35,15 +35,18 @@ class ReportRepository @Inject constructor(
 
     fun update(report: Report, onComplete: (DatabaseError?) -> Unit) {
         if (report.localImageUri == null) {
-            reportRemoteDataSource.update(report = report, onComplete = onComplete)
+            databaseRemoteDataSource.updateReport(report = report, onComplete = onComplete)
             return
         } else {
             uploadImageTask(report).addOnSuccessListener { downloadUri ->
                 val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
-                reportRemoteDataSource.update(report = reportWithImage, onComplete = onComplete)
+                databaseRemoteDataSource.updateReport(
+                    report = reportWithImage,
+                    onComplete = onComplete
+                )
             }
         }
-        reportRemoteDataSource.update(report = report, onComplete = onComplete)
+        databaseRemoteDataSource.updateReport(report = report, onComplete = onComplete)
     }
 
     private fun uploadImageTask(
@@ -58,6 +61,6 @@ class ReportRepository @Inject constructor(
 
     fun delete(report: Report, onComplete: (DatabaseError?) -> Unit) {
         report.remoteImageUri?.let { imageRemoteDataSource.delete(it) }
-        reportRemoteDataSource.delete(key = report.key!!, onComplete = onComplete)
+        databaseRemoteDataSource.deleteReport(key = report.key!!, onComplete = onComplete)
     }
 }

@@ -25,12 +25,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 data class UserPreferences(
+    val fcmToken: String? = null,
     val showLocationTrace: Boolean = UserPreference.SHOW_LOCATION_TRACE.defaultValue,
     val receiveNotificationsForNewReports: Boolean = UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.defaultValue
 )
@@ -52,6 +54,10 @@ enum class UserPreference(
 class PreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
+    companion object {
+        val FCM_TOKEN_KEY = stringPreferencesKey("fcm_token")
+    }
+
     val preferencesFlow: Flow<UserPreferences> =
         dataStore.data
             .catch { exception ->
@@ -65,9 +71,14 @@ class PreferencesRepository @Inject constructor(
 
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
         return UserPreferences(
+            fcmToken = preferences[FCM_TOKEN_KEY],
             showLocationTrace = UserPreference.SHOW_LOCATION_TRACE.getValue(preferences),
             receiveNotificationsForNewReports =
-                UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.getValue(preferences)
+                UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.getValue(preferences),
         )
+    }
+
+    suspend fun setFcmToken(token: String) {
+        dataStore.edit { preferences -> preferences[FCM_TOKEN_KEY] = token }
     }
 }
