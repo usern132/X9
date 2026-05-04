@@ -43,6 +43,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.data.repositories.UserPreference
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
@@ -113,7 +114,12 @@ fun MainScaffold(
         },
         onStartLocationTracking = onStartLocationTracking,
         onStopLocationTracking = onStopLocationTracking,
-        setLocationTraceEnabled = { preferencesViewModel.setLocationTraceEnabled(it) },
+        setPreference = { preference, enabled ->
+            preferencesViewModel.setPreference(
+                preference = preference,
+                enabled = enabled
+            )
+        },
         showCameraRequiredAlertDialog = { mainViewModel.showCameraRequiredAlertDialog(it) }
     )
     MainScaffoldContent(
@@ -153,7 +159,7 @@ private fun MainScaffoldContent(
             actions.onStartLocationTracking()
         } else {
             actions.showLocationRequiredAlertDialog(locationPermissionRequiredForTracingMessage)
-            actions.setLocationTraceEnabled(false)
+            actions.setPreference(UserPreference.SHOW_LOCATION_TRACE, false)
         }
     }
 
@@ -166,7 +172,7 @@ private fun MainScaffoldContent(
             actions.showNotificationRequiredAlertDialog(
                 notificationPermissionAlertDialogMessage
             )
-            actions.setLocationTraceEnabled(false)
+            actions.setPreference(UserPreference.SHOW_LOCATION_TRACE, false)
         }
     }
 
@@ -276,9 +282,7 @@ fun MainScaffoldPreview() {
             uiState = MainUiState(reports = Report.previewReports),
             currentUser = user,
             locationTrace = emptyList(),
-            preferences = UserPreferences(
-                showLocationTrace = false
-            ),
+            preferences = UserPreferences(),
             actions = MainActions(),
         )
     }

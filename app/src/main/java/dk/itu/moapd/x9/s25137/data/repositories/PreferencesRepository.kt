@@ -25,23 +25,29 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import dk.itu.moapd.x9.s25137.data.repositories.PreferencesRepository.PreferencesKeys.SHOW_LOCATION_TRACE_KEY
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 data class UserPreferences(
-    val showLocationTrace: Boolean
+    val showLocationTrace: Boolean = UserPreference.SHOW_LOCATION_TRACE.defaultValue,
+    val receiveNotificationsForNewReports: Boolean = UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.defaultValue
 )
+
+enum class UserPreference(
+    val key: Preferences.Key<Boolean>,
+    val defaultValue: Boolean = false
+) {
+    SHOW_LOCATION_TRACE(booleanPreferencesKey("show_location_trace")),
+    RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS(booleanPreferencesKey("receive_notifications_for_new_reports"));
+
+    fun getValue(preferences: Preferences) = preferences[key] ?: defaultValue
+}
 
 class PreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-    private object PreferencesKeys {
-        val SHOW_LOCATION_TRACE_KEY = booleanPreferencesKey("show_location_trace")
-    }
-
     val preferencesFlow: Flow<UserPreferences> =
         dataStore.data
             .catch { exception ->
@@ -49,12 +55,15 @@ class PreferencesRepository @Inject constructor(
                 else throw exception
             }.map { preferences -> mapUserPreferences(preferences) }
 
-    suspend fun setShowLocationTrace(showLocationTrace: Boolean) {
-        dataStore.edit { preferences -> preferences[SHOW_LOCATION_TRACE_KEY] = showLocationTrace }
+    suspend fun setPreference(preference: UserPreference, enabled: Boolean) {
+        dataStore.edit { preferences -> preferences[preference.key] = enabled }
     }
 
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
-        val showLocationTrace = preferences[SHOW_LOCATION_TRACE_KEY] ?: false
-        return UserPreferences(showLocationTrace)
+        return UserPreferences(
+            showLocationTrace = UserPreference.SHOW_LOCATION_TRACE.getValue(preferences),
+            receiveNotificationsForNewReports =
+                UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.getValue(preferences)
+        )
     }
 }

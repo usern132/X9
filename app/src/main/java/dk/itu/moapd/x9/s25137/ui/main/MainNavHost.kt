@@ -208,10 +208,8 @@ fun MainNavHost(
         composable<Route.Preferences> {
             PreferencesPage(
                 uiState = preferences,
-                onShowLocationTraceChanged = { enabled ->
-                    actions.setLocationTraceEnabled(
-                        enabled
-                    )
+                onPreferenceChanged = { preference, enabled ->
+                    actions.setPreference(preference, enabled)
                 }
             )
         }

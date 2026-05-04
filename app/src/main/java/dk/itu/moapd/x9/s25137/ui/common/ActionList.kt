@@ -31,7 +31,9 @@ fun ActionList(modifier: Modifier = Modifier, actions: Set<Action> = emptySet())
             ) {
                 Text(
                     action.label,
-                    style = MaterialTheme.typography.bodyMedium
+                    // (fill = false) prevents the text from pushing out the trailing composable
+                    modifier = Modifier.weight(1.0f, fill = false),
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 action.trailingComposable()
             }
@@ -46,7 +48,9 @@ fun ActionListPreview() {
     val actions = setOf(
         Action("Example", {}),
         Action("Example 2", {}),
-        Action("Example 3", {})
+        Action(
+            "This is a very long label that serves as a very long example with a lot of different words",
+            {})
     )
     ActionList(actions = actions)
 }

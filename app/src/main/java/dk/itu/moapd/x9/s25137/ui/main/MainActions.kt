@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import androidx.compose.ui.Modifier
+import dk.itu.moapd.x9.s25137.data.repositories.UserPreference
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 
@@ -19,7 +20,7 @@ data class MainActions(
     val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
     val onStartLocationTracking: () -> Unit,
     val onStopLocationTracking: () -> Unit,
-    val setLocationTraceEnabled: (Boolean) -> Unit,
+    val setPreference: (UserPreference, Boolean) -> Unit,
     val showCameraRequiredAlertDialog: (String) -> Unit,
 ) {
     // Dummy constructor used for the Compose preview
@@ -37,7 +38,7 @@ data class MainActions(
         fetchCurrentLocation = { _, _ -> },
         onStartLocationTracking = {},
         onStopLocationTracking = {},
-        setLocationTraceEnabled = {},
+        setPreference = { _, _ -> },
         showCameraRequiredAlertDialog = {}
     )
 }

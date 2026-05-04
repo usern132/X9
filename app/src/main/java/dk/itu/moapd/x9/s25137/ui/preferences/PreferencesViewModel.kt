@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dk.itu.moapd.x9.s25137.data.repositories.PreferencesRepository
+import dk.itu.moapd.x9.s25137.data.repositories.UserPreference
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,12 +21,12 @@ class PreferencesViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = UserPreferences(showLocationTrace = false)
+            initialValue = UserPreferences()
         )
 
-    fun setLocationTraceEnabled(enabled: Boolean) {
+    fun setPreference(preference: UserPreference, enabled: Boolean) {
         viewModelScope.launch {
-            preferencesRepository.setShowLocationTrace(enabled)
+            preferencesRepository.setPreference(preference, enabled)
         }
     }
 }
