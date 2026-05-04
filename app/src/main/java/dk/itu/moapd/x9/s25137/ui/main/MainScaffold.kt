@@ -1,10 +1,12 @@
 package dk.itu.moapd.x9.s25137.ui.main
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -42,7 +44,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
-import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.User
 import dk.itu.moapd.x9.s25137.ui.preferences.PreferencesViewModel
@@ -73,51 +74,17 @@ import kotlinx.coroutines.flow.StateFlow
  */
 
 enum class TopLevelDestinations(
-    val route: Route, val labelRes: Int, val icon: ImageVector
+    val route: Route,
+    @StringRes
+    val labelRes: Int,
+    val icon: ImageVector
 ) {
     HOME(Route.Home, R.string.home, Icons.Filled.Home),
     CALENDAR(Route.Calendar, R.string.calendar, Icons.Filled.CalendarMonth),
     ACCOUNT(Route.Account, R.string.account, Icons.Filled.AccountCircle),
 }
 
-data class MainActions(
-    val onLogout: () -> Unit,
-    val onInsertReport: (Report) -> Unit,
-    val onEditReport: (Report) -> Unit,
-    val onDeleteReport: (Report) -> Unit,
-    val isReportEditable: (Report) -> Boolean,
-    val isReportDeletable: (Report) -> Boolean,
-    val modifier: Modifier = Modifier,
-    val showLoginAlertDialog: () -> Unit,
-    val showLocationRequiredAlertDialog: (String) -> Unit,
-    val showLocationErrorAlertDialog: () -> Unit,
-    val showNotificationRequiredAlertDialog: (String) -> Unit,
-    val fetchCurrentLocation: ((Location) -> Unit, () -> Unit) -> Unit,
-    val onStartLocationTracking: () -> Unit,
-    val onStopLocationTracking: () -> Unit,
-    val setLocationTraceEnabled: (Boolean) -> Unit,
-    val showCameraRequiredAlertDialog: (String) -> Unit,
-) {
-    // Dummy constructor used for the Compose preview
-    constructor() : this(
-        onLogout = {},
-        onInsertReport = {},
-        onEditReport = {},
-        onDeleteReport = {},
-        isReportEditable = { false },
-        isReportDeletable = { false },
-        showLoginAlertDialog = {},
-        showLocationRequiredAlertDialog = {},
-        showLocationErrorAlertDialog = {},
-        showNotificationRequiredAlertDialog = {},
-        fetchCurrentLocation = { _, _ -> },
-        onStartLocationTracking = {},
-        onStopLocationTracking = {},
-        setLocationTraceEnabled = {},
-        showCameraRequiredAlertDialog = {}
-    )
-}
-
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
