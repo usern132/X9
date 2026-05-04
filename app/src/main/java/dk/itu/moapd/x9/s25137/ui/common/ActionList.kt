@@ -12,11 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ActionList(modifier: Modifier = Modifier, actions: Set<Action> = emptySet()) {
+fun ActionList(
+    modifier: Modifier = Modifier,
+    actions: Set<Action> = emptySet()
+) {
     if (actions.isEmpty()) return
     Column(modifier = modifier) {
         HorizontalDivider()
@@ -24,8 +28,9 @@ fun ActionList(modifier: Modifier = Modifier, actions: Set<Action> = emptySet())
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = action.onClick)
-                    .padding(vertical = 12.dp),
+                    .clickable(enabled = action.enabled, onClick = action.onClick)
+                    .padding(vertical = 12.dp)
+                    .graphicsLayer(alpha = if (action.enabled) 1f else 0.5f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -47,7 +52,7 @@ fun ActionList(modifier: Modifier = Modifier, actions: Set<Action> = emptySet())
 fun ActionListPreview() {
     val actions = setOf(
         Action("Example", {}),
-        Action("Example 2", {}),
+        Action("Example 2", {}, enabled = false),
         Action(
             "This is a very long label that serves as a very long example with a lot of different words",
             {})

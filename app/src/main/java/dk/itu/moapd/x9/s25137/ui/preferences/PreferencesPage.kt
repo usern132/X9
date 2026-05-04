@@ -18,10 +18,12 @@ import dk.itu.moapd.x9.s25137.ui.common.ActionList
 @Composable
 fun PreferencesPage(
     uiState: UserPreferences,
+    preferencesBeingUpdated: Set<UserPreference>,
     onPreferenceChanged: (UserPreference, Boolean) -> Unit,
     actions: Set<Action> = preferencesActions(
         uiState,
-        onPreferenceChanged
+        onPreferenceChanged,
+        preferencesBeingUpdated
     )
 ) {
     ActionList(
@@ -35,20 +37,23 @@ fun PreferencesPage(
 @Composable
 private fun preferencesActions(
     uiState: UserPreferences,
-    onPreferenceChanged: (UserPreference, Boolean) -> Unit
+    onPreferenceChanged: (UserPreference, Boolean) -> Unit,
+    preferencesBeingUpdated: Set<UserPreference>
 ): Set<Action> =
     setOf(
         ToggleAction(
             labelResId = R.string.preferences_show_location_trace,
             preference = UserPreference.SHOW_LOCATION_TRACE,
             onPreferenceChanged = onPreferenceChanged,
-            isChecked = uiState.showLocationTrace
+            isChecked = uiState.showLocationTrace,
+            enabled = !preferencesBeingUpdated.contains(UserPreference.SHOW_LOCATION_TRACE)
         ),
         ToggleAction(
             labelResId = R.string.preferences_new_report_notifications,
             preference = UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS,
             onPreferenceChanged = onPreferenceChanged,
-            isChecked = uiState.receiveNotificationsForNewReports
+            isChecked = uiState.receiveNotificationsForNewReports,
+            enabled = !preferencesBeingUpdated.contains(UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS)
         )
     )
 
@@ -58,14 +63,17 @@ private fun ToggleAction(
     labelResId: Int,
     preference: UserPreference,
     onPreferenceChanged: (UserPreference, Boolean) -> Unit,
-    isChecked: Boolean
+    isChecked: Boolean,
+    enabled: Boolean = true
 ): Action = Action(
     label = stringResource(labelResId),
     onClick = { onPreferenceChanged(preference, !isChecked) },
+    enabled = enabled,
     trailingComposable = {
         Switch(
             checked = isChecked,
-            onCheckedChange = { onPreferenceChanged(preference, it) }
+            onCheckedChange = { onPreferenceChanged(preference, it) },
+            enabled = enabled
         )
     }
 )
@@ -75,6 +83,7 @@ private fun ToggleAction(
 fun PreferencesPagePreview() {
     PreferencesPage(
         uiState = UserPreferences(),
-        onPreferenceChanged = { _, _ -> }
+        onPreferenceChanged = { _, _ -> },
+        preferencesBeingUpdated = setOf(UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS)
     )
 }

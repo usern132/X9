@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 data class Action(
     val label: String,
     val onClick: () -> Unit,
+    val enabled: Boolean = true,
     val trailingComposable: @Composable () -> Unit = {
         Icon(
             Icons.AutoMirrored.Default.KeyboardArrowRight,

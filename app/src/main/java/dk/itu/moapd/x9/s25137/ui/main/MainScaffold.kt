@@ -99,6 +99,8 @@ fun MainScaffold(
     val state by uiState.collectAsState()
     val locationTrace by mainViewModel.locationTrace.collectAsState()
     val preferences by preferencesViewModel.preferencesFlow.collectAsState()
+    val preferencesBeingUpdated by preferencesViewModel.preferencesBeingUpdated.collectAsState()
+
     val actions = MainActions(
         onLogout = { mainViewModel.logOut() },
         onInsertReport = { mainViewModel.insertReport(it) },
@@ -128,6 +130,7 @@ fun MainScaffold(
         currentUser = state.currentUser,
         locationTrace = locationTrace,
         preferences = preferences,
+        preferencesBeingUpdated = preferencesBeingUpdated,
         actions = actions
     )
 }
@@ -140,6 +143,7 @@ private fun MainScaffoldContent(
     currentUser: User?,
     locationTrace: List<LatLng>,
     preferences: UserPreferences,
+    preferencesBeingUpdated: Set<UserPreference>,
     actions: MainActions
 ) {
     val context = LocalContext.current
@@ -276,6 +280,7 @@ private fun MainScaffoldContent(
             innerPadding = innerPadding,
             isLoggedIn = { isLoggedIn() },
             hasLocationPermission = hasLocationPermission,
+            preferencesBeingUpdated = preferencesBeingUpdated,
             actions = actions
         )
     }
@@ -318,6 +323,7 @@ fun MainScaffoldPreview() {
             currentUser = user,
             locationTrace = emptyList(),
             preferences = UserPreferences(),
+            preferencesBeingUpdated = emptySet(),
             actions = MainActions(),
         )
     }

@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.data.repositories.UserPreference
 import dk.itu.moapd.x9.s25137.data.repositories.UserPreferences
 import dk.itu.moapd.x9.s25137.domain.models.Location
 import dk.itu.moapd.x9.s25137.domain.models.User
@@ -74,6 +75,7 @@ fun MainNavHost(
     innerPadding: PaddingValues,
     isLoggedIn: () -> Boolean,
     hasLocationPermission: Boolean,
+    preferencesBeingUpdated: Set<UserPreference>,
     actions: MainActions,
 ) {
     val enterTransition: EnterTransition = fadeIn(animationSpec = tween(ANIM_DURATION))
@@ -210,7 +212,8 @@ fun MainNavHost(
                 uiState = preferences,
                 onPreferenceChanged = { preference, enabled ->
                     actions.setPreference(preference, enabled)
-                }
+                },
+                preferencesBeingUpdated = preferencesBeingUpdated
             )
         }
     }
