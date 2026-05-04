@@ -48,6 +48,7 @@ servicesLocation = "21.3.0"
 secretsGradle = "2.0.1"
 mapsCompose = "8.3.0"
 firebaseStorageKtx = "21.0.2"
+firebaseMessaging = "25.0.1"
 
 [libraries]
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -100,6 +101,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "servicesLocation" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

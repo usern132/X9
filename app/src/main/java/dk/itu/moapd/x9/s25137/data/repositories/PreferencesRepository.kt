@@ -37,10 +37,14 @@ data class UserPreferences(
 
 enum class UserPreference(
     val key: Preferences.Key<Boolean>,
-    val defaultValue: Boolean = false
+    val defaultValue: Boolean = false,
+    val notificationTopic: NotificationTopic? = null
 ) {
     SHOW_LOCATION_TRACE(booleanPreferencesKey("show_location_trace")),
-    RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS(booleanPreferencesKey("receive_notifications_for_new_reports"));
+    RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS(
+        key = booleanPreferencesKey("receive_notifications_for_new_reports"),
+        notificationTopic = NotificationTopic.NEW_REPORTS
+    );
 
     fun getValue(preferences: Preferences) = preferences[key] ?: defaultValue
 }

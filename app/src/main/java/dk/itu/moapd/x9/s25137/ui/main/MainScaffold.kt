@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -163,14 +164,14 @@ private fun MainScaffoldContent(
         }
     }
 
-    val notificationPermissionAlertDialogMessage =
-        stringResource(R.string.notification_permission_required_message)
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+    val locationTracingNotificationPermissionAlertDialogMessage =
+        stringResource(R.string.location_tracing_notification_permission_required_message)
+    val locationTracingNotificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (!granted) {
             actions.showNotificationRequiredAlertDialog(
-                notificationPermissionAlertDialogMessage
+                locationTracingNotificationPermissionAlertDialogMessage
             )
             actions.setPreference(UserPreference.SHOW_LOCATION_TRACE, false)
         }
@@ -199,7 +200,7 @@ private fun MainScaffoldContent(
 
                 if (!notificationPermissionGranted) {
                     // Request notification permission to the user
-                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    locationTracingNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
                     actions.onStartLocationTracking()
                 }
@@ -211,6 +212,40 @@ private fun MainScaffoldContent(
             }
         } else {
             actions.onStopLocationTracking()
+        }
+    }
+
+    val newReportsNotificationPermissionAlertDialogMessage =
+        stringResource(R.string.new_reports_notification_permission_required_message)
+    val newReportsNotificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (!granted) {
+            actions.showNotificationRequiredAlertDialog(
+                newReportsNotificationPermissionAlertDialogMessage
+            )
+            actions.setPreference(UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS, false)
+        }
+    }
+
+    LaunchedEffect(preferences.receiveNotificationsForNewReports, lifecycleState) {
+        val notificationsPermissionGranted =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            else NotificationManagerCompat.from(context).areNotificationsEnabled()
+
+        if (preferences.receiveNotificationsForNewReports) {
+            if (!notificationsPermissionGranted) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                    newReportsNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                else actions.showNotificationRequiredAlertDialog(
+                    newReportsNotificationPermissionAlertDialogMessage
+                )
+            } else {
+                actions.setPreference(UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS, true)
+            }
         }
     }
 

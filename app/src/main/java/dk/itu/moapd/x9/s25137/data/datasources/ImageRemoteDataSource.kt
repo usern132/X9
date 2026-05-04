@@ -6,7 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import javax.inject.Inject
 
-class ImageDataSource @Inject constructor(
+class ImageRemoteDataSource @Inject constructor(
     private val storage: FirebaseStorage
 ) {
     fun uploadFile(localUri: Uri, remotePath: String): Task<Uri> {

@@ -4,14 +4,14 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseError
-import dk.itu.moapd.x9.s25137.data.datasources.ImageDataSource
+import dk.itu.moapd.x9.s25137.data.datasources.ImageRemoteDataSource
 import dk.itu.moapd.x9.s25137.data.datasources.ReportRemoteDataSource
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import javax.inject.Inject
 
 class ReportRepository @Inject constructor(
     private val reportRemoteDataSource: ReportRemoteDataSource,
-    private val imageDataSource: ImageDataSource
+    private val imageRemoteDataSource: ImageRemoteDataSource
 ) {
     fun getAllQuery() =
         reportRemoteDataSource.getAllQuery()
@@ -50,14 +50,14 @@ class ReportRepository @Inject constructor(
         report: Report
     ): Task<Uri> {
         requireNotNull(report.localImageUri) { "Report's local image URI is null." }
-        return imageDataSource.uploadFile(
+        return imageRemoteDataSource.uploadFile(
             localUri = report.localImageUri.toUri(),
             remotePath = "images/reports/${report.key}.jpg"
         )
     }
 
     fun delete(report: Report, onComplete: (DatabaseError?) -> Unit) {
-        report.remoteImageUri?.let { imageDataSource.delete(it) }
+        report.remoteImageUri?.let { imageRemoteDataSource.delete(it) }
         reportRemoteDataSource.delete(key = report.key!!, onComplete = onComplete)
     }
 }

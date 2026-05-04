@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.services.LocationService
@@ -80,8 +82,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        logFCMToken()
 
+        enableEdgeToEdge()
         setContent {
             AppTheme {
                 val uiState by viewModel.uiState.collectAsState()
@@ -178,4 +181,16 @@ private fun MainActivity.navigateToAppSystemSettings() {
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts("package", packageName, null)
     ).also { startActivity(it) }
+}
+
+private fun logFCMToken() {
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        if (!task.isSuccessful) {
+            Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+            return@addOnCompleteListener
+        }
+
+        val token = task.result
+        Log.d(TAG, "Current FCM token: $token")
+    }
 }
