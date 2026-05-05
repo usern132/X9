@@ -1,0 +1,2 @@
+DATABASE_URL=https://dk-itu-moapd-x9-s25137-default-rtdb.europe-west1.firebasedatabase.app/
+BUCKET_URL=gs://dk-itu-moapd-x9-s25137.firebasestorage.app
