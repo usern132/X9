@@ -51,7 +51,7 @@ class DatabaseRemoteDataSource @Inject constructor(
 
     private fun fcmTopicTokenReference(topic: NotificationTopic, token: String): DatabaseReference =
         fcmTokensReference()
-            .child(topic.name)
+            .child(topic.topic)
             .child(token)
 
     fun getAllReportsQuery() =
@@ -98,7 +98,7 @@ class DatabaseRemoteDataSource @Inject constructor(
     ) {
         // Set the value of the token in all topics to null in order to delete it
         val updates = NotificationTopic.entries.associate { topic ->
-            "${topic.name}/$token" to null
+            "${topic.topic}/$token" to null
         }
         fcmTokensReference().updateChildren(updates)
     }

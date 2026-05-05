@@ -24,7 +24,7 @@ private enum class FirebaseNotificationChannel(
     NEW_REPORTS(
         "new_reports",
         R.string.new_reports_notification_channel_name,
-        NotificationManager.IMPORTANCE_LOW,
+        NotificationManager.IMPORTANCE_HIGH,
         R.string.new_reports_notification_channel_description
     );
 
@@ -36,12 +36,13 @@ private enum class FirebaseNotificationChannel(
 }
 
 @AndroidEntryPoint
-class MyFirebaseMessagingService @Inject constructor(
-    val notificationsRepository: NotificationsRepository
-) : FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
+    @Inject
+    lateinit var notificationsRepository: NotificationsRepository
+
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannels()
+        createNotificationChannels(this)
     }
 
     override fun onNewToken(token: String) {
@@ -49,13 +50,16 @@ class MyFirebaseMessagingService @Inject constructor(
         notificationsRepository.updateFcmToken(token)
     }
 
-    private fun createNotificationChannels() {
-        val notificationChannels =
-            FirebaseNotificationChannel.entries.map { it.toNotificationChannel(this) }
+    companion object {
+        fun createNotificationChannels(context: Context) {
+            val notificationChannels =
+                FirebaseNotificationChannel.entries.map { it.toNotificationChannel(context) }
 
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationChannels.forEach {
-            notificationManager.createNotificationChannel(it)
+            val notificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationChannels.forEach {
+                notificationManager.createNotificationChannel(it)
+            }
         }
     }
 

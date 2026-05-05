@@ -20,6 +20,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.services.LocationService
+import dk.itu.moapd.x9.s25137.services.MyFirebaseMessagingService
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.CameraPermissionAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
 import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
@@ -83,6 +84,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logFCMToken()
+        MyFirebaseMessagingService.createNotificationChannels(this)
 
         enableEdgeToEdge()
         setContent {
