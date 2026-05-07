@@ -28,10 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.common.toFormattedString
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
-import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
 import dk.itu.moapd.x9.s25137.ui.common.ProfilePicture
 import dk.itu.moapd.x9.s25137.ui.reports.components.ReportFormImage
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
@@ -73,12 +73,7 @@ fun ReportDetailsPage(
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(VERTICAL_SPACING.dp)
             ) {
-                Text(
-                    text = report.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
+                Title(report.title)
 
                 AuthorDetails(report, modifier = Modifier.clickable(onClick = onAuthorClick))
 
@@ -113,6 +108,16 @@ fun ReportDetailsPage(
             }
         }
     }
+}
+
+@Composable
+private fun Title(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.primary,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
@@ -158,8 +163,10 @@ private fun ReportDetailsPagePreview(isEditable: Boolean) {
 
 @Preview(showBackground = true)
 @Composable
-private fun ReportDetailsPageEditablePreview() = ReportDetailsPagePreview(isEditable = true)
+private fun ReportDetailsPageEditablePreview() =
+    ReportDetailsPagePreview(isEditable = true)
 
 @Preview(showBackground = true)
 @Composable
-private fun ReportDetailsPageNotEditablePreview() = ReportDetailsPagePreview(isEditable = false)
+private fun ReportDetailsPageNotEditablePreview() =
+    ReportDetailsPagePreview(isEditable = false)

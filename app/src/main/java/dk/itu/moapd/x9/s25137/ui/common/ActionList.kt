@@ -51,8 +51,8 @@ fun ActionList(
 @Preview(showBackground = true)
 fun ActionListPreview() {
     val actions = setOf(
-        Action("Example", {}),
-        Action("Example 2", {}, enabled = false),
+        Action("Enabled example", {}, enabled = true),
+        Action("Disabled example", {}, enabled = false),
         Action(
             "This is a very long label that serves as a very long example with a lot of different words",
             {})

@@ -1,18 +1,10 @@
 package dk.itu.moapd.x9.s25137.domain.models
 
-import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import com.google.firebase.database.Exclude
 import dk.itu.moapd.x9.s25137.R
 import io.bloco.faker.Faker
-import java.util.Date
 import kotlin.random.Random
-
-fun Date.toFormattedString(includeTime: Boolean = false, timeSeparator: String = "·"): String {
-    var result: String = DateFormat.format("dd/MM/yyyy", this).toString()
-    if (includeTime) result += " $timeSeparator ${DateFormat.format("HH:mm", this)}"
-    return result
-}
 
 data class Report(
     /* The "key" attribute gets excluded when serialising a Report to save it to Firebase Realtime Database.
@@ -29,8 +21,9 @@ data class Report(
     val description: String = "",
     val severity: Severity = Severity.MINOR,
 
-    // The local image URI gets excluded because it is the location of an image that was
-    // just attached/captured in the local filesystem as a temporary file.
+    /* The local image URI gets excluded because it is the location of an image that was
+     * just attached/captured in the local filesystem as a temporary file.
+     */
     @get:Exclude
     val localImageUri: String? = null,
     // The remote image URI will be assigned once it is uploaded to the storage bucket.

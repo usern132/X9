@@ -14,16 +14,14 @@ fun CameraPermissionAlertDialog(
     onConfirm: () -> Unit,
     dismiss: () -> Unit,
     message: String
-) {
-    BaseAlertDialog(
-        icon = { Icon(Icons.Default.PhotoCamera, contentDescription = null) },
-        title = stringResource(R.string.camera_permission_required_title),
-        text = message,
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = stringResource(R.string.settings))
-            }
-        },
-        dismiss = dismiss
-    )
-}
+) = BaseAlertDialog(
+    icon = { Icon(Icons.Default.PhotoCamera, contentDescription = null) },
+    title = stringResource(R.string.camera_permission_required_title),
+    text = message,
+    confirmButton = {
+        TextButton(onClick = onConfirm) {
+            Text(text = stringResource(R.string.settings))
+        }
+    },
+    dismiss = dismiss
+)

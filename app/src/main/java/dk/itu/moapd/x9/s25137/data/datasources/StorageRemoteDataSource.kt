@@ -6,7 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import javax.inject.Inject
 
-class ImageRemoteDataSource @Inject constructor(
+class StorageRemoteDataSource @Inject constructor(
     private val storage: FirebaseStorage
 ) {
     fun uploadFile(localUri: Uri, remotePath: String): Task<Uri> {
@@ -20,7 +20,7 @@ class ImageRemoteDataSource @Inject constructor(
         }
     }
 
-    fun delete(remotePath: String): Task<Void> {
+    fun deleteFile(remotePath: String): Task<Void> {
         return storage.reference.child(remotePath).delete()
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
@@ -27,8 +28,7 @@ fun ProfilePicture(profilePictureUri: String?, size: Int) {
         contentAlignment = Alignment.Center
     ) {
         val placeholderImageSize = (size / 2)
-        /**
-         * Placeholder/fallback icon displayed while AsyncImage is
+        /* Placeholder/fallback icon displayed while AsyncImage is
          * not ready (loading remote image or unavailable)
          */
         Icon(
@@ -46,4 +46,10 @@ fun ProfilePicture(profilePictureUri: String?, size: Int) {
                 contentScale = ContentScale.Crop
             )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfilePicturePreview() {
+    ProfilePicture(profilePictureUri = null, size = 256)
 }

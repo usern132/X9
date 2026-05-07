@@ -56,6 +56,7 @@ class LoginActivity : ComponentActivity() {
             .setAvailableProviders(providers)
             .setLogo(R.drawable.ic_launcher_foreground)
             .setTheme(R.style.Theme_X9)
+            // Avoids the authentication failure when using Android's credential manager popup to log in
             .setCredentialManagerEnabled(false)
             .apply {
                 setTosAndPrivacyPolicyUrls(
@@ -70,12 +71,12 @@ class LoginActivity : ComponentActivity() {
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         when (result.resultCode) {
             RESULT_OK -> {
-                showSnackBar("User logged in the app.")
+                showSnackBar(getString(R.string.successfully_logged))
                 startMainActivity()
             }
 
             else -> {
-                showSnackBar("Authentication failed.")
+                showSnackBar(getString(R.string.authentication_failed))
             }
         }
     }

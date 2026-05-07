@@ -13,19 +13,19 @@ import dk.itu.moapd.x9.s25137.R
 @Composable
 fun LocationAlertDialog(message: String, onConfirm: () -> Unit, dismiss: () -> Unit) =
     BaseAlertDialog(
-    icon = {
-        Icon(
-            imageVector = Icons.Default.LocationOff,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )
-    },
-    title = stringResource(R.string.location_permission_required_title),
+        icon = {
+            Icon(
+                imageVector = Icons.Default.LocationOff,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        title = stringResource(R.string.location_permission_required_title),
         text = message,
-    confirmButton = {
-        TextButton(onClick = onConfirm) {
-            Text(text = stringResource(R.string.settings))
-        }
-    },
-    dismiss = dismiss
-)
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(R.string.settings))
+            }
+        },
+        dismiss = dismiss
+    )

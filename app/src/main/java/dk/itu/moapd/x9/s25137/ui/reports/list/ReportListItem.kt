@@ -29,10 +29,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.R
+import dk.itu.moapd.x9.s25137.common.toFormattedString
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import dk.itu.moapd.x9.s25137.domain.models.Severity
 import dk.itu.moapd.x9.s25137.domain.models.Type
-import dk.itu.moapd.x9.s25137.domain.models.toFormattedString
 import kotlinx.coroutines.launch
 import java.util.Date
 

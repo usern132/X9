@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import dk.itu.moapd.x9.s25137.R
@@ -45,4 +46,10 @@ fun ReportFormImage(attachedImageUri: Uri?) {
             .fillMaxWidth()
             .height(400.dp)
     )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ReportFormImagePreview() {
+    ReportFormImage(attachedImageUri = null)
 }

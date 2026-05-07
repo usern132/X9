@@ -154,6 +154,8 @@ private fun MainScaffoldContent(
 
     var hasLocationPermission by remember { mutableStateOf(false) }
 
+    fun isLoggedIn(): Boolean = currentUser != null
+
     val locationPermissionRequiredForTracingMessage =
         stringResource(R.string.location_permission_required_for_tracing_message)
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -181,10 +183,11 @@ private fun MainScaffoldContent(
         }
     }
 
-    // Using the showLocationTrace shared preference as a key, we can observe
-    // any changes in the toggle and recompose accordingly.
-    // The lifecycle key is required to re-check the permission when the user resumes the activity
-    // after returning from the app's settings page where they may have enabled the location permission
+    /* Using the showLocationTrace shared preference as a key, we can observe
+     * any changes in the toggle and recompose accordingly.
+     * The lifecycle key is required to re-check the permission when the user resumes the activity
+     * after returning from the app's settings page where they may have enabled the location permission
+     */
     LaunchedEffect(preferences.showLocationTrace, lifecycleState) {
         val locationPermissionGranted = ContextCompat.checkSelfPermission(
             context,
@@ -252,12 +255,6 @@ private fun MainScaffoldContent(
             }
         }
     }
-
-    fun isLoggedIn(): Boolean = currentUser != null
-
-    fun navigateOrShowLoginAlertDialog(route: Any) =
-        if (isLoggedIn()) navController.navigate(route)
-        else actions.showLoginAlertDialog()
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination

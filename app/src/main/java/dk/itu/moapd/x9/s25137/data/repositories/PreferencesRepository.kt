@@ -42,7 +42,7 @@ enum class UserPreference(
     val defaultValue: Boolean = false,
     val notificationTopic: NotificationTopic? = null
 ) {
-    SHOW_LOCATION_TRACE(booleanPreferencesKey("show_location_trace")),
+    SHOW_LOCATION_TRACE(key = booleanPreferencesKey("show_location_trace")),
     RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS(
         key = booleanPreferencesKey("receive_notifications_for_new_reports"),
         notificationTopic = NotificationTopic.NEW_REPORTS
@@ -69,6 +69,10 @@ class PreferencesRepository @Inject constructor(
         dataStore.edit { preferences -> preferences[preference.key] = enabled }
     }
 
+    suspend fun setFcmToken(token: String) {
+        dataStore.edit { preferences -> preferences[FCM_TOKEN_KEY] = token }
+    }
+
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
         return UserPreferences(
             fcmToken = preferences[FCM_TOKEN_KEY],
@@ -76,9 +80,5 @@ class PreferencesRepository @Inject constructor(
             receiveNotificationsForNewReports =
                 UserPreference.RECEIVE_NOTIFICATIONS_FOR_NEW_REPORTS.getValue(preferences),
         )
-    }
-
-    suspend fun setFcmToken(token: String) {
-        dataStore.edit { preferences -> preferences[FCM_TOKEN_KEY] = token }
     }
 }

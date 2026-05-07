@@ -79,23 +79,15 @@ class DatabaseRemoteDataSource @Inject constructor(
         }
     }
 
-    fun addTokenToTopic(
-        token: String,
-        topic: NotificationTopic
-    ) {
+    fun addTokenToTopic(token: String, topic: NotificationTopic) {
         fcmTopicTokenReference(topic, token).setValue(true)
     }
 
-    fun removeTokenFromTopic(
-        token: String,
-        topic: NotificationTopic
-    ) {
+    fun removeTokenFromTopic(token: String, topic: NotificationTopic) {
         fcmTopicTokenReference(topic, token).removeValue()
     }
 
-    fun removeTokenFromAllTopics(
-        token: String
-    ) {
+    fun removeTokenFromAllTopics(token: String) {
         // Set the value of the token in all topics to null in order to delete it
         val updates = NotificationTopic.entries.associate { topic ->
             "${topic.topic}/$token" to null

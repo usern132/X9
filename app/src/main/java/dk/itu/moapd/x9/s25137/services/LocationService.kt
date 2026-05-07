@@ -49,8 +49,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 class LocationService : Service() {
     companion object {
-        // Arbitrary name used to refer to the stop action
-        const val ACTION_STOP_SERVICE = "LocationService.STOP"
+        /** Arbitrary name used to refer to the stop action */
+        private const val ACTION_STOP_SERVICE = "LocationService.STOP"
         private const val NOTIFICATION_CHANNEL_ID = "location_tracking_channel"
         private const val NOTIFICATION_ID = 1
         private const val LOCATION_UPDATE_INTERVAL_MS = 1000L

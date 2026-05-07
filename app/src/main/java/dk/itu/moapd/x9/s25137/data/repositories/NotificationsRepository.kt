@@ -61,8 +61,10 @@ class NotificationsRepository @Inject constructor(
             val preferences = preferencesRepository.preferencesFlow.first()
             val oldToken = preferences.fcmToken
             if (oldToken != token) {
+                // Remove the expired token from all topics
                 if (oldToken != null)
                     databaseRemoteDataSource.removeTokenFromAllTopics(oldToken)
+                // Add the new token to the user's subscribed topics
                 if (preferences.receiveNotificationsForNewReports)
                     databaseRemoteDataSource.addTokenToTopic(
                         token,

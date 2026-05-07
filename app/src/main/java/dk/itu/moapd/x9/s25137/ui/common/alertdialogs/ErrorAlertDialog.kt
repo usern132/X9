@@ -9,15 +9,16 @@ import androidx.compose.ui.res.stringResource
 import dk.itu.moapd.x9.s25137.R
 
 @Composable
-fun ErrorAlertDialog(errorMessage: String, dismiss: () -> Unit) = BaseAlertDialog(
-    icon = {
-        Icon(
-            imageVector = Icons.Default.Warning,
-            contentDescription = null,
-            tint = Color(red = 200, green = 100, blue = 100)
-        )
-    },
-    title = stringResource(R.string.error_occurred),
-    text = errorMessage,
-    dismiss = dismiss
-)
+fun ErrorAlertDialog(errorMessage: String, dismiss: () -> Unit) =
+    BaseAlertDialog(
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = Color(red = 200, green = 100, blue = 100)
+            )
+        },
+        title = stringResource(R.string.error_occurred),
+        text = errorMessage,
+        dismiss = dismiss
+    )

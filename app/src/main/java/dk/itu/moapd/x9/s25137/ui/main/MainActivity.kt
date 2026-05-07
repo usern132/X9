@@ -14,18 +14,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
-import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.services.LocationService
 import dk.itu.moapd.x9.s25137.services.MyFirebaseMessagingService
-import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.CameraPermissionAlertDialog
-import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.ErrorAlertDialog
-import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LocationAlertDialog
-import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.LoginAlertDialog
-import dk.itu.moapd.x9.s25137.ui.common.alertdialogs.NotificationAlertDialog
 import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
@@ -51,7 +44,7 @@ import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-private const val TAG = "MainActivity"
+private val TAG = MainActivity::class.simpleName
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -98,46 +91,11 @@ class MainActivity : ComponentActivity() {
                     onStopLocationTracking = { stopLocationService() },
                 )
 
-                uiState.errorMessage?.let { errorMessage ->
-                    ErrorAlertDialog(errorMessage, dismiss = { viewModel.errorConsumed() })
-                }
-
-                if (uiState.showLoginAlertDialog)
-                    LoginAlertDialog(dismiss = { viewModel.hideLoginAlertDialog() })
-
-                if (uiState.locationRequiredAlertDialog != null)
-                    LocationAlertDialog(
-                        message = uiState.locationRequiredAlertDialog!!,
-                        onConfirm = {
-                            navigateToAppSystemSettings()
-                            viewModel.hideLocationRequiredAlertDialog()
-                        },
-                        dismiss = { viewModel.hideLocationRequiredAlertDialog() }
-                    )
-                if (uiState.showLocationErrorAlertDialog)
-                    ErrorAlertDialog(
-                        errorMessage = stringResource(R.string.location_error_message),
-                        dismiss = { viewModel.hideLocationErrorAlertDialog() },
-                    )
-                if (uiState.notificationRequiredAlertDialog != null)
-                    NotificationAlertDialog(
-                        message = uiState.notificationRequiredAlertDialog!!,
-                        onConfirm = {
-                            navigateToAppSystemSettings()
-                            viewModel.hideNotificationRequiredAlertDialog()
-                        },
-                        dismiss = { viewModel.hideNotificationRequiredAlertDialog() },
-                    )
-                if (uiState.cameraRequiredAlertDialog != null) {
-                    CameraPermissionAlertDialog(
-                        onConfirm = {
-                            navigateToAppSystemSettings()
-                            viewModel.hideCameraRequiredAlertDialog()
-                        },
-                        dismiss = { viewModel.hideCameraRequiredAlertDialog() },
-                        message = uiState.cameraRequiredAlertDialog!!
-                    )
-                }
+                MainAlertDialogs(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    onNavigateToSettings = { navigateToAppSystemSettings() }
+                )
             }
         }
     }

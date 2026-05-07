@@ -76,5 +76,7 @@
     <string name="new_reports_notification_channel_description">Notifies you every time a new report is published on the platform</string>
     <string name="preferences_new_report_notifications">Receive notifications for new reports</string>
     <string name="new_reports_notification_permission_required_message">Notification permission is required to receive alerts for new reports.</string>
+    <string name="authentication_failed">Authentication failed.</string>
+    <string name="successfully_logged">You\'re successfully logged in the app!</string>
 
 </resources>

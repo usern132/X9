@@ -11,6 +11,7 @@ import dk.itu.moapd.x9.s25137.R
 import dk.itu.moapd.x9.s25137.data.repositories.NotificationsRepository
 import javax.inject.Inject
 
+// Using this TAG allows for the class name to always be in sync when refactoring the name
 private val TAG = MyFirebaseMessagingService::class.simpleName
 
 private enum class FirebaseNotificationChannel(

@@ -41,10 +41,10 @@ private enum class DashboardElement(val testTag: String) {
 }
 
 enum class DashboardTabDestination(
-    val route: String, val labelRes: Int, val icon: ImageVector
+    val labelRes: Int, val icon: ImageVector
 ) {
-    LIST("list", R.string.list, Icons.AutoMirrored.Filled.List),
-    MAP("map", R.string.map, Icons.Filled.Map),
+    LIST(R.string.list, Icons.AutoMirrored.Filled.List),
+    MAP(R.string.map, Icons.Filled.Map),
 }
 
 @Composable
