@@ -49,7 +49,7 @@ import javax.inject.Inject
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-private const val TAG = "MainViewModel"
+private val TAG = MainViewModel::class.simpleName
 
 @HiltViewModel
 class MainViewModel @Inject constructor(

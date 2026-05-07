@@ -23,7 +23,12 @@ data class MainActions(
     val setPreference: (UserPreference, Boolean) -> Unit,
     val showCameraRequiredAlertDialog: (String) -> Unit,
 ) {
-    // Dummy constructor used for the Compose preview
+    /** Dummy constructor used for the Compose preview
+     *
+     * (note: default empty parameters could have been used in the data class,
+     * but not providing them ensures that no parameters are left out when
+     * instantiating MainActions.)
+     */
     constructor() : this(
         onLogout = {},
         onInsertReport = {},

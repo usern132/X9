@@ -1,7 +1,7 @@
 import firebase_admin
-from firebase_functions.options import set_global_options
 from firebase_admin import messaging
 from firebase_functions import db_fn
+from firebase_functions.options import set_global_options
 
 firebase_admin.initialize_app()
 set_global_options(max_instances=5, region="europe-west1")
@@ -19,7 +19,6 @@ def notify_new_report(event: db_fn.Event):
         notification=messaging.Notification(
             title="New report",
             body=report_data.get("title"),
-            image=report_data.get("remoteImageUri"),
         ),
         topic=NEW_REPORTS,
         android=messaging.AndroidConfig(
