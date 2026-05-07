@@ -1,6 +1,7 @@
 package dk.itu.moapd.x9.s25137.ui.reports.form
 
 import android.Manifest
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -34,11 +35,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -62,13 +67,23 @@ fun EditReportForm(
     viewModel: ReportFormViewModel = hiltViewModel(),
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit)
-) = ReportForm(
-    location = Location(latitude = report.latitude, longitude = report.longitude),
-    report = report,
-    viewModel = viewModel,
-    onSubmit = onSubmit,
-    submitButtonText = submitButtonText,
-)
+) {
+    LaunchedEffect(report) {
+        viewModel.initialize(report)
+    }
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    ReportForm(
+        location = Location(latitude = report.latitude, longitude = report.longitude),
+        uiState = uiState,
+        onCreateTempUri = { viewModel.createTempImageUri() },
+        onValidate = { viewModel.validateFields() },
+        onFormReport = { viewModel.formReport },
+        onSubmit = onSubmit,
+        submitButtonText = submitButtonText
+    )
+}
 
 @Composable
 fun CreateReportForm(
@@ -77,29 +92,33 @@ fun CreateReportForm(
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit),
     onCameraPermissionDenied: () -> Unit
-) = ReportForm(
-    location = location,
-    viewModel = viewModel,
-    onSubmit = onSubmit,
-    submitButtonText = submitButtonText,
-    onCameraPermissionDenied = onCameraPermissionDenied
-)
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    ReportForm(
+        location = location,
+        uiState = uiState,
+        onCreateTempUri = { viewModel.createTempImageUri() },
+        onValidate = { viewModel.validateFields() },
+        onFormReport = { viewModel.formReport },
+        onSubmit = onSubmit,
+        submitButtonText = submitButtonText,
+        onCameraPermissionDenied = onCameraPermissionDenied
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReportForm(
     location: Location,
-    report: Report? = null,
-    viewModel: ReportFormViewModel = hiltViewModel(),
+    uiState: ReportFormUiState,
+    onCreateTempUri: () -> Uri,
+    onValidate: () -> Boolean,
+    onFormReport: () -> Report,
     onSubmit: (Report) -> Unit,
     submitButtonText: String = stringResource(R.string.submit),
     onCameraPermissionDenied: () -> Unit = { }
 ) {
-    LaunchedEffect(report) {
-        viewModel.initialize(report)
-    }
-
-    val uiState by viewModel.uiState.collectAsState()
     uiState.latitude = location.latitude
     uiState.longitude = location.longitude
 
@@ -107,38 +126,41 @@ private fun ReportForm(
 
     val requiredErrorMessage = stringResource(R.string.field_is_required)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-    ) {
-        TitleInput(uiState, requiredErrorMessage)
-        TypeInput(uiState, requiredErrorMessage)
-        DescriptionInput(uiState, requiredErrorMessage)
-        SeverityInput(uiState)
-        Spacer(modifier = Modifier.height(16.dp))
-        ImageAttachmentButtonsRow(
-            uiState = uiState,
-            createTempUri = { viewModel.createTempImageUri() },
-            onCameraPermissionDenied = onCameraPermissionDenied
-        )
-        if (uiState.attachedImageUri != null) AttachedImage(
-            modifier = Modifier.padding(vertical = 16.dp),
-            attachedImageUri = uiState.attachedImageUri,
-            uiState = uiState
-        )
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState),
+        ) {
+            TitleInput(uiState, requiredErrorMessage)
+            TypeInput(uiState, requiredErrorMessage)
+            DescriptionInput(uiState, requiredErrorMessage)
+            SeverityInput(uiState)
+            Spacer(modifier = Modifier.height(16.dp))
+            ImageAttachmentButtonsRow(
+                uiState = uiState,
+                createTempUri = onCreateTempUri,
+                onCameraPermissionDenied = onCameraPermissionDenied
+            )
+            if (uiState.attachedImageUri != null) AttachedImage(
+                modifier = Modifier.padding(vertical = 16.dp),
+                attachedImageUri = uiState.attachedImageUri,
+                uiState = uiState
+            )
 
-        // Spacer to push the submit button to the bottom of the screen
-        Spacer(modifier = Modifier.weight(1f))
+            // Spacer to push the submit button to the bottom of the screen
+            Spacer(modifier = Modifier.weight(1f))
 
-        LocationDisclaimer()
-        SubmitButton(
-            modifier = Modifier.padding(top = 4.dp),
-            viewModel = viewModel,
-            onSubmit = onSubmit,
-            submitButtonText = submitButtonText
-        )
+            LocationDisclaimer()
+            SubmitButton(
+                modifier = Modifier.padding(top = 4.dp),
+                onValidate = onValidate,
+                onFormReport = onFormReport,
+                onSubmit = onSubmit,
+                submitButtonText = submitButtonText
+            )
+        }
     }
 }
 
@@ -176,7 +198,7 @@ private fun ImageAttachmentButtonsRow(
             uri?.let { uiState.attachedImageUri = uri }
         }
 
-    var tempUri = createTempUri()
+    var tempUri by remember { mutableStateOf(Uri.EMPTY) }
 
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { wasSaved ->
@@ -189,8 +211,9 @@ private fun ImageAttachmentButtonsRow(
             if (granted) {
                 // Update the temporary URI every time the user captures a new image,
                 // to substitute the previous capture.
-                tempUri = createTempUri()
-                cameraLauncher.launch(tempUri)
+                val newUri = createTempUri()
+                tempUri = newUri
+                cameraLauncher.launch(newUri)
             } else {
                 onCameraPermissionDenied()
             }
@@ -232,15 +255,16 @@ private fun LocationDisclaimer() = Text(
 @Composable
 private fun SubmitButton(
     modifier: Modifier = Modifier,
-    viewModel: ReportFormViewModel,
+    onValidate: () -> Boolean,
+    onFormReport: () -> Report,
     onSubmit: (Report) -> Unit,
     submitButtonText: String
 ) {
     Button(
         onClick = {
-            val hasErrors = viewModel.validateFields()
+            val hasErrors = onValidate()
             if (!hasErrors) {
-                val report = viewModel.formReport
+                val report = onFormReport()
                 onSubmit(report)
             }
         },
@@ -280,7 +304,11 @@ private fun SeverityInput(uiState: ReportFormUiState) {
                 RadioButton(
                     selected = (severity == uiState.selectedSeverity), onClick = null
                 )
-                Text(text = stringResource(labelResId), modifier = Modifier.padding(8.dp))
+                Text(
+                    text = stringResource(labelResId),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
@@ -386,31 +414,52 @@ private fun TitleInput(
 
 @Preview(showBackground = true)
 @Composable
-fun CreateReportFormPreview() {
-    AppTheme {
-        CreateReportForm(
+fun CreateReportFormPreview(darkTheme: Boolean = false) {
+    val uiState = remember { ReportFormUiState() }
+    AppTheme(darkTheme = darkTheme) {
+        ReportForm(
             location = Location(latitude = 0.0, longitude = 0.0),
+            uiState = uiState,
+            onCreateTempUri = { Uri.EMPTY },
+            onValidate = { false },
+            onFormReport = { Report() },
             onSubmit = {},
             onCameraPermissionDenied = {}
         )
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun CreateReportFormPreviewDark() =
+    CreateReportFormPreview(darkTheme = true)
+
 @Preview(showBackground = true)
 @Composable
-fun EditReportFormPreview() {
-    AppTheme {
-        EditReportForm(
-            report = Report(
-                title = "Important speed camera on highway",
-                latitude = 0.0,
-                longitude = 0.0,
-                timestamp = 0L,
-                type = Type.SPEED_CAMERA,
-                description = "There is a speed camera on the highway.",
-                severity = Severity.MODERATE
-            ),
+fun EditReportFormPreview(darkTheme: Boolean = false) {
+    val report = Report(
+        title = "Important speed camera on highway",
+        latitude = 0.0,
+        longitude = 0.0,
+        timestamp = 0L,
+        type = Type.SPEED_CAMERA,
+        description = "There is a speed camera on the highway.",
+        severity = Severity.MODERATE
+    )
+    val uiState = remember { ReportFormUiState(report) }
+    AppTheme(darkTheme = darkTheme) {
+        ReportForm(
+            location = Location(latitude = report.latitude, longitude = report.longitude),
+            uiState = uiState,
+            onCreateTempUri = { Uri.EMPTY },
+            onValidate = { false },
+            onFormReport = { report },
             onSubmit = {}
         )
     }
 }
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun EditReportFormPreviewDark() =
+    EditReportFormPreview(darkTheme = true)
