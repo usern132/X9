@@ -2,6 +2,7 @@ package dk.itu.moapd.x9.s25137.ui.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -9,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dk.itu.moapd.x9.s25137.common.Utils.timestampToLocalDate
@@ -66,7 +68,9 @@ private fun MyDay(dayState: DayState<DynamicSelectionState>, hasReports: Boolean
             width = 1.dp,
             color = Color.Red.copy(alpha = 0.4f),
             shape = RoundedCornerShape(3.dp)
-        ) else Modifier,
+        ) else Modifier
+            .clickable(enabled = false, onClick = {})
+            .graphicsLayer(alpha = 0.5f),
     )
 }
 
