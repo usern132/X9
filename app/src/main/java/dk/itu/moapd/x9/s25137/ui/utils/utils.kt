@@ -14,6 +14,6 @@ fun PlaceholderScreen(name: String = "Placeholder") {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("$name screen - Work in progress")
+        Text("$name screen")
     }
 }

@@ -69,10 +69,6 @@ class PreferencesRepository @Inject constructor(
         dataStore.edit { preferences -> preferences[preference.key] = enabled }
     }
 
-    suspend fun setFcmToken(token: String) {
-        dataStore.edit { preferences -> preferences[FCM_TOKEN_KEY] = token }
-    }
-
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
         return UserPreferences(
             fcmToken = preferences[FCM_TOKEN_KEY],

@@ -12,14 +12,6 @@
     <string name="broken_vehicles">Broken vehicles</string>
     <string name="other">Other</string>
 
-    <string-array name="report_types">
-        <item>@string/speed_camera</item>
-        <item>@string/heavy_traffic</item>
-        <item>@string/road_incidents</item>
-        <item>@string/broken_vehicles</item>
-        <item>@string/other</item>
-    </string-array>
-
     <string name="report_description">Report description</string>
     <string name="minor">Minor</string>
     <string name="moderate">Moderate</string>
@@ -27,9 +19,6 @@
     <string name="submit">Submit</string>
 
     <string name="field_is_required">This field is required.</string>
-    <string name="no_report_yet">No report yet!</string>
-    <string name="report_saved">Report saved successfully!</string>
-    <string name="report_edited">Report edited successfully!</string>
     <string name="delete_report">Delete report</string>
 
     <string name="home">Home</string>
