@@ -118,15 +118,30 @@ private fun ReportListItemContent(
             .background(MaterialTheme.colorScheme.surface)
             .padding(12.dp)
     ) {
-        Text(
-            text = report.title,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = Date(report.timestamp).toFormattedString(includeTime = true),
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Title(report)
+        Subtitle(report)
     }
+}
+
+@Composable
+private fun Subtitle(report: Report) {
+    val separator = "•"
+    val details = listOf(
+        Date(report.timestamp).toFormattedString(includeTime = true, timeSeparator = separator),
+        stringResource(report.severity.nameResId),
+    )
+    Text(
+        text = details.joinToString(separator = " $separator "),
+        style = MaterialTheme.typography.bodyMedium
+    )
+}
+
+@Composable
+private fun Title(report: Report) {
+    Text(
+        text = report.title,
+        style = MaterialTheme.typography.titleMedium
+    )
 }
 
 @Preview(showBackground = true)
