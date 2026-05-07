@@ -23,7 +23,7 @@ import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
 
 /* Code adapted from the MOAPD 2026 subject repository, found at https://github.com/fabricionarcizo/moapd2026/.
  * Its original license is attached below.
-
+/
  * MIT License
  *
  * Copyright (c) 2026 Fabricio Batista Narcizo
@@ -44,6 +44,7 @@ import dk.itu.moapd.x9.s25137.ui.theme.AppTheme
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// Using this TAG allows for the class name to always be in sync when refactoring the name
 private val TAG = MainActivity::class.simpleName
 
 @AndroidEntryPoint

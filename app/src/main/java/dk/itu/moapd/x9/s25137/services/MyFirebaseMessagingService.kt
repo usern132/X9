@@ -3,16 +3,10 @@ package dk.itu.moapd.x9.s25137.services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import androidx.annotation.StringRes
 import com.google.firebase.messaging.FirebaseMessagingService
 import dagger.hilt.android.AndroidEntryPoint
 import dk.itu.moapd.x9.s25137.R
-import dk.itu.moapd.x9.s25137.data.repositories.NotificationsRepository
-import javax.inject.Inject
-
-// Using this TAG allows for the class name to always be in sync when refactoring the name
-private val TAG = MyFirebaseMessagingService::class.simpleName
 
 private enum class FirebaseNotificationChannel(
     val id: String,
@@ -38,17 +32,9 @@ private enum class FirebaseNotificationChannel(
 
 @AndroidEntryPoint
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-    @Inject
-    lateinit var notificationsRepository: NotificationsRepository
-
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels(this)
-    }
-
-    override fun onNewToken(token: String) {
-        Log.d(TAG, "Refreshed FCM token: $token")
-        notificationsRepository.updateFcmToken(token)
     }
 
     companion object {

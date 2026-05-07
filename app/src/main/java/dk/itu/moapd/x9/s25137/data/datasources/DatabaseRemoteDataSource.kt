@@ -3,7 +3,6 @@ package dk.itu.moapd.x9.s25137.data.datasources
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import dk.itu.moapd.x9.s25137.data.repositories.NotificationTopic
 import dk.itu.moapd.x9.s25137.domain.models.Report
 import javax.inject.Inject
 
@@ -35,7 +34,6 @@ class DatabaseRemoteDataSource @Inject constructor(
 ) {
     companion object {
         private const val PATH_REPORTS = "reports"
-        private const val PATH_FCM_TOKENS = "fcm_tokens"
     }
 
     private val root: DatabaseReference = database.reference
@@ -45,14 +43,6 @@ class DatabaseRemoteDataSource @Inject constructor(
 
     private fun reportReference(key: String): DatabaseReference = reportsReference()
         .child(key)
-
-    private fun fcmTokensReference(): DatabaseReference = root
-        .child(PATH_FCM_TOKENS)
-
-    private fun fcmTopicTokenReference(topic: NotificationTopic, token: String): DatabaseReference =
-        fcmTokensReference()
-            .child(topic.topic)
-            .child(token)
 
     fun getAllReportsQuery() =
         reportsReference()
@@ -77,21 +67,5 @@ class DatabaseRemoteDataSource @Inject constructor(
         reportReference(key).removeValue { error, _ ->
             onComplete(error)
         }
-    }
-
-    fun addTokenToTopic(token: String, topic: NotificationTopic) {
-        fcmTopicTokenReference(topic, token).setValue(true)
-    }
-
-    fun removeTokenFromTopic(token: String, topic: NotificationTopic) {
-        fcmTopicTokenReference(topic, token).removeValue()
-    }
-
-    fun removeTokenFromAllTopics(token: String) {
-        // Set the value of the token in all topics to null in order to delete it
-        val updates = NotificationTopic.entries.associate { topic ->
-            "${topic.topic}/$token" to null
-        }
-        fcmTokensReference().updateChildren(updates)
     }
 }
