@@ -41,9 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -198,7 +196,7 @@ private fun ImageAttachmentButtonsRow(
             uri?.let { uiState.attachedImageUri = uri }
         }
 
-    var tempUri by remember { mutableStateOf(Uri.EMPTY) }
+    var tempUri = Uri.EMPTY
 
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { wasSaved ->
@@ -209,11 +207,10 @@ private fun ImageAttachmentButtonsRow(
     val cameraPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
-                // Update the temporary URI every time the user captures a new image,
+                // Update the temporary URI every time the user captures a new image
                 // to substitute the previous capture.
-                val newUri = createTempUri()
-                tempUri = newUri
-                cameraLauncher.launch(newUri)
+                tempUri = createTempUri()
+                cameraLauncher.launch(tempUri)
             } else {
                 onCameraPermissionDenied()
             }

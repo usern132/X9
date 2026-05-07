@@ -17,28 +17,27 @@ class ReportRepository @Inject constructor(
         databaseRemoteDataSource.getAllReportsQuery()
 
     fun insert(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
-        if (report.localImageUri == null) return databaseRemoteDataSource.insertReport(
+        val insertedReportKey = databaseRemoteDataSource.insertReport(
             report = report,
             onComplete = onComplete
         )
-
-        var insertedReportKey: String? = null
-        uploadImageTask(report).addOnSuccessListener { downloadUri ->
-            val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
-            insertedReportKey = databaseRemoteDataSource.insertReport(
-                report = reportWithImage,
-                onComplete = onComplete
-            )
+        if (report.localImageUri != null) {
+            val reportWithKey = report.copy(key = insertedReportKey)
+            uploadReportImageTask(reportWithKey).addOnSuccessListener { downloadUri ->
+                val reportWithImage = reportWithKey.copy(remoteImageUri = downloadUri.toString())
+                databaseRemoteDataSource.updateReport(
+                    report = reportWithImage,
+                    onComplete = onComplete
+                )
+            }
         }
         return insertedReportKey
     }
 
     fun update(report: Report, onComplete: (DatabaseError?) -> Unit) {
-        if (report.localImageUri == null) {
-            databaseRemoteDataSource.updateReport(report = report, onComplete = onComplete)
-            return
-        } else {
-            uploadImageTask(report).addOnSuccessListener { downloadUri ->
+        databaseRemoteDataSource.updateReport(report = report, onComplete = onComplete)
+        if (report.localImageUri != null) {
+            uploadReportImageTask(report).addOnSuccessListener { downloadUri ->
                 val reportWithImage = report.copy(remoteImageUri = downloadUri.toString())
                 databaseRemoteDataSource.updateReport(
                     report = reportWithImage,
@@ -46,7 +45,6 @@ class ReportRepository @Inject constructor(
                 )
             }
         }
-        databaseRemoteDataSource.updateReport(report = report, onComplete = onComplete)
     }
 
     fun delete(report: Report, onComplete: (DatabaseError?) -> Unit) {
@@ -54,7 +52,7 @@ class ReportRepository @Inject constructor(
         databaseRemoteDataSource.deleteReport(key = report.key!!, onComplete = onComplete)
     }
 
-    private fun uploadImageTask(
+    private fun uploadReportImageTask(
         report: Report
     ): Task<Uri> {
         requireNotNull(report.localImageUri) { "Report's local image URI is null." }

@@ -48,6 +48,7 @@ class DatabaseRemoteDataSource @Inject constructor(
         reportsReference()
             .orderByChild("timestamp")
 
+    /** @return the key of the newly inserted report */
     fun insertReport(report: Report, onComplete: (DatabaseError?) -> Unit): String? {
         val newChild = reportsReference().push()
         newChild.setValue(report) { error, _ ->
